@@ -1,0 +1,16 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_2019_3_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
