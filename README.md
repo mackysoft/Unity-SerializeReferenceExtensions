@@ -14,6 +14,31 @@ The `SubclassSelector` attribute allows you to easily set subclasses of those ab
 - **[New]** Type finding by fuzzy finder.
 - **[New]** Override the type name and path by the `AddTypeMenu` attribute.
 
+## 📥 Installation
+
+Download any version from releases.
+
+Releases: https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases
+
+#### Install via git URL
+
+Or, you can add this package by opening PackageManager and entering
+
+`https://github.com/mackysoft/Vision.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
+
+from the `Add package from git URL` option.
+
+
+#### Install via Open UPM
+
+Or, you can install this package from the [Open UPM](https://openupm.com/packages/com.mackysoft.serializereference-extensions/) registry.
+
+More details [here](https://openupm.com/).
+
+```
+openupm add com.mackysoft.vision
+```
+
 ## 🔰 Usage
 
 ```cs
