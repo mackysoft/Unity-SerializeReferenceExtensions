@@ -36,7 +36,7 @@ Or, you can install this package from the [Open UPM](https://openupm.com/package
 More details [here](https://openupm.com/).
 
 ```
-openupm add com.mackysoft.vision
+openupm add com.mackysoft.serializereference-extensions
 ```
 
 ## 🔰 Usage
