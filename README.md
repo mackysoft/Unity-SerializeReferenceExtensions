@@ -24,7 +24,7 @@ Releases: https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releas
 
 Or, you can add this package by opening PackageManager and entering
 
-`https://github.com/mackysoft/Vision.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
+`https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
 
 from the `Add package from git URL` option.
 
