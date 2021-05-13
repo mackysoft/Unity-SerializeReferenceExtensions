@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  pull_request: {}
+  push: { branches: [main] }
+
+jobs:
+  build:
+    name: ${{ matrix.targetPlatform }}
+    if: "((github.event_name == 'push' && github.repository_owner == 'mackysoft') || startsWith(github.event.pull_request.head.label, 'mackysoft:'))"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneOSX # Build a macOS standalone (Intel 64-bit).
+          - StandaloneWindows # Build a Windows standalone.
+          - StandaloneWindows64 # Build a Windows 64-bit standalone.
+          - StandaloneLinux64 # Build a Linux 64-bit standalone.
+          - iOS # Build an iOS player.
+          - Android # Build an Android .apk standalone app.
+          - WebGL # WebGL.
+
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      # Cache
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      # Build
+      - name: Build
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE_2020 }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}

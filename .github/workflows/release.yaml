@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "tag: git tag you want create. (sample 1.0.0)"
+        required: true
+
+env:
+  GIT_TAG: ${{ github.event.inputs.tag }}
+
+jobs:
+  update-packagejson:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_FILE: ./Assets/MackySoft/MackySoft.SerializeReferenceExtensions/package.json
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Output package.json (Before)
+        run: cat ${{ env.TARGET_FILE}}
+
+      - name: Update package.json to version ${{ env.GIT_TAG }}
+        run: sed -i -e "s/\(\"version\":\) \"\(.*\)\",/\1 \"${{ env.GIT_TAG }}\",/" ${{ env.TARGET_FILE }}
+
+      - name: Check update
+        id: check_update
+        run: |
+          cat ${{ env.TARGET_FILE}}
+          git diff --exit-code || echo "::set-output name=changed::1"
+
+      - name: Commit files
+        id: commit
+        if: steps.check_update.outputs.changed == '1'
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "feat: Update package.json to ${{ env.GIT_TAG }}" -a
+          echo "::set-output name=sha::$(git rev-parse HEAD)"
+
+      - name: Check sha
+        run: echo "SHA ${SHA}"
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+
+      - name: Create Tag
+        if: steps.check_update.outputs.changed == '1'
+        run: git tag ${{ env.GIT_TAG }}
+
+      - name: Push changes
+        if: steps.check_update.outputs.changed == '1'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+  build:
+    needs: [update-packagejson]
+    strategy:
+      matrix:
+        unity: ["2020.3.8f1"]
+        include:
+          - unityVersion: 2020.3.8f1
+            license: UNITY_LICENSE_2020
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - run: echo ${{ needs.update-packagejson.outputs.sha }}
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.update-packagejson.outputs.sha }}
+
+      - name: Export unitypackage
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets[matrix.license] }}
+        with:
+          projectPath: .
+          unityVersion: ${{ matrix.unityVersion }}
+          targetPlatform: StandaloneLinux64
+          buildMethod: MackySoft.PackageTools.Editor.UnityPackageExporter.Export
+          versioning: None
+
+      - name: check all .meta is commited
+        run: |
+          if git ls-files --others --exclude-standard -t | grep --regexp='[.]meta$'; then
+            echo "Detected .meta file generated. Do you forgot commit a .meta file?"
+            exit 1
+          else
+            echo "Great, all .meta files are commited."
+          fi
+        working-directory: .
+
+      # Store artifacts.
+      - uses: actions/upload-artifact@v2
+        with:
+          name: SerializeReference-Extensions.unitypackage
+          path: ./Build/SerializeReference-Extensions.unitypackage
+
+  create-release:
+    needs: [update-packagejson, build]
+    runs-on: ubuntu-latest
+    steps:
+      # Create Releases
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.GIT_TAG }}
+          release_name: ${{ env.GIT_TAG }}
+          commitish: ${{ needs.update-packagejson.outputs.sha }}
+          draft: true
+          prerelease: false
+
+      # Download(All) Artifacts to current directory
+      - uses: actions/download-artifact@v2
+      
+      # Upload to Releases(unitypackage)
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./SerializeReference-Extensions.unitypackage/SerializeReference-Extensions.unitypackage
+          asset_name: SerializeReference-Extensions.unitypackage
+          asset_content_type: application/octet-stream
