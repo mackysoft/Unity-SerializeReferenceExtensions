@@ -1,0 +1,41 @@
+name: Export Package
+
+on:
+  pull_request: {}
+  push: { branches: [main] }
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE_2020 }}
+
+jobs:
+  build:
+    name: Build UnityPackage
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      # Cache
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library
+          restore-keys: Library-
+
+      # Build
+      - name: Build .unitypackage
+        uses: game-ci/unity-builder@v2
+        with:
+          unityVersion: 2020.3.8f1
+          buildMethod: MackySoft.PackageTools.Editor.UnityPackageExporter.Export
+
+      # Upload
+      - name: Upload .unitypackage
+        uses: actions/upload-artifact@v2
+        with:
+          name: Unity Package
+          path: Build
