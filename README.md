@@ -1,5 +1,9 @@
 ﻿# Unity SerializeReferenceExtensions
 
+[![Build](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml/badge.svg)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml)
+[![Release](https://img.shields.io/github/v/release/mackysoft/Unity-SerializeReferenceExtensions)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases)
+[![openupm](https://img.shields.io/npm/v/com.mackysoft.serializereference-extensions?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.mackysoft.serializereference-extensions/)
+
 **Inspired by [this post](https://qiita.com/tsukimi_neko/items/7922b2433ed4d8616cce).**
 
 The `SerializeReference` attribute, added in Unity 2019.3, makes it possible to serialize references to interfaces and abstract classes.
