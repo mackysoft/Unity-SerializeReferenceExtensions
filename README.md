@@ -10,7 +10,7 @@ The `SerializeReference` attribute, added in Unity 2019.3, makes it possible to 
 
 The `SubclassSelector` attribute allows you to easily set subclasses of those abstract classes in the Editor that are serialized by `SerializeReference` attribute.
 
-![SubclassSelector](https://user-images.githubusercontent.com/13536348/113597922-5d912500-9677-11eb-8faa-a33dabc60aa3.gif)
+![SubclassSelector](https://user-images.githubusercontent.com/13536348/118233552-03cd1780-b4cd-11eb-9e5b-4824e8f01f1d.gif)
 
 #### Features
 
