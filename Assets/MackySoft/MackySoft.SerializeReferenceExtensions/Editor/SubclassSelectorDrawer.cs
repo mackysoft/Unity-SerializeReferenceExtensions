@@ -22,9 +22,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 		const int k_MaxTypePopupLineCount = 13;
 		static readonly Type k_UnityObjectType = typeof(UnityEngine.Object);
+		static readonly GUIContent k_NullDisplayName = new GUIContent(TypeMenuUtility.k_NullDisplayName);
 		static readonly GUIContent k_IsNotManagedReferenceLabel = new GUIContent("The property type is not manage reference.");
 
 		readonly Dictionary<string,TypePopupCache> m_TypePopups = new Dictionary<string,TypePopupCache>();
+		readonly Dictionary<string,GUIContent> m_TypeNameCaches = new Dictionary<string,GUIContent>();
 
 		SerializedProperty m_TargetProperty;
 		
@@ -40,7 +42,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 				popupPosition.x += EditorGUIUtility.labelWidth;
 				popupPosition.height = EditorGUIUtility.singleLineHeight;
 
-				if (EditorGUI.DropdownButton(popupPosition,new GUIContent(GetTypeName(property)),FocusType.Keyboard)) {
+				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard)) {
 					m_TargetProperty = property;
 					popup.TypePopup.Show(popupPosition);
 				}
@@ -60,17 +62,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 				Type baseType = property.GetManagedReferenceFieldType();
 				var popup = new AdvancedTypePopup(
-					AppDomain.CurrentDomain.GetAssemblies()
-						.SelectMany(assembly => assembly.GetTypes())
-						.Where(p =>
-							p.IsClass &&
-							(p.IsPublic || p.IsNestedPublic) &&
-							!p.IsAbstract &&
-							!p.IsGenericType &&
-							baseType.IsAssignableFrom(p) &&
-							!k_UnityObjectType.IsAssignableFrom(p) &&
-							Attribute.IsDefined(p,typeof(SerializableAttribute))
-						),
+					TypeCache.GetTypesDerivedFrom(baseType).Where(p =>
+						p.IsClass &&
+						(p.IsPublic || p.IsNestedPublic) &&
+						!p.IsAbstract &&
+						!p.IsGenericType &&
+						!k_UnityObjectType.IsAssignableFrom(p) &&
+						Attribute.IsDefined(p,typeof(SerializableAttribute))
+					),
 					k_MaxTypePopupLineCount,
 					state
 				);
@@ -86,22 +85,32 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 			return result;
 		}
 
-		static string GetTypeName (SerializedProperty property) {
+		GUIContent GetTypeName (SerializedProperty property) {
 			if (string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
-				return TypeMenuUtility.k_NullDisplayName;
+				return k_NullDisplayName;
+			}
+			if (m_TypeNameCaches.TryGetValue(property.managedReferenceFullTypename,out GUIContent cachedTypeName)) {
+				return cachedTypeName;
 			}
 
 			Type type = property.GetManagedReferenceType();
+			string typeName = null;
 
 			AddTypeMenuAttribute typeMenu = TypeMenuUtility.GetAttribute(type);
 			if (typeMenu != null) {
-				string typeName = typeMenu.GetTypeNameWithoutPath();
+				typeName = typeMenu.GetTypeNameWithoutPath();
 				if (!string.IsNullOrWhiteSpace(typeName)) {
-					return ObjectNames.NicifyVariableName(typeName);
+					typeName = ObjectNames.NicifyVariableName(typeName);
 				}
 			}
 
-			return ObjectNames.NicifyVariableName(type.Name);
+			if (string.IsNullOrWhiteSpace(typeName)) {
+				typeName = ObjectNames.NicifyVariableName(type.Name);
+			}
+
+			GUIContent result = new GUIContent(typeName);
+			m_TypeNameCaches.Add(property.managedReferenceFullTypename,result);
+			return result;
 		}
 
 		public override float GetPropertyHeight (SerializedProperty property,GUIContent label) {
