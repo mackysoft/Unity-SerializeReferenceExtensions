@@ -6,5 +6,12 @@
 	"description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
 	"keywords": [ "SerializeReference", "Editor" ],
 	"license": "MIT",
-	"dependencies": {}
+	"dependencies": {},
+	"samples": [
+		{
+			"displayName": "Example",
+			"description": "",
+			"path": "Example"
+		}
+	]
 }
