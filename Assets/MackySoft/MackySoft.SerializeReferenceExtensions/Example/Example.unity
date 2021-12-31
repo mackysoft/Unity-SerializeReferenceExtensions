@@ -337,17 +337,17 @@ MonoBehaviour:
   references:
     version: 1
     00000000:
-      type: {class: DebugCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example}
+      type: {class: DebugCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
       data:
         m_Message: Hello world
     00000001:
-      type: {class: InstantiateCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example}
+      type: {class: InstantiateCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
       data:
         m_Prefab: {fileID: 111724559944437223, guid: 4f11d1aa1b8a3114a96570cafa19d7c6, type: 3}
     00000002:
-      type: {class: Example/NestedCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example}
+      type: {class: Example/NestedCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
     00000003:
-      type: {class: AddTypeMenuCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example}
+      type: {class: AddTypeMenuCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
 --- !u!4 &1098750747
 Transform:
   m_ObjectHideFlags: 0
