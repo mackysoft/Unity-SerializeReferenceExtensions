@@ -111,13 +111,19 @@ public class AddTypeMenuCommand : ICommand {
 		Debug.Log("Execute AddTypeMenuCommand");
 	}
 }
+
+[Serializable]
+public struct StructCommand : ICommand {
+	public void Execute () {
+		Debug.Log("Execute StructCommand");
+	}
+}
 ```
 
 #### Supported Types
 
 The `SubclassSelector` attribute supports types that meet the following conditions.
 
-- Class
 - Public
 - Not abstract
 - Not generic
