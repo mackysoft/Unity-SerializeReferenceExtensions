@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MackySoft.SerializeReferenceExtensions", "MackySoft.SerializeReferenceExtensions.csproj", "{416A0403-CB55-36CC-5B0D-0D345FA05F49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MackySoft.SerializeReferenceExtensions.Example", "MackySoft.SerializeReferenceExtensions.Example.csproj", "{19A3DFD2-76AC-5BD2-796C-431D7979E720}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MackySoft.SerializeReferenceExtensions.Editor", "MackySoft.SerializeReferenceExtensions.Editor.csproj", "{D1920D53-66A8-7BB7-4FB5-7CA468A92179}"
 EndProject
@@ -19,10 +19,10 @@ Global
 		{416A0403-CB55-36CC-5B0D-0D345FA05F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{416A0403-CB55-36CC-5B0D-0D345FA05F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{416A0403-CB55-36CC-5B0D-0D345FA05F49}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19A3DFD2-76AC-5BD2-796C-431D7979E720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19A3DFD2-76AC-5BD2-796C-431D7979E720}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19A3DFD2-76AC-5BD2-796C-431D7979E720}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19A3DFD2-76AC-5BD2-796C-431D7979E720}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1920D53-66A8-7BB7-4FB5-7CA468A92179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1920D53-66A8-7BB7-4FB5-7CA468A92179}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1920D53-66A8-7BB7-4FB5-7CA468A92179}.Release|Any CPU.ActiveCfg = Release|Any CPU
