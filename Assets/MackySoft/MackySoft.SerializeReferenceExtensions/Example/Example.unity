@@ -334,6 +334,7 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
+  - id: 4
   references:
     version: 1
     00000000:
@@ -348,6 +349,8 @@ MonoBehaviour:
       type: {class: Example/NestedCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
     00000003:
       type: {class: AddTypeMenuCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
+    00000004:
+      type: {class: StructCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
 --- !u!4 &1098750747
 Transform:
   m_ObjectHideFlags: 0

@@ -69,5 +69,12 @@ namespace MackySoft.SerializeReferenceExtensions.Example {
 		}
 	}
 
+	[Serializable]
+	public struct StructCommand : ICommand {
+		public void Execute () {
+			Debug.Log("Execute StructCommand");
+		}
+	}
+
 }
 #endif

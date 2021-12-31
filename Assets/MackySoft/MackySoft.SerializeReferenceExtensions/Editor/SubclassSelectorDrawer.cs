@@ -63,7 +63,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 				Type baseType = property.GetManagedReferenceFieldType();
 				var popup = new AdvancedTypePopup(
 					TypeCache.GetTypesDerivedFrom(baseType).Where(p =>
-						p.IsClass &&
 						(p.IsPublic || p.IsNestedPublic) &&
 						!p.IsAbstract &&
 						!p.IsGenericType &&
