@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor {
 
@@ -29,13 +31,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 		readonly Dictionary<string,GUIContent> m_TypeNameCaches = new Dictionary<string,GUIContent>();
 
 		SerializedProperty m_TargetProperty;
-		
+
 		public override void OnGUI (Rect position,SerializedProperty property,GUIContent label) {
 			EditorGUI.BeginProperty(position,label,property);
 
 			if (property.propertyType == SerializedPropertyType.ManagedReference) {
-				TypePopupCache popup = GetTypePopup(property);
-
 				// Draw the subclass selector popup.
 				Rect popupPosition = new Rect(position);
 				popupPosition.width -= EditorGUIUtility.labelWidth;
@@ -43,6 +43,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 				popupPosition.height = EditorGUIUtility.singleLineHeight;
 
 				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard)) {
+					TypePopupCache popup = GetTypePopup(property);
 					m_TargetProperty = property;
 					popup.TypePopup.Show(popupPosition);
 				}
@@ -57,10 +58,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 		}
 
 		TypePopupCache GetTypePopup (SerializedProperty property) {
-			if (!m_TypePopups.TryGetValue(property.managedReferenceFieldTypename,out TypePopupCache result)) {
-				var state = new AdvancedDropdownState();
+			// Cache this string. This property internally call Assembly.GetName, which result in a large allocation.
+			string managedReferenceFieldTypename = property.managedReferenceFieldTypename;
 
-				Type baseType = property.GetManagedReferenceFieldType();
+			if (!m_TypePopups.TryGetValue(managedReferenceFieldTypename,out TypePopupCache result)) {
+				var state = new AdvancedDropdownState();
+				
+				Type baseType = ManagedReferenceUtility.GetType(managedReferenceFieldTypename);
 				var popup = new AdvancedTypePopup(
 					TypeCache.GetTypesDerivedFrom(baseType).Where(p =>
 						(p.IsPublic || p.IsNestedPublic) &&
@@ -79,20 +83,23 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					m_TargetProperty.serializedObject.ApplyModifiedProperties();
 				};
 
-				m_TypePopups.Add(property.managedReferenceFieldTypename,new TypePopupCache(popup,state));
+				m_TypePopups.Add(managedReferenceFieldTypename,new TypePopupCache(popup,state));
 			}
 			return result;
 		}
 
 		GUIContent GetTypeName (SerializedProperty property) {
-			if (string.IsNullOrEmpty(property.managedReferenceFullTypename)) {
+			// Cache this string.
+			string managedReferenceFullTypename = property.managedReferenceFullTypename;
+
+			if (string.IsNullOrEmpty(managedReferenceFullTypename)) {
 				return k_NullDisplayName;
 			}
-			if (m_TypeNameCaches.TryGetValue(property.managedReferenceFullTypename,out GUIContent cachedTypeName)) {
+			if (m_TypeNameCaches.TryGetValue(managedReferenceFullTypename,out GUIContent cachedTypeName)) {
 				return cachedTypeName;
 			}
 
-			Type type = property.GetManagedReferenceType();
+			Type type = ManagedReferenceUtility.GetType(managedReferenceFullTypename);
 			string typeName = null;
 
 			AddTypeMenuAttribute typeMenu = TypeMenuUtility.GetAttribute(type);
@@ -108,7 +115,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 			}
 
 			GUIContent result = new GUIContent(typeName);
-			m_TypeNameCaches.Add(property.managedReferenceFullTypename,result);
+			m_TypeNameCaches.Add(managedReferenceFullTypename,result);
 			return result;
 		}
 
