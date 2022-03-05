@@ -1,0 +1,17 @@
+name: Feature Request
+description: Suggest an idea for this library
+title: "[FEATURE] "
+labels: ["enhancement"]
+assignees:
+  - mackysoft
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature destription
+    validations:
+      required: true

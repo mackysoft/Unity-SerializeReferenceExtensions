@@ -1,0 +1,17 @@
+name: Improvement Request
+description: Suggest an improve for this library
+title: "[IMPROVE] "
+labels: ["enhancement"]
+assignees:
+  - mackysoft
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this improvement request!
+  - type: textarea
+    id: improvement-description
+    attributes:
+      label: Improvement destription
+    validations:
+      required: true
