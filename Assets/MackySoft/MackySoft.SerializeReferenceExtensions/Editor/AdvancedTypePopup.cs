@@ -50,7 +50,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 						namespaces[k] = splittedTypePath[k];
 					}
 					else if (ns != splittedTypePath[k]) {
-						
 						isSingleNamespace = false;
 						break;
 					}
