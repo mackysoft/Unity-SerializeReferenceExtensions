@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor {
 
