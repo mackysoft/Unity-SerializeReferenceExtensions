@@ -79,6 +79,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					object obj = m_TargetProperty.SetManagedReference(type);
 					m_TargetProperty.isExpanded = (obj != null);
 					m_TargetProperty.serializedObject.ApplyModifiedProperties();
+					m_TargetProperty.serializedObject.Update();
 				};
 
 				result = new TypePopupCache(popup, state);
