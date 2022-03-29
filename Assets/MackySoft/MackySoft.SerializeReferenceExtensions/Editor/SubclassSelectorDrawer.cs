@@ -81,7 +81,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					m_TargetProperty.serializedObject.ApplyModifiedProperties();
 				};
 
-				m_TypePopups.Add(managedReferenceFieldTypename,new TypePopupCache(popup,state));
+				result = new TypePopupCache(popup, state);
+				m_TypePopups.Add(managedReferenceFieldTypename, result);
 			}
 			return result;
 		}
