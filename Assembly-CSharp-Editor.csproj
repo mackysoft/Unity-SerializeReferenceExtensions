@@ -54,7 +54,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\PackageTools\Editor\UnityPackageExporter.cs" />
-    <Compile Include="Assets\MackySoft\MackySoft.SerializeReferenceExtensions\Example\ExampleAssets\Scripts\Editor\ExampleEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -704,10 +703,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{DBA81C0C-2909-6E1C-966B-5AA13C17CC10}</Project>
-      <Name>Assembly-CSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="MackySoft.SerializeReferenceExtensions.Editor.csproj">
       <Project>{D1920D53-66A8-7BB7-4FB5-7CA468A92179}</Project>
       <Name>MackySoft.SerializeReferenceExtensions.Editor</Name>
@@ -715,6 +710,10 @@
     <ProjectReference Include="MackySoft.SerializeReferenceExtensions.csproj">
       <Project>{416A0403-CB55-36CC-5B0D-0D345FA05F49}</Project>
       <Name>MackySoft.SerializeReferenceExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="MackySoft.SerializeReferenceExtensions.Example.csproj">
+      <Project>{19A3DFD2-76AC-5BD2-796C-431D7979E720}</Project>
+      <Name>MackySoft.SerializeReferenceExtensions.Example</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
