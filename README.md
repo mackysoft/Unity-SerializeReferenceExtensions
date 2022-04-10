@@ -129,3 +129,18 @@ The `SubclassSelector` attribute supports types that meet the following conditio
 - Not generic
 - Not unity object
 - Serializable attribute is applied.
+
+
+## ❓ FAQ
+
+### If the type is renamed, the reference is lost.
+
+It is a limitation of `SerializeReference` of Unity.
+
+When serializing a `SerializeReference` reference, the type name, namespace, and assembly name are used, so if any of these are changed, the reference cannot be resolved during deserialization.
+
+To solve this problem, `UnityEngine.Scripting.APIUpdating.MovedFromAttribute` can be used.
+
+Also, [this thread](https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/) will be helpful.
+
+https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/
