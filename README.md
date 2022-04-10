@@ -143,4 +143,6 @@ To solve this problem, `UnityEngine.Scripting.APIUpdating.MovedFromAttribute` ca
 
 Also, [this thread](https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/) will be helpful.
 
-https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/
+#### References
+- https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/
+- https://issuetracker.unity3d.com/issues/serializereference-serialized-reference-data-lost-when-the-class-name-is-refactored
