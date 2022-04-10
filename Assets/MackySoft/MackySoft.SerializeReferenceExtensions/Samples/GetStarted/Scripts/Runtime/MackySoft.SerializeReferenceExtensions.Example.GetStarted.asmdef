@@ -1,0 +1,16 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions.Example.GetStarted",
+    "rootNamespace": "",
+    "references": [
+        "GUID:49b49c76ee64f6b41bf28ef951cb0e50"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

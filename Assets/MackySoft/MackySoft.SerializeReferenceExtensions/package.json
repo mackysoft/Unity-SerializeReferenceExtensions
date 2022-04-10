@@ -9,9 +9,9 @@
 	"dependencies": {},
 	"samples": [
 		{
-			"displayName": "Example",
+			"displayName": "Get Started",
 			"description": "",
-			"path": "Example"
+			"path": "Samples~/GetStarted"
 		}
 	]
 }
