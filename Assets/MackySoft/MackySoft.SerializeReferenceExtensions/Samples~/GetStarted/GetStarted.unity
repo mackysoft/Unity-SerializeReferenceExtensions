@@ -206,6 +206,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &774496582
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 774496584}
+  - component: {fileID: 774496583}
+  m_Layer: 0
+  m_Name: Example
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &774496583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774496582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b84d01d3056a974585aa0791b5434f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Command:
+    id: 0
+  m_Commands:
+  - id: 1
+  - id: 2
+  - id: 3
+  - id: 4
+  references:
+    version: 1
+    00000000:
+      type: {class: DebugCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example.GetStarted}
+      data:
+        m_Message: Hello world
+    00000001:
+      type: {class: InstantiateCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example.GetStarted}
+      data:
+        m_Prefab: {fileID: 111724559944437223, guid: 4f11d1aa1b8a3114a96570cafa19d7c6, type: 3}
+    00000002:
+      type: {class: AddTypeMenuCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example.GetStarted}
+    00000003:
+      type: {class: Example/NestedCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example.GetStarted}
+    00000004:
+      type: {class: StructCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: MackySoft.SerializeReferenceExtensions.Example.GetStarted}
+--- !u!4 &774496584
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774496582}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &975868111
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,69 +365,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1098750745
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1098750747}
-  - component: {fileID: 1098750746}
-  m_Layer: 0
-  m_Name: Example
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1098750746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098750745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b84d01d3056a974585aa0791b5434f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Command:
-    id: 0
-  m_Commands:
-  - id: 1
-  - id: 2
-  - id: 3
-  - id: 4
-  references:
-    version: 1
-    00000000:
-      type: {class: DebugCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
-      data:
-        m_Message: Hello world
-    00000001:
-      type: {class: InstantiateCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
-      data:
-        m_Prefab: {fileID: 111724559944437223, guid: 4f11d1aa1b8a3114a96570cafa19d7c6, type: 3}
-    00000002:
-      type: {class: Example/NestedCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
-    00000003:
-      type: {class: AddTypeMenuCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
-    00000004:
-      type: {class: StructCommand, ns: MackySoft.SerializeReferenceExtensions.Example, asm: Assembly-CSharp}
---- !u!4 &1098750747
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098750745}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
