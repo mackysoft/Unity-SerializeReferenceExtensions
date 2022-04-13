@@ -146,3 +146,11 @@ Also, [this thread](https://forum.unity.com/threads/serializereference-data-loss
 #### References
 - https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/
 - https://issuetracker.unity3d.com/issues/serializereference-serialized-reference-data-lost-when-the-class-name-is-refactored
+
+# <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
+
+I welcome feature requests and bug reports in [issues](https://github.com/mackysoft/XPool/issues) and [pull requests](https://github.com/mackysoft/XPool/pulls).
+
+If you feel that my works are worthwhile, I would greatly appreciate it if you could sponsor me.
+
+GitHub Sponsors: https://github.com/sponsors/mackysoft
