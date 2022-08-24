@@ -32,6 +32,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					return -999;
 				}
 				return GetAttribute(type)?.Order ?? 0;
+			}).ThenBy(type => {
+				if (type == null) {
+					return null;
+				}
+				return GetAttribute(type)?.MenuName ?? type.Name;
 			});
 		}
 
