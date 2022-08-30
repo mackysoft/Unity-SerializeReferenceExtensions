@@ -44,6 +44,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 				if (splittedTypePath.Length <= 1) {
 					continue;
 				}
+				// If they explicitly want sub category, let them do.
+				if (TypeMenuUtility.GetAttribute(type) != null) {
+					isSingleNamespace = false;
+					break;
+				}
 				for (int k = 0;(splittedTypePath.Length - 1) > k;k++) {
 					string ns = namespaces[k];
 					if (ns == null) {
@@ -53,6 +58,10 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 						isSingleNamespace = false;
 						break;
 					}
+				}
+
+				if (!isSingleNamespace) {
+					break;
 				}
 			}
 
