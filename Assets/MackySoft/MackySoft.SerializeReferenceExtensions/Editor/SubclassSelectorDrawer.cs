@@ -76,10 +76,18 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 				);
 				popup.OnItemSelected += item => {
 					Type type = item.Type;
-					object obj = m_TargetProperty.SetManagedReference(type);
-					m_TargetProperty.isExpanded = (obj != null);
-					m_TargetProperty.serializedObject.ApplyModifiedProperties();
-					m_TargetProperty.serializedObject.Update();
+
+					// Apply changes to individual serialized objects.
+					foreach (var targetObject in m_TargetProperty.serializedObject.targetObjects) {
+						SerializedObject individualObject = new SerializedObject(targetObject);
+						SerializedProperty individualProperty = individualObject.FindProperty(m_TargetProperty.propertyPath);
+
+						object obj = individualProperty.SetManagedReference(type);
+						individualProperty.isExpanded = (obj != null);
+						
+						individualObject.ApplyModifiedProperties();
+						individualObject.Update();
+					}
 				};
 
 				result = new TypePopupCache(popup, state);
