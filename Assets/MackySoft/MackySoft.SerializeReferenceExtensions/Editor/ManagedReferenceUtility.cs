@@ -13,6 +13,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 		}
 
 		public static Type GetType (string typeName) {
+			if (string.IsNullOrEmpty(typeName))
+			{
+				return null;
+			}
+
 			int splitIndex = typeName.IndexOf(' ');
 			var assembly = Assembly.Load(typeName.Substring(0,splitIndex));
 			return assembly.GetType(typeName.Substring(splitIndex + 1));
