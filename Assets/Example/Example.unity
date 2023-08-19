@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -206,6 +206,133 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &586792171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 586792173}
+  - component: {fileID: 586792172}
+  m_Layer: 0
+  m_Name: Example
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &586792172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586792171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be69d932204e464fb7da2e0d53eab25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  food1:
+    rid: 9020349853700980763
+  food2:
+    rid: 9020349853700980764
+  food3:
+    rid: 9020349853700980765
+  foodOne:
+    rid: 9020349853700980766
+  foodTwo:
+    rid: 9020349853700980767
+  foodThree:
+    rid: 9020349853700980768
+  foodsOne:
+  - rid: 9020349853700980769
+  - rid: 9020349853700980770
+  - rid: 9020349853700980771
+  foodsTwo:
+  - rid: 9020349853700980772
+  - rid: 9020349853700980773
+  - rid: 9020349853700980774
+  references:
+    version: 2
+    RefIds:
+    - rid: 9020349853700980763
+      type: {class: Apple, ns: , asm: Assembly-CSharp}
+      data:
+        name: Apple
+        kcal: 100
+    - rid: 9020349853700980764
+      type: {class: Peach, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
+    - rid: 9020349853700980765
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
+    - rid: 9020349853700980766
+      type: {class: Apple, ns: , asm: Assembly-CSharp}
+      data:
+        name: Apple
+        kcal: 100
+    - rid: 9020349853700980767
+      type: {class: Peach, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
+    - rid: 9020349853700980768
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
+    - rid: 9020349853700980769
+      type: {class: Apple, ns: , asm: Assembly-CSharp}
+      data:
+        name: Apple
+        kcal: 100
+    - rid: 9020349853700980770
+      type: {class: Peach, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
+    - rid: 9020349853700980771
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
+    - rid: 9020349853700980772
+      type: {class: Apple, ns: , asm: Assembly-CSharp}
+      data:
+        name: Apple
+        kcal: 100
+    - rid: 9020349853700980773
+      type: {class: Peach, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
+    - rid: 9020349853700980774
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
+--- !u!4 &586792173
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586792171}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1127138992
 GameObject:

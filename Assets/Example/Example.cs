@@ -79,6 +79,8 @@ public class Example : MonoBehaviour
 	};
 }
 
+#if UNITY_EDITOR
+
 /// These classes are in a folder named "Editor" in the project
 
 [CustomPropertyDrawer(typeof(Peach), true)]
@@ -112,3 +114,4 @@ public class AppleDrawer : PropertyDrawer
 		return EditorGUIUtility.singleLineHeight;
 	}
 }
+#endif
