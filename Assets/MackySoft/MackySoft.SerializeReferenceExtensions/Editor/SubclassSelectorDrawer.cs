@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 
-namespace MackySoft.SerializeReferenceExtensions.Editor {
+namespace MackySoft.SerializeReferenceExtensions.Editor
+{
 
 	[CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
 	public class SubclassSelectorDrawer : PropertyDrawer {
@@ -46,13 +47,46 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					popup.TypePopup.Show(popupPosition);
 				}
 
-				// Draw the managed reference property.
-				EditorGUI.PropertyField(position,property,label,true);
+				// Check if a custom property drawer exists for this type.
+				PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
+				if (customDrawer != null)
+				{
+					// Draw the property with custom property drawer.
+					Rect foldoutRect = new Rect(position);
+					foldoutRect.height = EditorGUIUtility.singleLineHeight;
+					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
+					
+					if (property.isExpanded)
+					{
+						using (new EditorGUI.IndentLevelScope())
+						{
+							Rect indentedRect = position;
+							float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+							indentedRect.height = customDrawer.GetPropertyHeight(property, label);
+							indentedRect.y += foldoutDifference;
+							customDrawer.OnGUI(indentedRect, property, label);
+						}
+					}
+				}
+				else
+				{
+					EditorGUI.PropertyField(position, property, label, true);
+				}
 			} else {
 				EditorGUI.LabelField(position,label,k_IsNotManagedReferenceLabel);
 			}
 
 			EditorGUI.EndProperty();
+		}
+
+		PropertyDrawer GetCustomPropertyDrawer (SerializedProperty property)
+		{
+			Type propertyType = ManagedReferenceUtility.GetType(property.managedReferenceFullTypename);
+			if (propertyType != null && PropertyDrawerCache.TryGetPropertyDrawer(propertyType, out PropertyDrawer drawer))
+			{
+				return drawer;
+			}
+			return null;
 		}
 
 		TypePopupCache GetTypePopup (SerializedProperty property) {
@@ -128,7 +162,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 		}
 
 		public override float GetPropertyHeight (SerializedProperty property,GUIContent label) {
-			return EditorGUI.GetPropertyHeight(property,true);
+			PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
+			if (customDrawer != null)
+			{
+				return property.isExpanded ? EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing +  customDrawer.GetPropertyHeight(property,label):EditorGUIUtility.singleLineHeight;
+			}
+			else
+			{
+				return property.isExpanded ? EditorGUI.GetPropertyHeight(property,true) : EditorGUIUtility.singleLineHeight;
+			}
 		}
 
 	}
