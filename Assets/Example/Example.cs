@@ -1,3 +1,4 @@
+#if UNITY_2019_3_OR_NEWER
 using System.Collections.Generic;
 using System;
 using UnityEditor;
@@ -114,4 +115,6 @@ public class AppleDrawer : PropertyDrawer
 		return EditorGUIUtility.singleLineHeight;
 	}
 }
+#endif
+
 #endif
