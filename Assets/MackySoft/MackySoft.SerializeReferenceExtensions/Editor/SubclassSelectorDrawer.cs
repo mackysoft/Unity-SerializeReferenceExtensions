@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 
-namespace MackySoft.SerializeReferenceExtensions.Editor {
+namespace MackySoft.SerializeReferenceExtensions.Editor
+{
 
 	[CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
 	public class SubclassSelectorDrawer : PropertyDrawer {
@@ -46,13 +47,46 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 					popup.TypePopup.Show(popupPosition);
 				}
 
-				// Draw the managed reference property.
-				EditorGUI.PropertyField(position,property,label,true);
+				// Check if a custom property drawer exists for this type.
+				PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
+				if (customDrawer != null)
+				{
+					// Draw the property with custom property drawer.
+					Rect foldoutRect = new Rect(position);
+					foldoutRect.height = EditorGUIUtility.singleLineHeight;
+					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
+					
+					if (property.isExpanded)
+					{
+						using (new EditorGUI.IndentLevelScope(1))
+						{
+							Rect indentedRect = EditorGUI.IndentedRect(position);
+							float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+							indentedRect.height -= foldoutDifference;
+							indentedRect.y += foldoutDifference;
+							customDrawer.OnGUI(indentedRect, property, label);
+						}
+					}
+				}
+				else
+				{
+					EditorGUI.PropertyField(position, property, label, true);
+				}
 			} else {
 				EditorGUI.LabelField(position,label,k_IsNotManagedReferenceLabel);
 			}
 
 			EditorGUI.EndProperty();
+		}
+
+		PropertyDrawer GetCustomPropertyDrawer (SerializedProperty property)
+		{
+			Type propertyType = ManagedReferenceUtility.GetType(property.managedReferenceFullTypename);
+			if (propertyType != null && PropertyDrawerCache.TryGetPropertyDrawer(propertyType, out PropertyDrawer drawer))
+			{
+				return drawer;
+			}
+			return null;
 		}
 
 		TypePopupCache GetTypePopup (SerializedProperty property) {
