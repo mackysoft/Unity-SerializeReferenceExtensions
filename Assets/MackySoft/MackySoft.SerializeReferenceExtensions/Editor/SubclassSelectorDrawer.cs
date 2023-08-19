@@ -58,11 +58,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					
 					if (property.isExpanded)
 					{
-						using (new EditorGUI.IndentLevelScope(1))
+						using (new EditorGUI.IndentLevelScope())
 						{
-							Rect indentedRect = EditorGUI.IndentedRect(position);
+							Rect indentedRect = position;
 							float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-							indentedRect.height -= foldoutDifference;
+							indentedRect.height = customDrawer.GetPropertyHeight(property, label);
 							indentedRect.y += foldoutDifference;
 							customDrawer.OnGUI(indentedRect, property, label);
 						}
@@ -162,7 +162,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 		}
 
 		public override float GetPropertyHeight (SerializedProperty property,GUIContent label) {
-			return EditorGUI.GetPropertyHeight(property,true);
+			PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
+			if (customDrawer != null)
+			{
+				return property.isExpanded ? EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing +  customDrawer.GetPropertyHeight(property,label):EditorGUIUtility.singleLineHeight;
+			}
+			else
+			{
+				return property.isExpanded ? EditorGUI.GetPropertyHeight(property,true) : EditorGUIUtility.singleLineHeight;
+			}
 		}
 
 	}
