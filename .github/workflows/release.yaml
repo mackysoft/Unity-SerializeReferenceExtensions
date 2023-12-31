@@ -61,10 +61,10 @@ jobs:
     needs: [update-packagejson]
     strategy:
       matrix:
-        unity: ["2020.3.8f1"]
+        unity: ["2021.3.29f1"]
         include:
-          - unityVersion: 2020.3.8f1
-            license: UNITY_LICENSE_2020
+          - unityVersion: 2021.3.29f1
+            license: UNITY_LICENSE
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -74,9 +74,11 @@ jobs:
           ref: ${{ needs.update-packagejson.outputs.sha }}
 
       - name: Export unitypackage
-        uses: game-ci/unity-builder@v2
+       uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets[matrix.license] }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: .
           unityVersion: ${{ matrix.unityVersion }}
