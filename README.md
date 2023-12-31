@@ -15,6 +15,9 @@ The `SubclassSelector` attribute allows you to easily set subclasses of those ab
 - Easily set subclass by popup.
 - **[New]** Type finding by fuzzy finder.
 - **[New]** Override the type name and path by the `AddTypeMenu` attribute.
+- **[New]** Restore values of previous object from JSON when subclass is changed.
+- **[New]** Copy & Paste the subclass properties.
+- **[New]** Available `CustomPropertyDrawer` for subclasses.
 
 ## 📥 Installation
 
