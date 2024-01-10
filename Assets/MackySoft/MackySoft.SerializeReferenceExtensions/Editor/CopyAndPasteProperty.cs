@@ -1,4 +1,5 @@
-﻿#if UNITY_2019_3_OR_NEWER
+﻿// NOTE: managedReferenceValue getter is available only in Unity 2021.3 or later.
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor;
 using UnityEngine;
 
