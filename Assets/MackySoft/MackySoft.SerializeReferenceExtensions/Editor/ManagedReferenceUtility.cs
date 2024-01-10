@@ -8,14 +8,19 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 	public static class ManagedReferenceUtility {
 
 		public static object SetManagedReference (this SerializedProperty property,Type type) {
-			object result;
+			object result = null;
+
+#if UNITY_2021_3_OR_NEWER
+			// NOTE: managedReferenceValue getter is available only in Unity 2021.3 or later.
 			if (property.managedReferenceValue != null)
 			{
 				// Restore an previous values from json.
 				string json = JsonUtility.ToJson(property.managedReferenceValue);
 				result = JsonUtility.FromJson(json, type);
 			}
-			else
+#endif
+
+			if (result == null)
 			{
 				result = (type != null) ? Activator.CreateInstance(type) : null;
 			}
