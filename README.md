@@ -15,11 +15,17 @@ The `SubclassSelector` attribute allows you to easily set subclasses of those ab
 - Easily set subclass by popup.
 - **[New]** Type finding by fuzzy finder.
 - **[New]** Override the type name and path by the `AddTypeMenu` attribute.
-- **[New]** Restore values of previous object from JSON when subclass is changed.
-- **[New]** Copy & Paste the subclass properties.
 - **[New]** Available `CustomPropertyDrawer` for subclasses.
+- **[New]** Restore values of previous object from JSON when subclass is changed. (required Unity 2021.3 or later)
+- **[New]** Copy & Paste the subclass properties. (required Unity 2021.3 or later)
+
+> See below for the reason for the limitation of versions less than Unity 2021.3.
+> 
+> https://blog.unity.com/engine-platform/serializereference-improvements-in-unity-2021-lts
 
 ## 📥 Installation
+
+#### Install via `.unitypackage`
 
 Download any version from releases.
 
@@ -29,10 +35,17 @@ Releases: https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releas
 
 Or, you can add this package by opening PackageManager and entering
 
-`https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
+```
+https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions
+```
 
 from the `Add package from git URL` option.
 
+If you are specifying a version, enter `#{VERSION}` at the end, as shown below.
+
+```
+https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions#1.1.9
+```
 
 #### Install via Open UPM
 
