@@ -35,6 +35,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 			EditorGUI.BeginProperty(position,label,property);
 
 			if (property.propertyType == SerializedPropertyType.ManagedReference) {
+				
+				// render label first to avoid label overlap for lists
+				Rect foldoutLabelRect = new Rect(position);
+				foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
+				foldoutLabelRect.x += EditorGUI.indentLevel * 12;
+				EditorGUI.PrefixLabel(foldoutLabelRect, label);
+				
 				// Draw the subclass selector popup.
 				Rect popupPosition = new Rect(position);
 				popupPosition.width -= EditorGUIUtility.labelWidth;
@@ -54,7 +61,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					// Draw the property with custom property drawer.
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
-					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
+					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
 					
 					if (property.isExpanded)
 					{
@@ -70,7 +77,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				}
 				else
 				{
-					EditorGUI.PropertyField(position, property, label, true);
+					EditorGUI.PropertyField(position, property, GUIContent.none, true);
 				}
 			} else {
 				EditorGUI.LabelField(position,label,k_IsNotManagedReferenceLabel);
