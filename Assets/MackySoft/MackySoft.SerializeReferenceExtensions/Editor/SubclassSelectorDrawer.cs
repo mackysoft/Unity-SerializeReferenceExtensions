@@ -35,12 +35,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 			EditorGUI.BeginProperty(position,label,property);
 
 			if (property.propertyType == SerializedPropertyType.ManagedReference) {
-				// Draw the subclass selector popup.
-				Rect popupPosition = new Rect(position);
-				popupPosition.width -= EditorGUIUtility.labelWidth;
-				popupPosition.x += EditorGUIUtility.labelWidth;
-				popupPosition.height = EditorGUIUtility.singleLineHeight;
 
+				// render label first to avoid label overlap for lists
+				Rect foldoutLabelRect = new Rect(position);
+				foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
+				foldoutLabelRect.x += EditorGUI.indentLevel * 12;
+				Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
+
+				// Draw the subclass selector popup.
 				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard)) {
 					TypePopupCache popup = GetTypePopup(property);
 					m_TargetProperty = property;
@@ -54,8 +56,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					// Draw the property with custom property drawer.
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
-					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
-					
+					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
+
 					if (property.isExpanded)
 					{
 						using (new EditorGUI.IndentLevelScope())
@@ -70,7 +72,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				}
 				else
 				{
-					EditorGUI.PropertyField(position, property, label, true);
+					EditorGUI.PropertyField(position, property, GUIContent.none, true);
 				}
 			} else {
 				EditorGUI.LabelField(position,label,k_IsNotManagedReferenceLabel);
@@ -95,7 +97,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 			if (!m_TypePopups.TryGetValue(managedReferenceFieldTypename,out TypePopupCache result)) {
 				var state = new AdvancedDropdownState();
-				
+
 				Type baseType = ManagedReferenceUtility.GetType(managedReferenceFieldTypename);
 				var popup = new AdvancedTypePopup(
 					TypeCache.GetTypesDerivedFrom(baseType).Append(baseType).Where(p =>
@@ -118,7 +120,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 						object obj = individualProperty.SetManagedReference(type);
 						individualProperty.isExpanded = (obj != null);
-						
+
 						individualObject.ApplyModifiedProperties();
 						individualObject.Update();
 					}
