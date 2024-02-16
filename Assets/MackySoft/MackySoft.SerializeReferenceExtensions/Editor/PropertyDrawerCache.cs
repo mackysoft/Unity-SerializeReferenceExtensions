@@ -25,6 +25,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 		static Type GetCustomPropertyDrawerType (Type type)
 		{
+			Type[] interfaceTypes = type.GetInterfaces();
+			
 			foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
 			{
 				foreach (Type drawerType in assembly.GetTypes())
@@ -36,9 +38,39 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 						if (field != null)
 						{
 							var fieldType = field.GetValue(customPropertyDrawer) as Type;
-							if (fieldType != null && fieldType == type)
+							if (fieldType != null)
 							{
-								return drawerType;
+								if (fieldType == type)
+								{
+									return drawerType;
+								}
+								
+								// If the property drawer also allows for being applied to child classes, check if they match
+								var useForChildrenField = customPropertyDrawer.GetType().GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance);
+								if (useForChildrenField != null)
+								{
+									object useForChildrenValue = useForChildrenField.GetValue(customPropertyDrawer);
+									if (useForChildrenValue is bool && (bool)useForChildrenValue)
+									{
+										// Check interfaces
+										if (Array.Exists(interfaceTypes, interfaceType => interfaceType == fieldType))
+										{
+											return drawerType;
+										}
+
+										// Check derived types
+										Type baseType = type.BaseType;
+										while (baseType != null)
+										{
+											if (baseType == fieldType)
+											{
+												return drawerType;
+											}
+
+											baseType = baseType.BaseType;
+										}
+									}
+								}
 							}
 						}
 					}
