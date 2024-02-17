@@ -18,6 +18,7 @@ The `SubclassSelector` attribute allows you to easily set subclasses of those ab
 - **[New]** Available `CustomPropertyDrawer` for subclasses.
 - **[New]** Restore values of previous object from JSON when subclass is changed. (required Unity 2021.3 or later)
 - **[New]** Copy & Paste the subclass properties. (required Unity 2021.3 or later)
+- **[New]** Clear & reset the subclass properties. (required Unity 2021.3 or later)
 
 > See below for the reason for the limitation of versions less than Unity 2021.3.
 > 
