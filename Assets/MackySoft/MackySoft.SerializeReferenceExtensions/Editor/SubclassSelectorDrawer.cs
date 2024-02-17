@@ -31,51 +31,74 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 		SerializedProperty m_TargetProperty;
 
-		public override void OnGUI (Rect position,SerializedProperty property,GUIContent label) {
-			EditorGUI.BeginProperty(position,label,property);
+		public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(position, label, property);
 
-			if (property.propertyType == SerializedPropertyType.ManagedReference) {
-
-				// render label first to avoid label overlap for lists
+			if (property.propertyType == SerializedPropertyType.ManagedReference)
+			{
+				// Render label first to avoid label overlap for lists
 				Rect foldoutLabelRect = new Rect(position);
 				foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
-				foldoutLabelRect.x += EditorGUI.indentLevel * 12;
+				foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
 				Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
 
 				// Draw the subclass selector popup.
-				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard)) {
+				if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
+				{
 					TypePopupCache popup = GetTypePopup(property);
 					m_TargetProperty = property;
 					popup.TypePopup.Show(popupPosition);
 				}
 
-				// Check if a custom property drawer exists for this type.
-				PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
-				if (customDrawer != null)
+				// Draw the foldout.
+				if (!string.IsNullOrEmpty(property.managedReferenceFullTypename))
 				{
-					// Draw the property with custom property drawer.
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
+					foldoutRect.x -= 12;
 					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
+				}
 
-					if (property.isExpanded)
+				// Draw property if expanded.
+				if (property.isExpanded)
+				{
+					using (new EditorGUI.IndentLevelScope())
 					{
-						using (new EditorGUI.IndentLevelScope())
+						// Check if a custom property drawer exists for this type.
+						PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
+						if (customDrawer != null)
 						{
+							// Draw the property with custom property drawer.
 							Rect indentedRect = position;
 							float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 							indentedRect.height = customDrawer.GetPropertyHeight(property, label);
 							indentedRect.y += foldoutDifference;
 							customDrawer.OnGUI(indentedRect, property, label);
 						}
+						else
+						{
+							// Draw the properties of the child elements.
+							// NOTE: In the following code, since the foldout layout isn't working properly, I'll iterate through the properties of the child elements myself.
+							// EditorGUI.PropertyField(position, property, GUIContent.none, true);
+
+							Rect childPosition = position;
+							childPosition.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+							foreach (SerializedProperty childProperty in property.GetChildProperties())
+							{
+								float height = EditorGUI.GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName, childProperty.tooltip), true);
+								childPosition.height = height;
+								EditorGUI.PropertyField(childPosition, childProperty, true);
+
+								childPosition.y += height + EditorGUIUtility.standardVerticalSpacing;
+							}
+						}
 					}
 				}
-				else
-				{
-					EditorGUI.PropertyField(position, property, GUIContent.none, true);
-				}
-			} else {
-				EditorGUI.LabelField(position,label,k_IsNotManagedReferenceLabel);
+			}
+			else
+			{
+				EditorGUI.LabelField(position, label, k_IsNotManagedReferenceLabel);
 			}
 
 			EditorGUI.EndProperty();
@@ -117,7 +140,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					foreach (var targetObject in m_TargetProperty.serializedObject.targetObjects) {
 						SerializedObject individualObject = new SerializedObject(targetObject);
 						SerializedProperty individualProperty = individualObject.FindProperty(m_TargetProperty.propertyPath);
-
 						object obj = individualProperty.SetManagedReference(type);
 						individualProperty.isExpanded = (obj != null);
 
