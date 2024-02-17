@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
-	public static class CopyAndPasteProperty
+	public static class ManagedReferenceContextualPropertyMenu
 	{
 
 		const string kCopiedPropertyPathKey = "SerializeReferenceExtensions.CopiedPropertyPath";
