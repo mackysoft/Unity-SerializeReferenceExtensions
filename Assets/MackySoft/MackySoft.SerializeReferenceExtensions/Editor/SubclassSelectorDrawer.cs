@@ -56,7 +56,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				{
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
+
+#if UNITY_2022_2_OR_NEWER
+					// NOTE: Position x must be adjusted.
+					// FIXME: Is there a more essential solution...?
 					foldoutRect.x -= 12;
+#endif
+
 					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
 				}
 
