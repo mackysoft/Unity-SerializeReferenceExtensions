@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
@@ -108,6 +110,21 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 			}
 
 			EditorGUI.EndProperty();
+		}
+
+		public override VisualElement CreatePropertyGUI (SerializedProperty property)
+		{
+			VisualElement root = new VisualElement();
+			if (property.propertyType == SerializedPropertyType.ManagedReference)
+			{
+				TypePopupField typePopupField = new TypePopupField(property, new VisualElement());
+				root.Add(typePopupField);
+			}
+			else
+			{
+				return new Label(k_IsNotManagedReferenceLabel.text);
+			}
+			return root;
 		}
 
 		PropertyDrawer GetCustomPropertyDrawer (SerializedProperty property)
