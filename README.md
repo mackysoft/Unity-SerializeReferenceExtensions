@@ -139,7 +139,7 @@ public struct StructCommand : ICommand {
 
 The `SubclassSelector` attribute supports types that meet the following conditions.
 
-- Public
+- Public or nested private
 - Not abstract
 - Not generic
 - Not unity object
