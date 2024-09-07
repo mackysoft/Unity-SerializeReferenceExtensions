@@ -57,7 +57,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
 
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_2
 					// NOTE: Position x must be adjusted.
 					// FIXME: Is there a more essential solution...?
 					foldoutRect.x -= 12;
