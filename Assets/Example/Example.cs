@@ -42,6 +42,17 @@ public class Grape : Food
 	}
 }
 
+[Serializable]
+[HideInTypeMenu]
+public class Banana : Food
+{
+	public Banana ()
+	{
+		name = "Banana";
+		kcal = 100f;
+	}
+}
+
 public class Example : MonoBehaviour
 {
 
