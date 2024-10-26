@@ -64,13 +64,14 @@ public class Example : MonoBehaviour
 	[SerializeReference]
 	public Food food3 = new Grape();
 
-	[SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
+	[SerializeReference, SubclassSelector]
 	public Food foodOne = new Apple();
 
 	[SerializeReference, SubclassSelector]
 	public Food foodTwo = new Peach();
 
-	[SerializeReference, SubclassSelector]
+	// UseToStringAsLabel support on UNITY_2021_3_OR_NEWER
+	[SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
 	public Food foodThree = new Grape();
 
 	[SerializeReference]
