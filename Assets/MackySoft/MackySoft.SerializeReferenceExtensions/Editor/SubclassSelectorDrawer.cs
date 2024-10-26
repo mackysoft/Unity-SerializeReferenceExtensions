@@ -22,7 +22,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 		}
 
 		const int k_MaxTypePopupLineCount = 13;
-		static readonly Type k_UnityObjectType = typeof(UnityEngine.Object);
+		
 		static readonly GUIContent k_NullDisplayName = new GUIContent(TypeMenuUtility.k_NullDisplayName);
 		static readonly GUIContent k_IsNotManagedReferenceLabel = new GUIContent("The property type is not manage reference.");
 
@@ -129,13 +129,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 				Type baseType = ManagedReferenceUtility.GetType(managedReferenceFieldTypename);
 				var popup = new AdvancedTypePopup(
-					TypeCache.GetTypesDerivedFrom(baseType).Append(baseType).Where(p =>
-						(p.IsPublic || p.IsNestedPublic || p.IsNestedPrivate) &&
-						!p.IsAbstract &&
-						!p.IsGenericType &&
-						!k_UnityObjectType.IsAssignableFrom(p) &&
-						Attribute.IsDefined(p,typeof(SerializableAttribute))
-					),
+					TypeMenuUtility.GetTypes(baseType),
 					k_MaxTypePopupLineCount,
 					state
 				);

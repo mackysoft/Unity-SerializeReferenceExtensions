@@ -2,11 +2,25 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor {
 	public static class TypeMenuUtility {
 
 		public const string k_NullDisplayName = "<null>";
+		static readonly Type k_UnityObjectType = typeof(UnityEngine.Object);
+
+		public static IEnumerable<Type> GetTypes (Type baseType)
+		{
+			return TypeCache.GetTypesDerivedFrom(baseType).Append(baseType).Where(p =>
+				(p.IsPublic || p.IsNestedPublic || p.IsNestedPrivate) &&
+				!p.IsAbstract &&
+				!p.IsGenericType &&
+				!k_UnityObjectType.IsAssignableFrom(p) &&
+				Attribute.IsDefined(p, typeof(SerializableAttribute)) &&
+				!Attribute.IsDefined(p, typeof(HideInTypeMenuAttribute))
+			);
+		}
 
 		public static AddTypeMenuAttribute GetAttribute (Type type) {
 			return Attribute.GetCustomAttribute(type,typeof(AddTypeMenuAttribute)) as AddTypeMenuAttribute;
