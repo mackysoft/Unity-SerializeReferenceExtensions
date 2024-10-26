@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_3_OR_NEWER
-using System;
+﻿using System;
 
 /// <summary>
 /// An attribute that hides the type in the SubclassSelector.
@@ -8,4 +7,3 @@ using System;
 public sealed class HideInTypeMenuAttribute : Attribute {
 
 }
-#endif

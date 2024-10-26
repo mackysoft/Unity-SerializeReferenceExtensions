@@ -1,5 +1,4 @@
-﻿#if UNITY_2019_3_OR_NEWER
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -138,4 +137,3 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 	}
 }
-#endif
