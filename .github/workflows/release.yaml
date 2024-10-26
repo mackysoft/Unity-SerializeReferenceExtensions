@@ -18,7 +18,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Output package.json (Before)
         run: cat ${{ env.TARGET_FILE}}
 
@@ -69,7 +69,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - run: echo ${{ needs.update-packagejson.outputs.sha }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
 
@@ -97,7 +97,7 @@ jobs:
         working-directory: .
 
       # Store artifacts.
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: SerializeReference-Extensions.unitypackage
           path: ./Build/SerializeReference-Extensions.unitypackage
@@ -119,7 +119,7 @@ jobs:
           prerelease: false
 
       # Download(All) Artifacts to current directory
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
       
       # Upload to Releases(unitypackage)
       - uses: actions/upload-release-asset@v1
