@@ -42,6 +42,19 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
 				Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
 
+#if UNITY_2021_3_OR_NEWER
+				// Override the label text with the ToString() of the managed reference.
+				var subclassSelectorAttribute = (SubclassSelectorAttribute)attribute;
+				if (subclassSelectorAttribute.UseToStringAsLabel && !property.hasMultipleDifferentValues)
+				{
+					object managedReferenceValue = property.managedReferenceValue;
+					if (managedReferenceValue != null)
+					{
+						label.text = managedReferenceValue.ToString();
+					}
+				}
+#endif
+
 				// Draw the subclass selector popup.
 				if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
 				{
