@@ -64,7 +64,7 @@ public class Example : MonoBehaviour
 	[SerializeReference]
 	public Food food3 = new Grape();
 
-	[SerializeReference, SubclassSelector]
+	[SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
 	public Food foodOne = new Apple();
 
 	[SerializeReference, SubclassSelector]
