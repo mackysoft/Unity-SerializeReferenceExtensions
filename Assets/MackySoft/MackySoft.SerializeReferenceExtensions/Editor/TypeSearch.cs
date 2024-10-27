@@ -16,7 +16,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 		public static IEnumerable<Type> GetTypes (Type baseType)
 		{
 #if UNITY_2023_2_OR_NEWER
-			// NOTE: This is a workaround for Unity 2023.2 and later.
+			// NOTE: This is a generics solution for Unity 2023.2 and later.
 			// 2023.2 because SerializeReference supports generic type instances and because the behaviour is stable.
 			if (baseType.IsGenericType)
 			{
