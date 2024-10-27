@@ -69,9 +69,17 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
 
-#if UNITY_2022_2
+#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER
 					// NOTE: Position x must be adjusted.
 					// FIXME: Is there a more essential solution...?
+					// The most promising is UI Toolkit, but it is currently unable to reproduce all of SubclassSelector features. (Complete provision of contextual menu, e.g.)
+					// 2021.3: No adjustment
+					// 2022.1: No adjustment
+					// 2022.2: Adjustment required
+					// 2022.3: Adjustment required
+					// 2023.1: Adjustment required
+					// 2023.2: Adjustment required
+					// 6000.0: No adjustment
 					foldoutRect.x -= 12;
 #endif
 
