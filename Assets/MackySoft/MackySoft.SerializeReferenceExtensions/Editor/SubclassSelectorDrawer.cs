@@ -39,7 +39,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				// Render label first to avoid label overlap for lists
 				Rect foldoutLabelRect = new Rect(position);
 				foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
-				foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
+
+				// NOTE: IndentedRect should be disabled as it causes extra indentation.
+				//foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
 				Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
 
 #if UNITY_2021_3_OR_NEWER
