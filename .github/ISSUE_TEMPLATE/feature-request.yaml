@@ -12,6 +12,6 @@ body:
   - type: textarea
     id: feature-description
     attributes:
-      label: Feature destription
+      label: Feature description
     validations:
       required: true
