@@ -27,7 +27,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				return GetTypesUsingTypeCache(baseType);
 			}
 #else
-			return GetTypesWithGeneric(baseType);
+			return GetTypesUsingTypeCache(baseType);
 #endif
 		}
 
