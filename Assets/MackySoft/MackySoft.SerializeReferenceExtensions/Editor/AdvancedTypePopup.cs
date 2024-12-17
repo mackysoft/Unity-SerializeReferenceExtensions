@@ -24,7 +24,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 		const int kMaxNamespaceNestCount = 16;
 
-		public static void AddTo (AdvancedDropdownItem root,IEnumerable<Type> types) {
+		public static void AddTo (AdvancedDropdownItem root,IEnumerable<Type> types, Type baseType) {
 			int itemCount = 0;
 
 			// Add null item.
@@ -39,10 +39,18 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 			bool isSingleNamespace = true;
 			string[] namespaces = new string[kMaxNamespaceNestCount];
 			foreach (Type type in typeArray) {
-				string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type);
+				string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type, baseType);
+				
+				// If any type has AutoTypeMenuAttribute, it is not single namespace.
+				if(Attribute.GetCustomAttribute(type, typeof(AutoTypeMenuAttribute)) as AutoTypeMenuAttribute != null) {
+					isSingleNamespace = false;
+					break;
+				}
+				
 				if (splittedTypePath.Length <= 1) {
 					continue;
 				}
+
 				// If they explicitly want sub category, let them do.
 				if (TypeMenuUtility.GetAttribute(type) != null) {
 					isSingleNamespace = false;
@@ -66,7 +74,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 			// Add type items.
 			foreach (Type type in typeArray) {
-				string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type);
+				string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type, baseType);
 				if (splittedTypePath.Length == 0) {
 					continue;
 				}
@@ -110,12 +118,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 		static readonly float k_HeaderHeight = EditorGUIUtility.singleLineHeight * 2f;
 
 		Type[] m_Types;
+		Type m_BaseType;
 
 		public event Action<AdvancedTypePopupItem> OnItemSelected;
 		
-		public AdvancedTypePopup (IEnumerable<Type> types,int maxLineCount,AdvancedDropdownState state) : base(state) {
+		public AdvancedTypePopup (IEnumerable<Type> types, Type baseType,int maxLineCount,AdvancedDropdownState state) : base(state) {
 			SetTypes(types);
 			minimumSize = new Vector2(minimumSize.x,EditorGUIUtility.singleLineHeight * maxLineCount + k_HeaderHeight);
+			m_BaseType = baseType;
 		}
 
 		public void SetTypes (IEnumerable<Type> types) {
@@ -124,7 +134,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 
 		protected override AdvancedDropdownItem BuildRoot () {
 			var root = new AdvancedDropdownItem("Select Type");
-			AddTo(root,m_Types);
+			AddTo(root,m_Types,m_BaseType);
 			return root;
 		}
 
