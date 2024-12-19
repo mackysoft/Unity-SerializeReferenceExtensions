@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
+using System.Diagnostics;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
@@ -13,11 +14,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 			return Attribute.GetCustomAttribute(type,typeof(AddTypeMenuAttribute)) as AddTypeMenuAttribute;
 		}
 
-		public static string[] GetSplittedTypePath (Type type) {
+		public static string[] GetSplittedTypePath (Type type, Type baseType) {
 			AddTypeMenuAttribute typeMenu = GetAttribute(type);
 			if (typeMenu != null) {
 				return typeMenu.GetSplittedMenuName();
-			} else {
+			} else if(AutoTypeMenuAttribute.TryGetPathIfThisOrAnyParentContainAutoTypeMenuAttribute(type, baseType, out string[] path)) {
+                return path;
+            }  else {
 				int splitIndex = type.FullName.LastIndexOf('.');
 				if (splitIndex >= 0) {
 					return new string[] { type.FullName.Substring(0,splitIndex),type.FullName.Substring(splitIndex + 1) };

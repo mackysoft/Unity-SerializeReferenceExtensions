@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 10
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,12 +38,13 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 12
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,6 +67,9 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -100,7 +104,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 3
+    serializedVersion: 2
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -113,7 +117,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    buildHeightMesh: 0
+    accuratePlacement: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -159,17 +163,9 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -203,13 +199,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 126803971}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &586792171
 GameObject:
@@ -251,18 +247,34 @@ MonoBehaviour:
   foodTwo:
     rid: 9020349853700980767
   foodThree:
-    rid: 9020349853700980768
+    rid: 5331542178295447552
   foodsOne:
   - rid: 9020349853700980769
   - rid: 9020349853700980770
   - rid: 9020349853700980771
   foodsTwo:
   - rid: 9020349853700980772
-  - rid: 9020349853700980773
+  - rid: 5331542178476589060
   - rid: 9020349853700980774
+  - rid: 5331542178476589059
   references:
     version: 2
     RefIds:
+    - rid: 5331542178295447552
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
+    - rid: 5331542178476589059
+      type: {class: ChocolateBean, ns: , asm: Assembly-CSharp}
+      data:
+        name: ChocolateBar
+        kcal: 100
+    - rid: 5331542178476589060
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
     - rid: 9020349853700980763
       type: {class: Apple, ns: , asm: Assembly-CSharp}
       data:
@@ -288,11 +300,6 @@ MonoBehaviour:
       data:
         name: Peach
         kcal: 100
-    - rid: 9020349853700980768
-      type: {class: Grape, ns: , asm: Assembly-CSharp}
-      data:
-        name: Grape
-        kcal: 100
     - rid: 9020349853700980769
       type: {class: Apple, ns: , asm: Assembly-CSharp}
       data:
@@ -313,11 +320,6 @@ MonoBehaviour:
       data:
         name: Apple
         kcal: 100
-    - rid: 9020349853700980773
-      type: {class: Peach, ns: , asm: Assembly-CSharp}
-      data:
-        name: Peach
-        kcal: 100
     - rid: 9020349853700980774
       type: {class: Grape, ns: , asm: Assembly-CSharp}
       data:
@@ -330,13 +332,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 586792171}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &994260143
 GameObject:
@@ -367,19 +369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dff76005e1dfac84287448b12c4b160e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contravarianceActions:
-  - rid: 3354424774140624943
-  covarianceActions:
-  - rid: 3354424774140624944
-  references:
-    version: 2
-    RefIds:
-    - rid: 3354424774140624943
-      type: {class: DerivedAction1, ns: , asm: Assembly-CSharp}
-      data: 
-    - rid: 3354424774140624944
-      type: {class: NetworkActorAction1, ns: , asm: Assembly-CSharp}
-      data: 
 --- !u!4 &994260145
 Transform:
   m_ObjectHideFlags: 0
@@ -387,13 +376,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 994260143}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1127138992
 GameObject:
@@ -420,8 +409,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127138992}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -480,19 +470,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127138992}
-  serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1660057539 &9223372036854775807
-SceneRoots:
-  m_ObjectHideFlags: 0
-  m_Roots:
-  - {fileID: 126803974}
-  - {fileID: 1127138994}
-  - {fileID: 586792173}
-  - {fileID: 994260145}

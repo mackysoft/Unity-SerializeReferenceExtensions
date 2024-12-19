@@ -152,6 +152,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				Type baseType = ManagedReferenceUtility.GetType(managedReferenceFieldTypename);
 				var popup = new AdvancedTypePopup(
 					TypeSearch.GetTypes(baseType),
+					baseType,
 					k_MaxTypePopupLineCount,
 					state
 				);
