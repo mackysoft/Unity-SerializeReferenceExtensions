@@ -38,37 +38,42 @@ namespace MackySoft.SerializeReferenceExtensions.Editor {
 			// Single namespace if the root has one namespace and the nest is unbranched.
 			bool isSingleNamespace = true;
 			string[] namespaces = new string[kMaxNamespaceNestCount];
-			foreach (Type type in typeArray) {
-				string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type, baseType);
-				
-				// If any type has AutoTypeMenuAttribute, it is not single namespace.
-				if(Attribute.GetCustomAttribute(type, typeof(AutoTypeMenuAttribute)) as AutoTypeMenuAttribute != null) {
-					isSingleNamespace = false;
-					break;
-				}
-				
-				if (splittedTypePath.Length <= 1) {
-					continue;
-				}
 
-				// If they explicitly want sub category, let them do.
-				if (TypeMenuUtility.GetAttribute(type) != null) {
-					isSingleNamespace = false;
-					break;
-				}
-				for (int k = 0;(splittedTypePath.Length - 1) > k;k++) {
-					string ns = namespaces[k];
-					if (ns == null) {
-						namespaces[k] = splittedTypePath[k];
-					}
-					else if (ns != splittedTypePath[k]) {
+			if(Attribute.GetCustomAttribute(baseType, typeof(AutoTypeMenuAttribute)) as AutoTypeMenuAttribute != null) {
+				isSingleNamespace = false;
+			} else {
+				foreach (Type type in typeArray) {
+					string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type, baseType);
+					
+					// If any type has AutoTypeMenuAttribute, it is not single namespace.
+					if(Attribute.GetCustomAttribute(type, typeof(AutoTypeMenuAttribute)) as AutoTypeMenuAttribute != null) {
 						isSingleNamespace = false;
 						break;
 					}
-				}
+					
+					if (splittedTypePath.Length <= 1) {
+						continue;
+					}
 
-				if (!isSingleNamespace) {
-					break;
+					// If they explicitly want sub category, let them do.
+					if (TypeMenuUtility.GetAttribute(type) != null) {
+						isSingleNamespace = false;
+						break;
+					}
+					for (int k = 0;(splittedTypePath.Length - 1) > k;k++) {
+						string ns = namespaces[k];
+						if (ns == null) {
+							namespaces[k] = splittedTypePath[k];
+						}
+						else if (ns != splittedTypePath[k]) {
+							isSingleNamespace = false;
+							break;
+						}
+					}
+
+					if (!isSingleNamespace) {
+						break;
+					}
 				}
 			}
 
