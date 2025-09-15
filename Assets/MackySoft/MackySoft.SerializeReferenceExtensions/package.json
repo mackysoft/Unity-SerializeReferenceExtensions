@@ -8,6 +8,9 @@
 	"keywords": [ "SerializeReference", "Editor" ],
 	"license": "MIT",
 	"dependencies": {},
+    "documentationUrl": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions",
+    "changelogUrl": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases",
+    "licensesUrl": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/blob/main/LICENSE",
 	"samples": [
 		{
 			"displayName": "Get Started",
