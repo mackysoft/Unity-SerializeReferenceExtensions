@@ -52,6 +52,85 @@ public class Banana : Food
 	}
 }
 
+[Serializable]
+public class Snack : Food
+{
+	public Snack ()
+	{
+		name = "Snack";
+		kcal = 100f;
+	}
+}
+[Serializable]
+public class Candy : Snack
+{
+	public Candy ()
+	{
+		name = "Candy";
+		kcal = 100f;
+	}
+}
+
+[Serializable, AutoTypeMenu]
+public class Chocolate : Snack
+{
+	public Chocolate ()
+	{
+		name = "Chocolate";
+		kcal = 100f;
+	}
+}
+
+[Serializable]
+public class ChocolateBar : Chocolate
+{
+	public ChocolateBar ()
+	{
+		name = "ChocolateBar";
+		kcal = 100f;
+	}
+}
+
+[Serializable]
+public class ChocolateIceCream : Chocolate
+{
+	public ChocolateIceCream ()
+	{
+		name = "ChocolateIceCream";
+		kcal = 100f;
+	}
+}
+
+[Serializable]
+public class ChocolateBean : Chocolate
+{
+	public ChocolateBean ()
+	{
+		name = "ChocolateBean";
+		kcal = 100f;
+	}
+}
+
+[Serializable]
+public class ChocolateBeanAlmond : ChocolateBean
+{
+	public ChocolateBeanAlmond ()
+	{
+		name = "ChocolateBeanAlmond";
+		kcal = 100f;
+	}
+}
+
+[Serializable]
+public class ChocolateBeanHazelnut : ChocolateBean
+{
+	public ChocolateBeanHazelnut ()
+	{
+		name = "ChocolateBeanHazelnut";
+		kcal = 100f;
+	}
+}
+
 public class Example : MonoBehaviour
 {
 
