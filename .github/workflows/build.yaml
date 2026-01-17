@@ -24,14 +24,14 @@ jobs:
     steps:
       # Checkout
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
 
       # Cache
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
@@ -39,7 +39,7 @@ jobs:
 
       # Build
       - name: Build
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE_2020 }}
         with:
