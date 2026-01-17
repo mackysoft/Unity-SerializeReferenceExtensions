@@ -150,8 +150,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				var state = new AdvancedDropdownState();
 
 				Type baseType = ManagedReferenceUtility.GetType(managedReferenceFieldTypename);
-				var popup = new AdvancedTypePopup(
-					TypeSearch.GetTypes(baseType),
+				var types = TypeSearchService.TypeCandiateService.GetDisplayableTypes(baseType);
+                var popup = new AdvancedTypePopup(
+                    types,
 					k_MaxTypePopupLineCount,
 					state
 				);
