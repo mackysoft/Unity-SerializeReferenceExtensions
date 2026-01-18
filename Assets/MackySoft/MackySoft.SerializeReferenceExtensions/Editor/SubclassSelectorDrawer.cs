@@ -26,6 +26,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private static readonly GUIContent NullDisplayName = new GUIContent(TypeMenuUtility.NullDisplayName);
         private static readonly GUIContent IsNotManagedReferenceLabel = new GUIContent("The property type is not manage reference.");
+        private static readonly GUIContent TempChildLabel = new GUIContent();
 
         private readonly Dictionary<string, TypePopupCache> typePopups = new Dictionary<string, TypePopupCache>();
         private readonly Dictionary<string, GUIContent> typeNameCaches = new Dictionary<string, GUIContent>();
@@ -222,15 +223,50 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
         {
+            if (property.propertyType != SerializedPropertyType.ManagedReference)
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+            if (!property.isExpanded || string.IsNullOrEmpty(property.managedReferenceFullTypename))
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+
+            float height = EditorGUIUtility.singleLineHeight;
+            height += EditorGUIUtility.standardVerticalSpacing;
+
             PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
             if (customDrawer != null)
             {
-                return property.isExpanded ? EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing + customDrawer.GetPropertyHeight(property, label) : EditorGUIUtility.singleLineHeight;
+                height += customDrawer.GetPropertyHeight(property, label);
+                return height;
             }
-            else
+
+            height += GetChildrenHeight(property);
+
+            return height;
+        }
+
+        private static float GetChildrenHeight (SerializedProperty property)
+        {
+            float height = 0f;
+            bool first = true;
+
+            foreach (SerializedProperty child in property.GetChildProperties())
             {
-                return property.isExpanded ? EditorGUI.GetPropertyHeight(property, true) : EditorGUIUtility.singleLineHeight;
+                if (!first)
+                {
+                    height += EditorGUIUtility.standardVerticalSpacing;
+                }
+                first = false;
+
+                TempChildLabel.text = child.displayName;
+                TempChildLabel.tooltip = child.tooltip;
+
+                height += EditorGUI.GetPropertyHeight(child, TempChildLabel, true);
             }
+
+            return height;
         }
 
     }
