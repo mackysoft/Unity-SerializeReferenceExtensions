@@ -13,18 +13,18 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             Unity_2023_2_OrNewer_GenericVarianceTypeCompatibilityPolicy.Instance
         );
 
-        private Dictionary<Type, List<Type>> m_TypeCache = new Dictionary<Type, List<Type>>();
+        private readonly Dictionary<Type, List<Type>> typeCache = new Dictionary<Type, List<Type>>();
 
-        private readonly IIntrinsicTypePolicy m_IntrinsicTypePolicy;
-        private readonly ITypeCompatibilityPolicy m_TypeCompatibilityPolicy;
+        private readonly IIntrinsicTypePolicy intrinsicTypePolicy;
+        private readonly ITypeCompatibilityPolicy typeCompatibilityPolicy;
 
         private Unity_2023_2_OrNewer_TypeCandiateProvider (
             IIntrinsicTypePolicy intrinsicTypePolicy,
             ITypeCompatibilityPolicy typeCompatibilityPolicy
         )
         {
-            m_IntrinsicTypePolicy = intrinsicTypePolicy ?? throw new ArgumentNullException(nameof(intrinsicTypePolicy));
-            m_TypeCompatibilityPolicy = typeCompatibilityPolicy ?? throw new ArgumentNullException(nameof(typeCompatibilityPolicy));
+            this.intrinsicTypePolicy = intrinsicTypePolicy ?? throw new ArgumentNullException(nameof(intrinsicTypePolicy));
+            this.typeCompatibilityPolicy = typeCompatibilityPolicy ?? throw new ArgumentNullException(nameof(typeCompatibilityPolicy));
         }
 
         public IEnumerable<Type> GetTypeCandidates (Type baseType)
@@ -39,7 +39,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private IEnumerable<Type> GetTypesWithGeneric (Type baseType)
         {
-            if (m_TypeCache.TryGetValue(baseType, out List<Type> result))
+            if (typeCache.TryGetValue(baseType, out List<Type> result))
             {
                 return result;
             }
@@ -49,11 +49,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             IEnumerable<Type> types = EnumerateAllTypesSafely();
             foreach (Type type in types)
             {
-                if (!m_IntrinsicTypePolicy.IsAllowed(type))
+                if (!intrinsicTypePolicy.IsAllowed(type))
                 {
                     continue;
                 }
-                if (!m_TypeCompatibilityPolicy.IsCompatible(baseType, type))
+                if (!typeCompatibilityPolicy.IsCompatible(baseType, type))
                 {
                     continue;
                 }
@@ -62,12 +62,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
 
             // Include the base type itself if allowed
-            if (m_IntrinsicTypePolicy.IsAllowed(baseType) && m_TypeCompatibilityPolicy.IsCompatible(baseType, baseType))
+            if (intrinsicTypePolicy.IsAllowed(baseType) && typeCompatibilityPolicy.IsCompatible(baseType, baseType))
             {
                 result.Add(baseType);
             }
 
-            m_TypeCache.Add(baseType, result);
+            typeCache.Add(baseType, result);
             return result;
         }
 

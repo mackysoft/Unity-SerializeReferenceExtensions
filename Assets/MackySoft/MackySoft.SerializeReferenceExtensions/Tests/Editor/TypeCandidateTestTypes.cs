@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
@@ -72,17 +71,20 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
     public sealed class Contravariant_DerivedNetworkActor : IContravariant<IDerivedNetworkActor> { }
 
     [Serializable]
-    public sealed class Covariant_Actor : ICovariant<IActor> {
+    public sealed class Covariant_Actor : ICovariant<IActor>
+    {
         public IActor Create () => null;
     }
 
     [Serializable]
-    public sealed class Covariant_NetworkActor : ICovariant<INetworkActor> {
+    public sealed class Covariant_NetworkActor : ICovariant<INetworkActor>
+    {
         public INetworkActor Create () => null;
     }
-    
+
     [Serializable]
-    public sealed class Covariant_Object : ICovariant<object> {
+    public sealed class Covariant_Object : ICovariant<object>
+    {
         public object Create () => null;
     }
 
