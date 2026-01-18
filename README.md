@@ -1,28 +1,34 @@
 ﻿# Unity SerializeReferenceExtensions
 
-[![Build](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml/badge.svg)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml) [![Release](https://img.shields.io/github/v/release/mackysoft/Unity-SerializeReferenceExtensions)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases) [![openupm](https://img.shields.io/npm/v/com.mackysoft.serializereference-extensions?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.mackysoft.serializereference-extensions/)
+[![Tests](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/tests.yaml/badge.svg)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/tests.yaml) [![Build](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml/badge.svg)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/workflows/build.yaml) [![Release](https://img.shields.io/github/v/release/mackysoft/Unity-SerializeReferenceExtensions)](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases) [![openupm](https://img.shields.io/npm/v/com.mackysoft.serializereference-extensions?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.mackysoft.serializereference-extensions/)
 
-**Inspired by [this post](https://qiita.com/tsukimi_neko/items/7922b2433ed4d8616cce).**
+This library provides an Inspector dropdown (`SubclassSelector`) for fields serialized by Unity's `[SerializeReference]`.
 
-The `SerializeReference` attribute, added in Unity 2019.3, makes it possible to serialize references to interfaces and abstract classes.
-
-The `SubclassSelector` attribute allows you to easily set subclasses of those abstract classes in the Editor that are serialized by `SerializeReference` attribute.
 
 ![SubclassSelector](https://user-images.githubusercontent.com/13536348/118233552-03cd1780-b4cd-11eb-9e5b-4824e8f01f1d.gif)
 
-#### Features
+#### Key Features
 
-- Easily set subclass by popup.
-- **[New]** Type finding by fuzzy finder.
-- **[New]** Override the type name and path by the `AddTypeMenu` attribute.
-- **[New]** Available `CustomPropertyDrawer` for subclasses.
-- **[New]** Restore values of previous object from JSON when subclass is changed. (required Unity 2021.3 or later)
-- **[New]** Copy & Paste the subclass properties. (required Unity 2021.3 or later)
-- **[New]** Clear & reset the subclass properties. (required Unity 2021.3 or later)
-- **[New]** Covariance / Contravariance support. (required Unity 2023.2 or later)
+- Select a concrete type for `[SerializeReference]` fields via dropdown.
+- Search candidates with a fuzzy finder.
+- Collection support (`T[]`, `List<T>`, etc.).
+- Nested type support.
+- Customize type display name/path with `[AddTypeMenu]`.
+- Supports `CustomPropertyDrawer` for selected subtypes.
+- When switching types, restore previous values by matching property names (JSON-based).
+- Context menu utilities:
+  - Copy & paste managed-reference values
+  - Clear / reset managed-reference values
+
+**Generic support improvements on Unity 2023.2+**
+- Supports variance matching (`in`/`out`) for generic interfaces (covariance / contravariance)
+
+## Requirements
+
+- **Unity 2021.3 LTS or later** (officially supported).
+- **Unity 2023.2 or later** is recommended when you use **generic field types** (see “Generic support” below).
 
 > See below for the reason for the limitation of versions less than Unity 2021.3.
-> 
 > https://blog.unity.com/engine-platform/serializereference-improvements-in-unity-2021-lts
 
 ## 📥 Installation
@@ -30,23 +36,20 @@ The `SubclassSelector` attribute allows you to easily set subclasses of those ab
 #### Install via `.unitypackage`
 
 Download any version from releases.
-
-Releases: https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases
+https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases
 
 #### Install via git URL
 
-Or, you can add this package by opening PackageManager and entering
+Open Package Manager → “Add package from git URL…”, then input:
 
 ```
 https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions
 ```
 
-from the `Add package from git URL` option.
-
-If you are specifying a version, enter `#{VERSION}` at the end, as shown below.
+To pin a version, append `#{VERSION}`:
 
 ```
-https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions#1.1.9
+https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions#1.7.0
 ```
 
 #### Install via Open UPM
@@ -136,18 +139,72 @@ public struct StructCommand : ICommand {
 }
 ```
 
-#### Supported Types
+## Generic support (Unity 2023.2+)
 
-The `SubclassSelector` attribute supports types that meet the following conditions.
+Unity 2023.2+ supports generic type instances for `SerializeReference` fields more reliably.
+SerializeReferenceExtensions also enhances type discovery for generic base types.
 
-- Public or nested private
-- Not abstract
-- Not generic
-- Not unity object
-- Serializable attribute is applied.
+Examples:
+
+- Generic interface as base type:
+  - `[SerializeReference, SubclassSelector] ICommand<int> cmd;`
+  - Show candidates that implement `ICommand<int>` (including variance rules if applicable)
+- Abstract generic base type:
+  - `[SerializeReference, SubclassSelector] BaseCommand<int> cmd;`
+  - Show candidates derived from `BaseCommand<int>`
+
+> Note:
+> Candidate types shown in the menu still follow “Type > eligibility rules” below.
+
+## Type discovery & eligibility rules
+
+The dropdown list is built by:
+
+1. enumerating candidate types, then
+2. filtering by eligibility (intrinsic) and compatibility with the field base type
+
+### 1. Candidate type eligibility (intrinsic rules)
+|Rule|Eligible|Notes|
+|-|:-:|-|
+|Top-level `public` type|✅| Internal / non-public top-level types are not listed|
+|Nested `private` type|✅| Supported (useful for encapsulated implementations)|
+| Nested `public` type|✅| Listed like other candidates|
+| `abstract`|❌| Cannot be instantiated|
+| `generic` type (open or constructed) |❌| See “Generic support” (base type generics are supported, but generic candidate types are excluded) |
+| derives from `UnityEngine.Object`|❌| Unity `SerializeReference` limitation|
+| `[Serializable]` is applied|✅| Unity `SerializeReference` requires serializable types|
+| `[HideInTypeMenu]` is applied|❌| Explicitly hidden from menu|
+
+### 2. Compatibility rules (base type vs candidate type)
+
+| Field base type| Support | How compatibility is checked|
+| - | :-: | - |
+| non-generic interface / abstract class |✅| `baseType.IsAssignableFrom(candidateType)`|
+| generic base type (Unity 2023.2+)|✅| candidate must implement/derive from the same generic definition and match type arguments (supports variance for `in` / `out`) |
+| generic base type (Unity < 2023.2)|⚠️| Unity engine limitations may prevent correct serialization of generic instances|
 
 
 ## ❓ FAQ
+
+### Why is my type not shown in the dropdown?
+
+Check the eligibility rules:
+
+- Is it `[Serializable]`?
+- Is it `abstract`?
+- Is it a generic candidate type?
+- Does it derive from `UnityEngine.Object`?
+- Is `[HideInTypeMenu] `applied?
+
+### Can I select MonoBehaviour / ScriptableObject?
+
+No. Unity does not allow `UnityEngine.Object` types in `SerializeReference`.
+
+### Structs (value types)
+
+Unity documentation states that value types are not supported for SerializeReference,
+but in practice boxed structs may work in some scenarios.
+If you rely on structs, test on your target Unity versions and prefer classes when possible.
 
 ### If the type is renamed, the reference is lost.
 
