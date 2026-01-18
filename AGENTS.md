@@ -26,7 +26,17 @@ I use GameCI `unity-test-runner`.
 ## How to run tests locally
 ### EditMode
 Run Unity in batchmode:
-- `Unity -batchmode -nographics -quit -projectPath . -runTests -testPlatform editmode -testResults ./TestResults/editmode.xml`
+```
+PROJECT_ROOT="$(pwd)"
+RESULT_XML="$PROJECT_ROOT/TestResults/editmode.xml"
+
+mkdir -p "$(dirname "$RESULT_XML")"
+
+"<UNITY_EXE>" -batchmode -nographics -quit \
+  -projectPath "$PROJECT_ROOT" \
+  -runTests -testPlatform editmode \
+  -testResults "$RESULT_XML"
+```
 
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).
