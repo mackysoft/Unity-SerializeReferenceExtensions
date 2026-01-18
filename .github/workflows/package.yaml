@@ -5,7 +5,7 @@ on:
   push: { branches: [main] }
 
 env:
-  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE_2020 }}
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 2021.3.29f1
+          unityVersion: 2021.3.45f2
           buildMethod: MackySoft.PackageTools.Editor.UnityPackageExporter.Export
 
       # Upload
