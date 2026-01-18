@@ -7,7 +7,7 @@ This library provides an Inspector dropdown (`SubclassSelector`) for fields seri
 
 ![SubclassSelector](https://user-images.githubusercontent.com/13536348/118233552-03cd1780-b4cd-11eb-9e5b-4824e8f01f1d.gif)
 
-#### Key Features
+## Key Features
 
 - Select a concrete type for `[SerializeReference]` fields via dropdown.
 - Search candidates with a fuzzy finder.
@@ -168,20 +168,20 @@ The dropdown list is built by:
 |-|:-:|-|
 |Top-level `public` type|✅| Internal / non-public top-level types are not listed|
 |Nested `private` type|✅| Supported (useful for encapsulated implementations)|
-| Nested `public` type|✅| Listed like other candidates|
-| `abstract`|❌| Cannot be instantiated|
-| `generic` type (open or constructed) |❌| See “Generic support” (base type generics are supported, but generic candidate types are excluded) |
-| derives from `UnityEngine.Object`|❌| Unity `SerializeReference` limitation|
-| `[Serializable]` is applied|✅| Unity `SerializeReference` requires serializable types|
-| `[HideInTypeMenu]` is applied|❌| Explicitly hidden from menu|
+|Nested `public` type|✅| Listed like other candidates|
+|`abstract`|❌| Cannot be instantiated|
+|`generic` type (open or constructed) |❌| See “Generic support” (base type generics are supported, but generic candidate types are excluded) |
+|derives from `UnityEngine.Object`|❌| Unity `SerializeReference` limitation|
+|`[Serializable]` is applied|✅| Unity `SerializeReference` requires serializable types|
+|`[HideInTypeMenu]` is applied|❌| Explicitly hidden from menu|
 
 ### 2. Compatibility rules (base type vs candidate type)
 
 | Field base type| Support | How compatibility is checked|
 | - | :-: | - |
-| non-generic interface / abstract class |✅| `baseType.IsAssignableFrom(candidateType)`|
-| generic base type (Unity 2023.2+)|✅| candidate must implement/derive from the same generic definition and match type arguments (supports variance for `in` / `out`) |
-| generic base type (Unity < 2023.2)|⚠️| Unity engine limitations may prevent correct serialization of generic instances|
+|non-generic interface / abstract class |✅| `baseType.IsAssignableFrom(candidateType)`|
+|generic base type (Unity 2023.2+)|✅| candidate must implement/derive from the same generic definition and match type arguments (supports variance for `in` / `out`) |
+|generic base type (Unity < 2023.2)|⚠️| Unity engine limitations may prevent correct serialization of generic instances|
 
 
 ## ❓ FAQ
@@ -194,7 +194,7 @@ Check the eligibility rules:
 - Is it `abstract`?
 - Is it a generic candidate type?
 - Does it derive from `UnityEngine.Object`?
-- Is `[HideInTypeMenu] `applied?
+- Is `[HideInTypeMenu]` applied?
 
 ### Can I select MonoBehaviour / ScriptableObject?
 
