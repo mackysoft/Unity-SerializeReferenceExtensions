@@ -65,9 +65,9 @@ jobs:
     needs: [update-packagejson]
     strategy:
       matrix:
-        unity: ["2021.3.29f1"]
+        unity: ["2021.3.45f2"]
         include:
-          - unityVersion: 2021.3.29f1
+          - unityVersion: 2021.3.45f2
             license: UNITY_LICENSE
     runs-on: ubuntu-latest
     timeout-minutes: 15

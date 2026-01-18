@@ -85,6 +85,12 @@ public class Example_Generics : MonoBehaviour
 {
 
 	[SerializeReference, SubclassSelector]
+	public IContravarianceAction<INetworkActor> contravarianceAction = null;
+
+    [SerializeReference, SubclassSelector]
+	public BaseAction<IActor> baseAction = null;
+
+    [SerializeReference, SubclassSelector]
 	public List<IContravarianceAction<INetworkActor>> contravarianceActions = new List<IContravarianceAction<INetworkActor>>();
 
 	[SerializeReference, SubclassSelector]

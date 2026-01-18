@@ -1,6 +1,6 @@
 {
-    "name": "Tests",
-    "rootNamespace": "",
+    "name": "MackySoft.SerializeReferenceExtensions.Tests.Editor",
+    "rootNamespace": "MackySoft.SerializeReferenceExtensions.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
