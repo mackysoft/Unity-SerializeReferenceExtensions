@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if UNITY_2023_2_OR_NEWER
+using System;
 using System.Reflection;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
-#if UNITY_2023_2_OR_NEWER
     public sealed class Unity_2023_2_OrNewer_GenericVarianceTypeCompatibilityPolicy : ITypeCompatibilityPolicy
     {
 
@@ -124,5 +124,5 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return true;
         }
     }
-#endif
 }
+#endif
