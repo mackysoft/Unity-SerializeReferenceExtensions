@@ -23,6 +23,11 @@ I use GameCI `unity-test-runner`.
   - 2021.3.x (minimum baseline)
   - 2023.2+ (generic/variance feature gate)
 
+## How to run tests locally
+### EditMode
+Run Unity in batchmode:
+- `Unity -batchmode -nographics -quit -projectPath . -runTests -testPlatform editmode -testResults ./TestResults/editmode.xml`
+
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).
 - Editor implementation (PropertyDrawer/UI/type search) must stay under `Editor/`.
