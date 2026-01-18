@@ -5,11 +5,6 @@ using UnityEditor;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
-    public interface ITypeCandiateProvider
-	{
-		IEnumerable<Type> GetTypeCandidates (Type baseType);
-    }
-
     public sealed class DefaultTypeCandiateProvider : ITypeCandiateProvider
     {
 
