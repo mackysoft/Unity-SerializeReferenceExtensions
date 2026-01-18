@@ -71,7 +71,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					Rect foldoutRect = new Rect(position);
 					foldoutRect.height = EditorGUIUtility.singleLineHeight;
 
-#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER
+#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER && !UNITY_2022_3
 					// NOTE: Position x must be adjusted.
 					// FIXME: Is there a more essential solution...?
 					// The most promising is UI Toolkit, but it is currently unable to reproduce all of SubclassSelector features. (Complete provision of contextual menu, e.g.)
@@ -85,7 +85,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 					foldoutRect.x -= 12;
 #endif
 
-					property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
+                    property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
 				}
 
 				// Draw property if expanded.
