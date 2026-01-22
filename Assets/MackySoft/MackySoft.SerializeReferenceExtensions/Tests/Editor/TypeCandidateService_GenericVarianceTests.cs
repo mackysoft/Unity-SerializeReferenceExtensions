@@ -2,6 +2,7 @@
 using System.Linq;
 using MackySoft.SerializeReferenceExtensions.Editor;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace MackySoft.SerializeReferenceExtensions.Tests
 {
@@ -38,6 +39,33 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
 
             Assert.That(set, Does.Contain(typeof(Invariant_Actor)));
             Assert.That(set, !Does.Contain(typeof(Invariant_NetworkActor)));
+        }
+
+        [Test]
+        public void GenericClass_ParticleSystem_IsSupported ()
+        {
+            var set = TypeSearchService.TypeCandiateService.GetDisplayableTypes(typeof(IObjectHolder<ParticleSystem>)).ToHashSet();
+
+            Assert.That(set, Does.Contain(typeof(ObjectHolder<ParticleSystem>)));
+            Assert.That(set, Does.Contain(typeof(ParticleSystemHolder)));
+        }
+
+        [Test]
+        public void GenericClass_GameObject_IsSupported ()
+        {
+            var set = TypeSearchService.TypeCandiateService.GetDisplayableTypes(typeof(IObjectHolder<GameObject>)).ToHashSet();
+
+            Assert.That(set, Does.Contain(typeof(ObjectHolder<GameObject>)));
+            Assert.That(set, !Does.Contain(typeof(ParticleSystemHolder)));
+        }
+
+        [Test]
+        public void GenericClass_Integer_IsSupported ()
+        {
+            var set = TypeSearchService.TypeCandiateService.GetDisplayableTypes(typeof(IObjectHolder<int>)).ToHashSet();
+
+            Assert.That(set, Does.Contain(typeof(ObjectHolder<int>)));
+            Assert.That(set, !Does.Contain(typeof(ParticleSystemHolder)));
         }
     }
 }

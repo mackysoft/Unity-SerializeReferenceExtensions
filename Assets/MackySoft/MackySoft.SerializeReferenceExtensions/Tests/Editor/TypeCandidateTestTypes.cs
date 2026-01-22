@@ -61,6 +61,8 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
     public interface ICovariant<out T> { T Create (); }
     public interface IInvariant<T> { }
 
+    public interface IObjectHolder<T> { }
+
     [Serializable]
     public sealed class Contravariant_Actor : IContravariant<IActor> { }
 
@@ -93,4 +95,10 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
 
     [Serializable]
     public sealed class Invariant_NetworkActor : IInvariant<INetworkActor> { }
+
+    [Serializable]
+    public sealed class ObjectHolder<T> : IObjectHolder<T> { }
+
+    [Serializable]
+    public sealed class ParticleSystemHolder : IObjectHolder<ParticleSystem> { }
 }
