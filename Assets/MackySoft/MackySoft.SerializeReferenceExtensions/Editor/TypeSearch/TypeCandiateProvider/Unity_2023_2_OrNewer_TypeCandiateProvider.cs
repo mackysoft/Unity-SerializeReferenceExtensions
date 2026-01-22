@@ -47,15 +47,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             result = new List<Type>();
 
-            // 
-            var isGenericBaseType = baseType.IsGenericType;
-            var genericTypeDefinition = isGenericBaseType ? baseType.GetGenericTypeDefinition() : baseType;
-            var targetTypeArguments = isGenericBaseType ? baseType.GetGenericArguments() : Type.EmptyTypes;
+            bool isGenericBaseType = baseType.IsGenericType;
+            Type genericTypeDefinition = isGenericBaseType ? baseType.GetGenericTypeDefinition() : baseType;
+            Type[] targetTypeArguments = isGenericBaseType ? baseType.GetGenericArguments() : Type.EmptyTypes;
             IEnumerable<Type> types = TypeCache.GetTypesDerivedFrom(genericTypeDefinition);
             foreach (Type type in types)
             {
                 // If the type is Generic, create a MakeGenericType from the Arguments of the baseType.
-                var targetType = type.IsGenericType ? type.MakeGenericType(targetTypeArguments) : type;
+                Type targetType = type.IsGenericType ? type.MakeGenericType(targetTypeArguments) : type;
 
                 if (!intrinsicTypePolicy.IsAllowed(targetType, targetType != type))
                 {
