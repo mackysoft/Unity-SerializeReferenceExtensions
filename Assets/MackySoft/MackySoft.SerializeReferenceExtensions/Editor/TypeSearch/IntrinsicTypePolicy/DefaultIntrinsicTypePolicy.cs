@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
@@ -7,12 +8,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public static readonly DefaultIntrinsicTypePolicy Instance = new DefaultIntrinsicTypePolicy();
 
-        public bool IsAllowed (Type candiateType)
+        public bool IsAllowed (Type candiateType, bool ignoreGenericTypeCheck)
         {
             return
                 (candiateType.IsPublic || candiateType.IsNestedPublic || candiateType.IsNestedPrivate) &&
                 !candiateType.IsAbstract &&
-                !candiateType.IsGenericType &&
+                (ignoreGenericTypeCheck || !candiateType.IsGenericType) &&
                 !candiateType.IsPrimitive &&
                 !candiateType.IsEnum &&
                 !typeof(UnityEngine.Object).IsAssignableFrom(candiateType) &&

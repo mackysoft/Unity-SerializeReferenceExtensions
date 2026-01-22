@@ -21,7 +21,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         {
             return TypeCache.GetTypesDerivedFrom(baseType)
                 .Append(baseType)
-                .Where(intrinsicTypePolicy.IsAllowed);
+                .Where(x => intrinsicTypePolicy.IsAllowed(x, false));
         }
     }
 }

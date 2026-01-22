@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
@@ -46,23 +47,30 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             result = new List<Type>();
 
-            IEnumerable<Type> types = EnumerateAllTypesSafely();
+            // 
+            var isGenericBaseType = baseType.IsGenericType;
+            var genericTypeDefinition = isGenericBaseType ? baseType.GetGenericTypeDefinition() : baseType;
+            var targetTypeArguments = isGenericBaseType ? baseType.GetGenericArguments() : Type.EmptyTypes;
+            IEnumerable<Type> types = TypeCache.GetTypesDerivedFrom(genericTypeDefinition);
             foreach (Type type in types)
             {
-                if (!intrinsicTypePolicy.IsAllowed(type))
+                // If the type is Generic, create a MakeGenericType from the Arguments of the baseType.
+                var targetType = type.IsGenericType ? type.MakeGenericType(targetTypeArguments) : type;
+
+                if (!intrinsicTypePolicy.IsAllowed(targetType, targetType != type))
                 {
                     continue;
                 }
-                if (!typeCompatibilityPolicy.IsCompatible(baseType, type))
+                if (!typeCompatibilityPolicy.IsCompatible(baseType, targetType))
                 {
                     continue;
                 }
 
-                result.Add(type);
+                result.Add(targetType);
             }
 
             // Include the base type itself if allowed
-            if (intrinsicTypePolicy.IsAllowed(baseType) && typeCompatibilityPolicy.IsCompatible(baseType, baseType))
+            if (intrinsicTypePolicy.IsAllowed(baseType, false) && typeCompatibilityPolicy.IsCompatible(baseType, baseType))
             {
                 result.Add(baseType);
             }

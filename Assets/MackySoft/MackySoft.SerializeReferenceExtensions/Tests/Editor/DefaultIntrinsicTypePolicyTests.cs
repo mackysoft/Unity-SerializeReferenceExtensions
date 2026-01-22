@@ -26,7 +26,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         [TestCaseSource(nameof(Cases))]
         public void IsAllowed_MatchesExpected (Type type, bool expected)
         {
-            bool actual = DefaultIntrinsicTypePolicy.Instance.IsAllowed(type);
+            bool actual = DefaultIntrinsicTypePolicy.Instance.IsAllowed(type, false);
             Assert.That(actual, Is.EqualTo(expected), type.FullName);
         }
     }
