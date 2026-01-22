@@ -24,10 +24,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
             else
             {
-                int splitIndex = type.FullName.LastIndexOf('.');
+                // In the case of Generic, type information is included as shown below, so it must be extracted.
+                // TestNamespace.TestClass`1[[UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]
+                var name = type.IsGenericType ? type.FullName.Substring(0, type.FullName.IndexOf("[")) : type.FullName;
+
+                int splitIndex = name.LastIndexOf('.');
                 if (splitIndex >= 0)
                 {
-                    return new string[] { type.FullName.Substring(0, splitIndex), type.FullName.Substring(splitIndex + 1) };
+                    return new string[] { name.Substring(0, splitIndex), name.Substring(splitIndex + 1) };
                 }
                 else
                 {
