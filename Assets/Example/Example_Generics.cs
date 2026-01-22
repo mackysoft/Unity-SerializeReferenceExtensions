@@ -83,6 +83,32 @@ public sealed class NetworkActorAction3 : IContravarianceAction<IActor>, ICovari
     public IActor Actor => null;
 }
 
+namespace TestExample.Generics
+{
+    public interface IObjectHolder<T>
+    {
+        T Value { get; }
+    }
+
+    [Serializable]
+    public sealed class ObjectHolder<T> : IObjectHolder<T>
+    {
+        [SerializeField]
+        private T value;
+
+        public T Value => value;
+    }
+
+    [Serializable]
+    public sealed class ParticleSystemHolder : IObjectHolder<ParticleSystem>
+    {
+        [SerializeField]
+        private ParticleSystem value;
+
+        public ParticleSystem Value => value;
+    }
+}
+
 public class Example_Generics : MonoBehaviour
 {
 
@@ -97,5 +123,11 @@ public class Example_Generics : MonoBehaviour
 
     [SerializeReference, SubclassSelector]
     public List<ICovarianceAction<INetworkActor>> covarianceActions = new List<ICovarianceAction<INetworkActor>>();
+
+    [SerializeReference, SubclassSelector]
+    public TestExample.Generics.IObjectHolder<GameObject> gameObjectHolder = null;
+
+    [SerializeReference, SubclassSelector]
+    public TestExample.Generics.IObjectHolder<ParticleSystem> particleSystemHolder = null;
 
 }
