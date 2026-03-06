@@ -35,20 +35,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorGUI.BeginProperty(position, label, property);
 
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
-                // Render label first to avoid label overlap for lists
-                Rect foldoutLabelRect = new Rect(position);
-                foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
-
-                // NOTE: IndentedRect should be disabled as it causes extra indentation.
-                //foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
-                Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
-
 #if UNITY_2021_3_OR_NEWER
                 // Override the label text with the ToString() of the managed reference.
+                // Must be called before EditorGUI.BeginProperty
                 var subclassSelectorAttribute = (SubclassSelectorAttribute)attribute;
                 if (subclassSelectorAttribute.UseToStringAsLabel && !property.hasMultipleDifferentValues)
                 {
@@ -59,6 +51,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     }
                 }
 #endif
+                
+                EditorGUI.BeginProperty(position, label, property);
+                // Render label first to avoid label overlap for lists
+                Rect foldoutLabelRect = new Rect(position);
+                foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
+
+                // NOTE: IndentedRect should be disabled as it causes extra indentation.
+                //foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
+                Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
 
                 // Draw the subclass selector popup.
                 if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
@@ -129,6 +130,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
             else
             {
+                EditorGUI.BeginProperty(position, label, property);
                 EditorGUI.LabelField(position, label, IsNotManagedReferenceLabel);
             }
 
