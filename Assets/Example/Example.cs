@@ -9,6 +9,8 @@ public abstract class Food
     public string name;
 
     public float kcal;
+
+    public override string ToString () => $"{name} ({kcal} kcal)";
 }
 
 [Serializable]
@@ -84,6 +86,15 @@ public class Example : MonoBehaviour
 
     [SerializeReference, SubclassSelector]
     public List<Food> foodsTwo = new List<Food>
+    {
+        new Apple(),
+        new Peach(),
+        new Grape()
+    };
+    
+    // UseToStringAsLabel support on UNITY_2021_3_OR_NEWER
+    [SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
+    public List<Food> foodsThree = new List<Food>
     {
         new Apple(),
         new Peach(),
