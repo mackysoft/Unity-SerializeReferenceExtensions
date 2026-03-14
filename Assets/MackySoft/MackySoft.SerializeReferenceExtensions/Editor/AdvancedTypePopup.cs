@@ -39,7 +39,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             };
             root.AddChild(nullItem);
 
-            Type[] typeArray = types.OrderByType().ToArray();
+            Type[] typeArray = types as Type[] ?? types.ToArray();
 
             // Single namespace if the root has one namespace and the nest is unbranched.
             bool isSingleNamespace = true;
@@ -111,7 +111,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 }
 
                 // Add type item.
-                var item = new AdvancedTypePopupItem(type, ObjectNames.NicifyVariableName(splittedTypePath[splittedTypePath.Length - 1]))
+                var item = new AdvancedTypePopupItem(type, TypeMenuUtility.CachedNicifyVariableName(splittedTypePath[splittedTypePath.Length - 1]))
+
                 {
                     id = itemCount++
                 };
@@ -145,7 +146,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public void SetTypes (IEnumerable<Type> types)
         {
-            this.types = types.ToArray();
+            this.types = types.OrderByType().ToArray();
         }
 
         protected override AdvancedDropdownItem BuildRoot ()
@@ -163,6 +164,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 OnItemSelected?.Invoke(typePopupItem);
             }
         }
-
+        
     }
 }
