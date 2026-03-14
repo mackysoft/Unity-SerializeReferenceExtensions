@@ -207,13 +207,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 typeName = typeMenu.GetTypeNameWithoutPath();
                 if (!string.IsNullOrWhiteSpace(typeName))
                 {
-                    typeName = ObjectNames.NicifyVariableName(typeName);
+                    typeName = TypeMenuUtility.CachedNicifyVariableName(typeName);
                 }
             }
 
             if (string.IsNullOrWhiteSpace(typeName))
             {
-                typeName = ObjectNames.NicifyVariableName(type.Name);
+                typeName = TypeMenuUtility.CachedNicifyVariableName(TypeMenuUtility.GetNiceGenericName(type));
             }
 
             GUIContent result = new GUIContent(typeName);

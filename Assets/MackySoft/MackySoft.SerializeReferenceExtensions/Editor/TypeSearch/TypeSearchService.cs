@@ -20,7 +20,7 @@
             TypeCandiateProvider = DefaultTypeCandiateProvider.Instance;
 #endif
 
-            TypeCandiateService = new TypeCandiateService(TypeCandiateProvider, IntrinsicTypePolicy, TypeCompatibilityPolicy);
+            TypeCandiateService = new TypeCandiateService(TypeCandiateProvider);
         }
     }
 }

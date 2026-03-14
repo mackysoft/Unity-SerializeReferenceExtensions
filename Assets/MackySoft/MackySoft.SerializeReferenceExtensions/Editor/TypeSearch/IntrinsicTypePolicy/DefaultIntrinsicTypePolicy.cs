@@ -12,7 +12,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return
                 (candiateType.IsPublic || candiateType.IsNestedPublic || candiateType.IsNestedPrivate) &&
                 !candiateType.IsAbstract &&
-                !candiateType.IsGenericType &&
+                !candiateType.ContainsGenericParameters &&
                 !candiateType.IsPrimitive &&
                 !candiateType.IsEnum &&
                 !typeof(UnityEngine.Object).IsAssignableFrom(candiateType) &&
