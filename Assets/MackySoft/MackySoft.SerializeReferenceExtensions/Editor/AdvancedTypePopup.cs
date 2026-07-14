@@ -121,7 +121,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private static AdvancedDropdownItem GetItem (AdvancedDropdownItem parent, string name)
         {
+#if UNITY_6000_5_OR_NEWER // AdvancedDropdownItem.children is obsolete in Unity 6.5+, use more optimized childList
+            foreach (AdvancedDropdownItem item in parent.childList)
+#else
             foreach (AdvancedDropdownItem item in parent.children)
+#endif
             {
                 if (item.name == name)
                 {
