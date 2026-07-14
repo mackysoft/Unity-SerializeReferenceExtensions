@@ -23,7 +23,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             Allowed, // No issues detected
             WillChangeType, // Pasting will overwrite type currently assigned to property
             IncompatibleType, // The copied type isn't compatible with the target property
-            TypeNotFound // The copied data referenced a type that cannot be found or is invalid
+            TypeNotFound, // The copied data referenced a type that cannot be found or is invalid
+            WillNullify // The copied value is null, will nullify/delete the property value
         }
 
         [InitializeOnLoadMethod]
@@ -44,12 +45,16 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             string copiedValueTypeName = SessionState.GetString(CopiedPropertyType, string.Empty);
             Type copiedValueType = Type.GetType(copiedValueTypeName);
 
+            object currentPropertyValue = property.managedReferenceValue;
+            
             if (copiedValueType == null)
             {
-                return ValuePasteState.TypeNotFound;
+                if (!string.IsNullOrEmpty(copiedValueTypeName)) return ValuePasteState.TypeNotFound;
+                
+                return currentPropertyValue == null
+                    ? ValuePasteState.Unavailable
+                    : ValuePasteState.WillNullify;
             }
-            
-            object currentPropertyValue = property.managedReferenceValue;
 
             if (currentPropertyValue == null)
             {
@@ -71,8 +76,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private static bool IsValidTypeFor (SerializedProperty property, Type candidateType)
         {
             Type baseType = ManagedReferenceUtility.GetType(property.managedReferenceFieldTypename);
-            if (baseType == null || candidateType == null) return false;
-
+            if (baseType == null) return false;
+            
             return TypeSearchService.TypeCandiateService.IsCandidateQualified(baseType, candidateType);
         }
         
@@ -97,7 +102,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     case ValuePasteState.Allowed:
                         menu.AddItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property"), false, Paste, clonedProperty);
                         break;
-                    case ValuePasteState.WillChangeType:
+                    case ValuePasteState.WillChangeType: 
                         menu.AddItem(
                             new GUIContent(
                                 $"Paste \"{copiedPropertyPath}\" property (⚠️ Will overwrite type with {targetType?.Name})"
@@ -106,6 +111,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                             Paste,
                             clonedProperty
                         );
+                        break;
+                    case ValuePasteState.WillNullify:
+                        menu.AddItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property (⚠️ Will set to null)"), false, Paste, clonedProperty);
                         break;
                     case ValuePasteState.IncompatibleType:
                         menu.AddDisabledItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property (❌ Incompatible type {targetType?.FullName})"));
@@ -155,25 +163,32 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         {
             SerializedProperty property = (SerializedProperty)customData;
             string json = SessionState.GetString(ClipboardKey, string.Empty);
-            string typeName = SessionState.GetString(CopiedPropertyType, string.Empty);
             
-            if (string.IsNullOrEmpty(json) || string.IsNullOrEmpty(typeName))
+            string typeName = SessionState.GetString(CopiedPropertyType, string.Empty);
+            Type targetType = Type.GetType(typeName);
+            
+            if (string.IsNullOrEmpty(json) && targetType != null)
             {
                 return;
             }
             Undo.RecordObject(property.serializedObject.targetObject, "Paste Property");
-
-            Type targetType = Type.GetType(typeName);
-
-            if (targetType == null)
+            
+            // targetType can be null under two conditions:
+            // 1) The type was actually null (empty typeName)
+            // 2) The type was not found (non-empty typename)
+            if (targetType == null && !string.IsNullOrEmpty(typeName))
             {
                 Debug.LogError($"Paste Failed: Could not find type {typeName}");
                 return;
             }
             
             object currentTargetValue = property.managedReferenceValue;
-            
-            if (currentTargetValue == null || targetType != currentTargetValue.GetType())
+
+            if (targetType == null)
+            {
+                property.managedReferenceValue = null;
+            }
+            else if (currentTargetValue == null || targetType != currentTargetValue.GetType())
             {
                 object newInstance = Activator.CreateInstance(targetType);
                 JsonUtility.FromJsonOverwrite(json, newInstance);
