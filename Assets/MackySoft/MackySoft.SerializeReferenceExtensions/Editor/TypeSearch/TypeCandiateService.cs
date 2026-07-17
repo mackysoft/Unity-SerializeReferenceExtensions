@@ -33,13 +33,18 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             var candiateTypes = typeCandiateProvider.GetTypeCandidates(baseType);
             var result = candiateTypes
-                .Where(intrinsicTypePolicy.IsAllowed)
-                .Where(t => typeCompatibilityPolicy.IsCompatible(baseType, t))
+                .Where(t => IsCandidateQualified(baseType, t))
                 .Distinct()
                 .ToArray();
 
             typeCache.Add(baseType, result);
             return result;
+        }
+
+        public bool IsCandidateQualified (Type baseType, Type candidateType)
+        {
+            return intrinsicTypePolicy.IsAllowed(candidateType)
+                && typeCompatibilityPolicy.IsCompatible(baseType, candidateType);
         }
     }
 }
