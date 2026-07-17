@@ -24,7 +24,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             WillChangeType, // Pasting will overwrite type currently assigned to property
             IncompatibleType, // The copied type isn't compatible with the target property
             TypeNotFound, // The copied data referenced a type that cannot be found or is invalid
-            WillNullify // The copied value is null, will nullify/delete the property value
+            WillNullify, // The copied value is null, will nullify/delete the property value
+            TargetNullAllowed, // The target property is null, but otherwise compatible
+            TargetNullIncompatible // The target property is null and copied type is incompatible
         }
 
         [InitializeOnLoadMethod]
@@ -59,8 +61,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             if (currentPropertyValue == null)
             {
                 return IsValidTypeFor(property, copiedValueType)
-                    ? ValuePasteState.Allowed
-                    : ValuePasteState.IncompatibleType;
+                    ? ValuePasteState.TargetNullAllowed
+                    : ValuePasteState.TargetNullIncompatible;
             }
             
             if (copiedValueType == currentPropertyValue.GetType())
@@ -96,30 +98,40 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 string copiedPropertyPath = SessionState.GetString(CopiedPropertyPathKey, string.Empty);
 
                 Type targetType = Type.GetType(typeName);
+
+                string pasteLabel = $"Paste \"{copiedPropertyPath}\" property";
                 
                 switch (GetValuePasteState(clonedProperty))
                 {
                     case ValuePasteState.Allowed:
-                        menu.AddItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property"), false, Paste, clonedProperty);
+                        menu.AddItem(
+                            new GUIContent(pasteLabel), false, PasteValues, clonedProperty);
                         break;
                     case ValuePasteState.WillChangeType: 
                         menu.AddItem(
-                            new GUIContent(
-                                $"Paste \"{copiedPropertyPath}\" property (⚠️ Will overwrite type with {targetType?.Name})"
-                            ),
+                            new GUIContent($"{pasteLabel}/Paste Type and Values (⚠️ Change type to {targetType?.Name})"),
                             false,
-                            Paste,
+                            PasteTypeAndValues,
                             clonedProperty
                         );
+                        menu.AddItem(new GUIContent($"{pasteLabel}/Paste Values Only"), false, PasteValues, clonedProperty);
                         break;
                     case ValuePasteState.WillNullify:
-                        menu.AddItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property (⚠️ Will set to null)"), false, Paste, clonedProperty);
+                        menu.AddItem(new GUIContent($"{pasteLabel} (⚠️ Set to null)"), false, PasteTypeAndValues, clonedProperty);
                         break;
                     case ValuePasteState.IncompatibleType:
-                        menu.AddDisabledItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property (❌ Incompatible type {targetType?.FullName})"));
+                        menu.AddDisabledItem(new GUIContent($"{pasteLabel}/Paste Type and Values (❌ Incompatible type {targetType?.FullName})"));
+                        menu.AddItem(new GUIContent($"{pasteLabel}/Paste Values Only"), false, PasteValues, clonedProperty);
                         break;
                     case ValuePasteState.TypeNotFound:
-                        menu.AddDisabledItem(new GUIContent($"Paste \"{copiedPropertyPath}\" property (❌ Invalid type)"));
+                        menu.AddDisabledItem(new GUIContent($"{pasteLabel}/Paste Type and Values (❌ Invalid type)"));
+                        menu.AddItem(new GUIContent($"{pasteLabel}/Paste Values Only"), false, PasteValues, clonedProperty);
+                        break;
+                    case ValuePasteState.TargetNullAllowed:
+                        menu.AddItem(new GUIContent($"Create New and Paste \"{copiedPropertyPath}\" property"), false, PasteTypeAndValues, clonedProperty);
+                        break;
+                    case ValuePasteState.TargetNullIncompatible:
+                        menu.AddDisabledItem(new GUIContent($"Create New and Paste (❌ Incompatible type {targetType?.FullName})"));
                         break;
                     default:
                         menu.AddDisabledItem(PasteContent);
@@ -159,7 +171,28 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
         }
 
-        private static void Paste (object customData)
+        private static void PasteValues (object customData)
+        {
+            SerializedProperty property = (SerializedProperty)customData;
+            string json = SessionState.GetString(ClipboardKey, string.Empty);
+            
+            if (string.IsNullOrEmpty(json))
+            {
+                return;
+            }
+            Undo.RecordObject(property.serializedObject.targetObject, "Paste Property");
+            
+            object currentTargetValue = property.managedReferenceValue;
+
+            if (currentTargetValue == null)
+            {
+                return;
+            }
+            JsonUtility.FromJsonOverwrite(json, property.managedReferenceValue);
+            property.serializedObject.ApplyModifiedProperties();
+        }
+
+        private static void PasteTypeAndValues (object customData)
         {
             SerializedProperty property = (SerializedProperty)customData;
             string json = SessionState.GetString(ClipboardKey, string.Empty);
