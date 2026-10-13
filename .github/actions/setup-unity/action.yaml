@@ -1,0 +1,73 @@
+name: Set up Unity
+description: Install Unity CLI and the Editor, then activate the supplied license.
+
+inputs:
+  editor-version:
+    description: Exact Unity Editor version to install.
+    required: true
+  license:
+    description: Contents of a Unity license file valid for the runner.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check license input
+      shell: bash
+      env:
+        UNITY_LICENSE: ${{ inputs.license }}
+      run: |
+        if [[ -z "$UNITY_LICENSE" ]]; then
+          echo "::error::UNITY_LICENSE is required. GitHub does not provide repository secrets to pull requests from forks."
+          exit 1
+        fi
+
+    - name: Install Linux dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends \
+          libasound2 libgbm1 libgconf-2-4 libglu1-mesa libgtk-3-0 \
+          libncurses5 libnotify4 libnss3 libxss1 libxtst6
+
+    # Unity 2021's .NET tooling requires OpenSSL 1.1, absent from Ubuntu 22.04.
+    - name: Install OpenSSL 1.1 for Unity 2021
+      if: startsWith(inputs.editor-version, '2021.')
+      shell: bash
+      run: |
+        curl --fail --silent --show-error --location \
+          https://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb \
+          --output "$RUNNER_TEMP/libssl1.1.deb"
+        echo "7cf39d70a639017d1dd7c8d36daa2258063608688e449fddf40ffdd46f992a78  $RUNNER_TEMP/libssl1.1.deb" | sha256sum --check
+        sudo apt-get install --yes --no-install-recommends "$RUNNER_TEMP/libssl1.1.deb"
+
+    - name: Install Unity CLI
+      shell: bash
+      env:
+        UNITY_CLI_CHANNEL: beta
+        UNITY_CLI_VERSION: 1.0.0-beta.12
+        UNITY_CLI_HOME: ${{ runner.temp }}/unity-cli
+      run: |
+        curl --fail --silent --show-error --location \
+          https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh \
+          --output "$RUNNER_TEMP/install-unity-cli.sh"
+        bash "$RUNNER_TEMP/install-unity-cli.sh"
+        echo "$UNITY_CLI_HOME/bin" >> "$GITHUB_PATH"
+        "$UNITY_CLI_HOME/bin/unity" --version
+
+    - name: Install Unity Editor
+      shell: bash
+      env:
+        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
+      run: unity --non-interactive install "$UNITY_EDITOR_VERSION" --yes --accept-eula
+
+    - name: Activate Unity license
+      shell: bash
+      env:
+        UNITY_LICENSE: ${{ inputs.license }}
+      run: |
+        umask 077
+        license_file="$(mktemp --suffix=.ulf "$RUNNER_TEMP/unity-license-XXXXXX")"
+        trap 'rm -f "$license_file"' EXIT
+        printf '%s' "$UNITY_LICENSE" > "$license_file"
+        unity --non-interactive license activate --file "$license_file"

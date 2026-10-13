@@ -3,43 +3,53 @@ name: Export Package
 on:
   pull_request: {}
   push: { branches: [main] }
+  workflow_dispatch: {}
 
-env:
-  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Build UnityPackage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
     steps:
-      # Checkout
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      # Cache
-      - name: Cache
+      - name: Set up Unity
+        uses: ./.github/actions/setup-unity
+        with:
+          editor-version: 2021.3.45f2
+          license: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Cache Library
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library
-          restore-keys: Library-
+          key: Library-${{ runner.os }}-2021.3.45f2-Package-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-${{ runner.os }}-2021.3.45f2-Package-
 
-      # Build
-      - name: Build .unitypackage
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: 2021.3.45f2
-          buildMethod: MackySoft.PackageTools.Editor.UnityPackageExporter.Export
+      - name: Export unitypackage
+        run: |
+          unity --non-interactive run . \
+            --editor-version 2021.3.45f2 \
+            --log-file Logs/package.log \
+            --timeout 900 \
+            -- -nographics -executeMethod MackySoft.PackageTools.Editor.UnityPackageExporter.Export
 
-      # Upload
-      - name: Upload .unitypackage
+      - name: Upload unitypackage
         uses: actions/upload-artifact@v4
         with:
           name: Unity Package
-          path: Build
+          path: Build/SerializeReference-Extensions.unitypackage
+          if-no-files-found: error
+
+      - name: Upload export log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Package-Logs
+          path: Logs/

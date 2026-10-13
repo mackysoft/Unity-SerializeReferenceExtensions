@@ -63,32 +63,28 @@ jobs:
 
   build:
     needs: [update-packagejson]
-    strategy:
-      matrix:
-        unity: ["2021.3.45f2"]
-        include:
-          - unityVersion: 2021.3.45f2
-            license: UNITY_LICENSE
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
     steps:
       - run: echo ${{ needs.update-packagejson.outputs.sha }}
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
+          lfs: true
+
+      - name: Set up Unity
+        uses: ./.github/actions/setup-unity
+        with:
+          editor-version: 2021.3.45f2
+          license: ${{ secrets.UNITY_LICENSE }}
 
       - name: Export unitypackage
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          projectPath: .
-          unityVersion: ${{ matrix.unityVersion }}
-          targetPlatform: StandaloneLinux64
-          buildMethod: MackySoft.PackageTools.Editor.UnityPackageExporter.Export
-          versioning: None
+        run: |
+          unity --non-interactive run . \
+            --editor-version 2021.3.45f2 \
+            --log-file Logs/package.log \
+            --timeout 900 \
+            -- -nographics -executeMethod MackySoft.PackageTools.Editor.UnityPackageExporter.Export
 
       - name: check all .meta is commited
         run: |
@@ -105,16 +101,27 @@ jobs:
         with:
           name: SerializeReference-Extensions.unitypackage
           path: ./Build/SerializeReference-Extensions.unitypackage
+          if-no-files-found: error
+
+      - name: Upload export log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release-Logs
+          path: Logs/
 
   create-release:
     needs: [update-packagejson, build]
     runs-on: ubuntu-latest
     steps:
-      # Download(All) Artifacts to current directory
+      # Download the package artifact for the release.
       - uses: actions/download-artifact@v4
+        with:
+          name: SerializeReference-Extensions.unitypackage
+          path: SerializeReference-Extensions.unitypackage
       
       # Create release and upload unitypackage.
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -17,26 +17,22 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 - Unity 2023.2+ has enhanced generic type support (variance, etc.). Changes must not break 2021.3 behavior and guarded by `UNITY_2023_2_OR_NEWER`.
 
 ## CI (GitHub Actions)
-I use GameCI `unity-test-runner`.
+Use Unity CLI through `.github/actions/setup-unity`.
 - Always run EditMode tests.
+- Run tests on Linux; the example player build targets Linux 64-bit.
 - Run a Unity matrix that includes:
   - 2021.3.x (minimum baseline)
   - 2023.2+ (generic/variance feature gate)
 
 ## How to run tests locally
 ### EditMode
-Run Unity in batchmode:
+Run tests through Unity CLI (which manages batch mode):
 ```
-PROJECT_ROOT="$(pwd)"
-RESULT_XML="$PROJECT_ROOT/TestResults/editmode.xml"
-
-mkdir -p "$(dirname "$RESULT_XML")"
-
-"<UNITY_EXE>" -batchmode -nographics -quit \
-  -projectPath "$PROJECT_ROOT" \
-  -runTests -testPlatform editmode \
-  -testResults "$RESULT_XML"
+unity --non-interactive test . --editor-version 2021.3.45f2 \
+  --mode EditMode --output Logs/TestResults/editmode.xml --timeout 900 \
+  -- -nographics -logFile Logs/editmode.log
 ```
+Repeat with `--editor-version 2023.2.22f1` for the generic/variance feature gate.
 
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).

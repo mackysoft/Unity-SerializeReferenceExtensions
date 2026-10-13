@@ -3,47 +3,56 @@ name: Build
 on:
   pull_request: {}
   push: { branches: [main] }
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    name: ${{ matrix.targetPlatform }}
-    if: "((github.event_name == 'push' && github.repository_owner == 'mackysoft') || startsWith(github.event.pull_request.head.label, 'mackysoft:'))"
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        targetPlatform:
-          - StandaloneOSX # Build a macOS standalone (Intel 64-bit).
-          - StandaloneWindows # Build a Windows standalone.
-          - StandaloneWindows64 # Build a Windows 64-bit standalone.
-          - StandaloneLinux64 # Build a Linux 64-bit standalone.
-          - iOS # Build an iOS player.
-          - Android # Build an Android .apk standalone app.
-          - WebGL # WebGL.
-
+    name: StandaloneLinux64
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
     steps:
-      # Checkout
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           lfs: true
 
-      # Cache
-      - name: Cache
+      - name: Set up Unity
+        uses: ./.github/actions/setup-unity
+        with:
+          editor-version: 2021.3.45f2
+          license: ${{ secrets.UNITY_LICENSE }}
+
+      - name: Cache Library
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ matrix.targetPlatform }}
-          restore-keys: Library-
+          key: Library-${{ runner.os }}-2021.3.45f2-StandaloneLinux64-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-${{ runner.os }}-2021.3.45f2-StandaloneLinux64-
 
-      # Build
-      - name: Build
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      - name: Build example player
+        run: |
+          unity --non-interactive build . \
+            --editor-version 2021.3.45f2 \
+            --target StandaloneLinux64 \
+            --output-path Build/StandaloneLinux64/SerializeReferenceExtensions \
+            --log-file Logs/build.log \
+            --timeout 900
+          tar -czf Build/StandaloneLinux64.tar.gz -C Build StandaloneLinux64
+
+      - name: Upload player
+        uses: actions/upload-artifact@v4
         with:
-          targetPlatform: ${{ matrix.targetPlatform }}
-          unityVersion: 2021.3.45f2
+          name: StandaloneLinux64
+          path: Build/StandaloneLinux64.tar.gz
+          if-no-files-found: error
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Logs
+          path: Logs/
