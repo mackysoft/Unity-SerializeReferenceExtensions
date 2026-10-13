@@ -12,8 +12,37 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Determine required checks
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      unity: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.unity == 'true' }}
+    steps:
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+
+      - name: Detect Unity changes
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            unity:
+              - 'Assets/**'
+              - 'Packages/**'
+              - 'ProjectSettings/**'
+              - '.github/actions/setup-unity/**'
+              - '.github/workflows/tests.yaml'
+              - '.gitattributes'
+
   test:
     name: EditMode on Unity ${{ matrix.unityVersion }}
+    needs: changes
+    if: needs.changes.outputs.unity == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     strategy:
@@ -60,15 +89,29 @@ jobs:
 
   verify:
     name: Verification
-    needs: test
+    needs: [changes, test]
     if: always()
     runs-on: ubuntu-22.04
     steps:
-      - name: Require all EditMode tests to pass
+      - name: Require all applicable checks to pass
         env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          UNITY_REQUIRED: ${{ needs.changes.outputs.unity }}
           TEST_RESULT: ${{ needs.test.result }}
         run: |
-          if [[ "$TEST_RESULT" != success ]]; then
-            echo "::error::EditMode validation did not pass ($TEST_RESULT)."
+          if [[ "$CHANGES_RESULT" != success ]]; then
+            echo "::error::Could not determine required checks ($CHANGES_RESULT)."
             exit 1
           fi
+          case "$UNITY_REQUIRED:$TEST_RESULT" in
+            true:success)
+              echo "All required EditMode tests passed."
+              ;;
+            false:skipped)
+              echo "No Unity changes require EditMode tests."
+              ;;
+            *)
+              echo "::error::EditMode validation did not pass (required=$UNITY_REQUIRED, result=$TEST_RESULT)."
+              exit 1
+              ;;
+          esac

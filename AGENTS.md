@@ -18,9 +18,9 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 
 ## CI (GitHub Actions)
 Use Unity CLI through `.github/actions/setup-unity`.
-- Always run EditMode tests.
+- Run EditMode tests when Unity source, assets, project settings, or the test setup changes. Documentation-only changes can skip Unity tests.
 - Run tests on Linux.
-- Keep the final `Verification` check successful only when every EditMode matrix job succeeds.
+- Always report the final `Verification` check on pull requests. It passes only when change detection succeeds and all required EditMode matrix jobs succeed, or Unity tests are not required and are skipped.
 - Build the example player for Linux 64-bit and export the package only in the Release workflow.
 - Run a Unity matrix that includes:
   - 2021.3.x (minimum baseline)
