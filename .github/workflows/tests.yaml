@@ -57,3 +57,18 @@ jobs:
         with:
           name: TestResults-${{ matrix.unityVersion }}-EditMode
           path: Logs/
+
+  verify:
+    name: Verification
+    needs: test
+    if: always()
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Require all EditMode tests to pass
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+        run: |
+          if [[ "$TEST_RESULT" != success ]]; then
+            echo "::error::EditMode validation did not pass ($TEST_RESULT)."
+            exit 1
+          fi

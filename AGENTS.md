@@ -20,6 +20,7 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 Use Unity CLI through `.github/actions/setup-unity`.
 - Always run EditMode tests.
 - Run tests on Linux.
+- Keep the final `Verification` check successful only when every EditMode matrix job succeeds.
 - Build the example player for Linux 64-bit and export the package only in the Release workflow.
 - Run a Unity matrix that includes:
   - 2021.3.x (minimum baseline)
