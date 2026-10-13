@@ -78,6 +78,16 @@ jobs:
           editor-version: 2021.3.45f2
           license: ${{ secrets.UNITY_LICENSE }}
 
+      - name: Build example player
+        run: |
+          unity --non-interactive build . \
+            --editor-version 2021.3.45f2 \
+            --target StandaloneLinux64 \
+            --output-path Build/StandaloneLinux64/SerializeReferenceExtensions \
+            --log-file Logs/build.log \
+            --timeout 900
+          tar -czf Build/StandaloneLinux64.tar.gz -C Build StandaloneLinux64
+
       - name: Export unitypackage
         run: |
           unity --non-interactive run . \
@@ -97,13 +107,20 @@ jobs:
         working-directory: .
 
       # Store artifacts.
+      - name: Upload example player
+        uses: actions/upload-artifact@v4
+        with:
+          name: StandaloneLinux64
+          path: Build/StandaloneLinux64.tar.gz
+          if-no-files-found: error
+
       - uses: actions/upload-artifact@v4
         with:
           name: SerializeReference-Extensions.unitypackage
           path: ./Build/SerializeReference-Extensions.unitypackage
           if-no-files-found: error
 
-      - name: Upload export log
+      - name: Upload Unity logs
         if: always()
         uses: actions/upload-artifact@v4
         with:

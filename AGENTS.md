@@ -19,7 +19,8 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 ## CI (GitHub Actions)
 Use Unity CLI through `.github/actions/setup-unity`.
 - Always run EditMode tests.
-- Run tests on Linux; the example player build targets Linux 64-bit.
+- Run tests on Linux.
+- Build the example player for Linux 64-bit and export the package only in the Release workflow.
 - Run a Unity matrix that includes:
   - 2021.3.x (minimum baseline)
   - 2023.2+ (generic/variance feature gate)
