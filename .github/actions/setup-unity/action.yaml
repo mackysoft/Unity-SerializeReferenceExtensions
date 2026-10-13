@@ -55,12 +55,6 @@ runs:
         echo "$UNITY_CLI_HOME/bin" >> "$GITHUB_PATH"
         "$UNITY_CLI_HOME/bin/unity" --version
 
-    - name: Install Unity Editor
-      shell: bash
-      env:
-        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
-      run: unity --non-interactive install "$UNITY_EDITOR_VERSION" --yes --accept-eula
-
     - name: Activate Unity license
       shell: bash
       env:
@@ -71,3 +65,9 @@ runs:
         trap 'rm -f "$license_file"' EXIT
         printf '%s' "$UNITY_LICENSE" > "$license_file"
         unity --non-interactive license activate --file "$license_file"
+
+    - name: Install Unity Editor
+      shell: bash
+      env:
+        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
+      run: unity --non-interactive install "$UNITY_EDITOR_VERSION" --yes --accept-eula

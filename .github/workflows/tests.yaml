@@ -19,7 +19,7 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      unity: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.unity == 'true' }}
+      unity: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.unity }}
     steps:
       - name: Checkout
         if: github.event_name == 'push'
