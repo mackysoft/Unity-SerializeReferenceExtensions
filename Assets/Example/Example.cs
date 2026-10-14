@@ -91,7 +91,7 @@ public class Example : MonoBehaviour
         new Peach(),
         new Grape()
     };
-    
+
     // UseToStringAsLabel support on UNITY_2021_3_OR_NEWER
     [SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
     private List<Food> foodsThree = new List<Food>
