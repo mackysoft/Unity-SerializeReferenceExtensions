@@ -109,8 +109,12 @@ jobs:
 
       - name: Return Unity license
         if: always() && env.UNITY_LICENSE_ACTIVATION_ATTEMPTED == 'true'
-        timeout-minutes: 3
-        run: unity --non-interactive license return --yes
+        timeout-minutes: 5
+        env:
+          UNITY_EDITOR_VERSION: 2021.3.45f2
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: bash .github/actions/setup-unity/return-license.sh
 
       # Store artifacts.
       - name: Upload example player
