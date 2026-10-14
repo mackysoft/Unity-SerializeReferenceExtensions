@@ -1,0 +1,108 @@
+name: Set up Unity
+description: Install Unity CLI and the Editor, then activate a license on this runner.
+
+inputs:
+  editor-version:
+    description: Exact Unity Editor version to install.
+    required: true
+  email:
+    description: Unity account email address.
+    required: true
+  password:
+    description: Unity account password.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check Unity credentials
+      shell: bash
+      env:
+        UNITY_EMAIL: ${{ inputs.email }}
+        UNITY_PASSWORD: ${{ inputs.password }}
+      run: |
+        if [[ -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" ]]; then
+          echo "::error::UNITY_EMAIL and UNITY_PASSWORD are required. GitHub does not provide repository secrets to pull requests from forks."
+          exit 1
+        fi
+
+    - name: Install Linux dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends \
+          libasound2 libgbm1 libgconf-2-4 libglu1-mesa libgtk-3-0 \
+          libncurses5 libnotify4 libnss3 libxss1 libxtst6
+
+    # Unity 2021's .NET tooling requires OpenSSL 1.1, absent from Ubuntu 22.04.
+    - name: Install OpenSSL 1.1 for Unity 2021
+      if: startsWith(inputs.editor-version, '2021.')
+      shell: bash
+      run: |
+        curl --fail --silent --show-error --location \
+          https://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb \
+          --output "$RUNNER_TEMP/libssl1.1.deb"
+        echo "7cf39d70a639017d1dd7c8d36daa2258063608688e449fddf40ffdd46f992a78  $RUNNER_TEMP/libssl1.1.deb" | sha256sum --check
+        sudo apt-get install --yes --no-install-recommends "$RUNNER_TEMP/libssl1.1.deb"
+
+    - name: Install Unity CLI
+      shell: bash
+      env:
+        UNITY_CLI_CHANNEL: beta
+        UNITY_CLI_VERSION: 1.0.0-beta.12
+        UNITY_CLI_HOME: ${{ runner.temp }}/unity-cli
+      run: |
+        curl --fail --silent --show-error --location \
+          https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh \
+          --output "$RUNNER_TEMP/install-unity-cli.sh"
+        bash "$RUNNER_TEMP/install-unity-cli.sh"
+        echo "$UNITY_CLI_HOME/bin" >> "$GITHUB_PATH"
+        "$UNITY_CLI_HOME/bin/unity" --version
+
+    - name: Install Unity Editor
+      shell: bash
+      env:
+        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
+      run: unity --non-interactive install "$UNITY_EDITOR_VERSION" --yes --accept-eula
+
+    # Unity CLI cannot sign in with email/password. The bundled client can
+    # activate a license for this runner instead of importing a desktop's ULF.
+    - name: Activate Unity license
+      shell: bash
+      env:
+        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
+        UNITY_EMAIL: ${{ inputs.email }}
+        UNITY_PASSWORD: ${{ inputs.password }}
+      run: |
+        editor_root="$(unity --non-interactive editors path "$UNITY_EDITOR_VERSION")"
+        licensing_client="$editor_root/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client"
+        test -x "$licensing_client"
+
+        umask 077
+        activation_log="$(mktemp "$RUNNER_TEMP/unity-activation-XXXXXX")"
+        trap 'rm -f "$activation_log"' EXIT
+        # Arm cleanup before activation, including a partially failed request.
+        echo "UNITY_LICENSE_ACTIVATION_ATTEMPTED=true" >> "$GITHUB_ENV"
+        result=0
+        timeout 120 "$licensing_client" \
+          --activate-all --include-personal \
+          --username "$UNITY_EMAIL" --password "$UNITY_PASSWORD" \
+          > "$activation_log" 2>&1 || result=$?
+
+        if [[ "$result" != 0 ]]; then
+          if grep -qiE 'no (available )?seats|seat is not available|LICENSE_LIMIT|maximum number of' "$activation_log"; then
+            echo "::error::Unity reports no available license seats for this account."
+          elif grep -qiE 'two.?factor|2fa|verification code|unauthorized|invalid (username|password|credentials)' "$activation_log"; then
+            echo "::error::Unity rejected the credentials or requires interactive account verification."
+          else
+            echo "::error::Unity account activation failed (exit $result)."
+          fi
+          exit 1
+        fi
+
+        # The client can exit zero without granting a seat. Check license state.
+        if ! unity --non-interactive license status > "$activation_log" 2>&1; then
+          echo "::error::Unity account activation did not produce an active license."
+          exit 1
+        fi
+        echo "Unity license is active on this runner."
