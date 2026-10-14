@@ -62,7 +62,8 @@ jobs:
         uses: ./.github/actions/setup-unity
         with:
           editor-version: ${{ matrix.unityVersion }}
-          license: ${{ secrets.UNITY_LICENSE }}
+          email: ${{ secrets.UNITY_EMAIL }}
+          password: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Cache Library
         uses: actions/cache@v4
@@ -79,6 +80,11 @@ jobs:
             --output Logs/TestResults/editmode.xml \
             --timeout 900 \
             -- -nographics -logFile Logs/editmode.log
+
+      - name: Return Unity license
+        if: always() && env.UNITY_LICENSE_ACTIVATION_ATTEMPTED == 'true'
+        timeout-minutes: 3
+        run: unity --non-interactive license return --yes
 
       - name: Upload test results and logs
         if: always()

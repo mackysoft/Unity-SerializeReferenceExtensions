@@ -76,7 +76,8 @@ jobs:
         uses: ./.github/actions/setup-unity
         with:
           editor-version: 2021.3.45f2
-          license: ${{ secrets.UNITY_LICENSE }}
+          email: ${{ secrets.UNITY_EMAIL }}
+          password: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Build example player
         run: |
@@ -105,6 +106,11 @@ jobs:
             echo "Great, all .meta files are commited."
           fi
         working-directory: .
+
+      - name: Return Unity license
+        if: always() && env.UNITY_LICENSE_ACTIVATION_ATTEMPTED == 'true'
+        timeout-minutes: 3
+        run: unity --non-interactive license return --yes
 
       # Store artifacts.
       - name: Upload example player

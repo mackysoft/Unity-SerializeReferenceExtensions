@@ -1,24 +1,28 @@
 name: Set up Unity
-description: Install Unity CLI and the Editor, then activate the supplied license.
+description: Install Unity CLI and the Editor, then activate a license on this runner.
 
 inputs:
   editor-version:
     description: Exact Unity Editor version to install.
     required: true
-  license:
-    description: Contents of a Unity license file valid for the runner.
+  email:
+    description: Unity account email address.
+    required: true
+  password:
+    description: Unity account password.
     required: true
 
 runs:
   using: composite
   steps:
-    - name: Check license input
+    - name: Check Unity credentials
       shell: bash
       env:
-        UNITY_LICENSE: ${{ inputs.license }}
+        UNITY_EMAIL: ${{ inputs.email }}
+        UNITY_PASSWORD: ${{ inputs.password }}
       run: |
-        if [[ -z "$UNITY_LICENSE" ]]; then
-          echo "::error::UNITY_LICENSE is required. GitHub does not provide repository secrets to pull requests from forks."
+        if [[ -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" ]]; then
+          echo "::error::UNITY_EMAIL and UNITY_PASSWORD are required. GitHub does not provide repository secrets to pull requests from forks."
           exit 1
         fi
 
@@ -55,19 +59,50 @@ runs:
         echo "$UNITY_CLI_HOME/bin" >> "$GITHUB_PATH"
         "$UNITY_CLI_HOME/bin/unity" --version
 
-    - name: Activate Unity license
-      shell: bash
-      env:
-        UNITY_LICENSE: ${{ inputs.license }}
-      run: |
-        umask 077
-        license_file="$(mktemp --suffix=.ulf "$RUNNER_TEMP/unity-license-XXXXXX")"
-        trap 'rm -f "$license_file"' EXIT
-        printf '%s' "$UNITY_LICENSE" > "$license_file"
-        unity --non-interactive license activate --file "$license_file"
-
     - name: Install Unity Editor
       shell: bash
       env:
         UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
       run: unity --non-interactive install "$UNITY_EDITOR_VERSION" --yes --accept-eula
+
+    # Unity CLI cannot sign in with email/password. The bundled client can
+    # activate a license for this runner instead of importing a desktop's ULF.
+    - name: Activate Unity license
+      shell: bash
+      env:
+        UNITY_EDITOR_VERSION: ${{ inputs.editor-version }}
+        UNITY_EMAIL: ${{ inputs.email }}
+        UNITY_PASSWORD: ${{ inputs.password }}
+      run: |
+        editor_root="$(unity --non-interactive editors path "$UNITY_EDITOR_VERSION")"
+        licensing_client="$editor_root/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client"
+        test -x "$licensing_client"
+
+        umask 077
+        activation_log="$(mktemp "$RUNNER_TEMP/unity-activation-XXXXXX")"
+        trap 'rm -f "$activation_log"' EXIT
+        # Arm cleanup before activation, including a partially failed request.
+        echo "UNITY_LICENSE_ACTIVATION_ATTEMPTED=true" >> "$GITHUB_ENV"
+        result=0
+        timeout 120 "$licensing_client" \
+          --activate-all --include-personal \
+          --username "$UNITY_EMAIL" --password "$UNITY_PASSWORD" \
+          > "$activation_log" 2>&1 || result=$?
+
+        if [[ "$result" != 0 ]]; then
+          if grep -qiE 'no (available )?seats|seat is not available|LICENSE_LIMIT|maximum number of' "$activation_log"; then
+            echo "::error::Unity reports no available license seats for this account."
+          elif grep -qiE 'two.?factor|2fa|verification code|unauthorized|invalid (username|password|credentials)' "$activation_log"; then
+            echo "::error::Unity rejected the credentials or requires interactive account verification."
+          else
+            echo "::error::Unity account activation failed (exit $result)."
+          fi
+          exit 1
+        fi
+
+        # The client can exit zero without granting a seat. Check license state.
+        if ! unity --non-interactive license status > "$activation_log" 2>&1; then
+          echo "::error::Unity account activation did not produce an active license."
+          exit 1
+        fi
+        echo "Unity license is active on this runner."
