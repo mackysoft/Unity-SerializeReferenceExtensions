@@ -260,9 +260,28 @@ MonoBehaviour:
   - rid: 9020349853700980772
   - rid: 9020349853700980773
   - rid: 9020349853700980774
+  foodsThree:
+  - rid: 7418200600248058228
+  - rid: 7418200600248058229
+  - rid: 7418200600248058230
   references:
     version: 2
     RefIds:
+    - rid: 7418200600248058228
+      type: {class: Apple, ns: , asm: Assembly-CSharp}
+      data:
+        name: Apple
+        kcal: 100
+    - rid: 7418200600248058229
+      type: {class: Peach, ns: , asm: Assembly-CSharp}
+      data:
+        name: Peach
+        kcal: 100
+    - rid: 7418200600248058230
+      type: {class: Grape, ns: , asm: Assembly-CSharp}
+      data:
+        name: Grape
+        kcal: 100
     - rid: 9020349853700980763
       type: {class: Apple, ns: , asm: Assembly-CSharp}
       data:

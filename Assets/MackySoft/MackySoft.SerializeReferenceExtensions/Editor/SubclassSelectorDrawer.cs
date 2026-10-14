@@ -35,9 +35,22 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
+            bool isManagedReference = property.propertyType == SerializedPropertyType.ManagedReference;
+#if UNITY_2021_3_OR_NEWER
+            // Prepare the label before BeginProperty captures it for rendering.
+            if (isManagedReference && ((SubclassSelectorAttribute)attribute).UseToStringAsLabel && !property.hasMultipleDifferentValues)
+            {
+                object managedReferenceValue = property.managedReferenceValue;
+                if (managedReferenceValue != null)
+                {
+                    label.text = managedReferenceValue.ToString();
+                }
+            }
+#endif
+
             EditorGUI.BeginProperty(position, label, property);
 
-            if (property.propertyType == SerializedPropertyType.ManagedReference)
+            if (isManagedReference)
             {
                 // Render label first to avoid label overlap for lists
                 Rect foldoutLabelRect = new Rect(position);
@@ -46,19 +59,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 // NOTE: IndentedRect should be disabled as it causes extra indentation.
                 //foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
                 Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
-
-#if UNITY_2021_3_OR_NEWER
-                // Override the label text with the ToString() of the managed reference.
-                var subclassSelectorAttribute = (SubclassSelectorAttribute)attribute;
-                if (subclassSelectorAttribute.UseToStringAsLabel && !property.hasMultipleDifferentValues)
-                {
-                    object managedReferenceValue = property.managedReferenceValue;
-                    if (managedReferenceValue != null)
-                    {
-                        label.text = managedReferenceValue.ToString();
-                    }
-                }
-#endif
 
                 // Draw the subclass selector popup.
                 if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
