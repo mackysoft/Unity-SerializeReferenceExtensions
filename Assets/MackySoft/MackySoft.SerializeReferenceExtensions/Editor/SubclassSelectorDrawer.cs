@@ -35,24 +35,23 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
-
-            if (property.propertyType == SerializedPropertyType.ManagedReference)
-            {
+            bool isManagedReference = property.propertyType == SerializedPropertyType.ManagedReference;
 #if UNITY_2021_3_OR_NEWER
-                // Override the label text with the ToString() of the managed reference.
-                // Must be called before EditorGUI.BeginProperty
-                var subclassSelectorAttribute = (SubclassSelectorAttribute)attribute;
-                if (subclassSelectorAttribute.UseToStringAsLabel && !property.hasMultipleDifferentValues)
+            // Prepare the label before BeginProperty captures it for rendering.
+            if (isManagedReference && ((SubclassSelectorAttribute)attribute).UseToStringAsLabel && !property.hasMultipleDifferentValues)
+            {
+                object managedReferenceValue = property.managedReferenceValue;
+                if (managedReferenceValue != null)
                 {
-                    object managedReferenceValue = property.managedReferenceValue;
-                    if (managedReferenceValue != null)
-                    {
-                        label.text = managedReferenceValue.ToString();
-                    }
+                    label.text = managedReferenceValue.ToString();
                 }
+            }
 #endif
-                
-                EditorGUI.BeginProperty(position, label, property);
+
+            EditorGUI.BeginProperty(position, label, property);
+
+            if (isManagedReference)
+            {
                 // Render label first to avoid label overlap for lists
                 Rect foldoutLabelRect = new Rect(position);
                 foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
@@ -130,7 +129,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
             else
             {
-                EditorGUI.BeginProperty(position, label, property);
                 EditorGUI.LabelField(position, label, IsNotManagedReferenceLabel);
             }
 
