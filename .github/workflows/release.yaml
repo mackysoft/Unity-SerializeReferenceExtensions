@@ -1,7 +1,16 @@
 name: Release
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Package version and Git tag (for example 1.7.1).
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -15,15 +24,35 @@ jobs:
       sha: ${{ steps.metadata.outputs.sha }}
       version: ${{ steps.metadata.outputs.version }}
     steps:
+      - name: Create release app token
+        id: release_app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: write
+
       - uses: actions/checkout@v4
-      - name: Read committed release version
-        id: metadata
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ steps.release_app.outputs.token }}
+
+      - name: Configure release app identity
+        env:
+          APP_SLUG: ${{ steps.release_app.outputs.app-slug }}
+          GH_TOKEN: ${{ steps.release_app.outputs.token }}
         run: |
-          version="$(jq -er '.version | select(type == "string" and length > 0)' "$TARGET_FILE")"
-          sha="$(git rev-parse HEAD)"
-          VERSION="$version" RELEASE_SHA="$sha" bash .github/scripts/release-tag.sh check
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          bot_login="${APP_SLUG}[bot]"
+          bot_id="$(gh api "/users/${APP_SLUG}%5Bbot%5D" --jq '.id')"
+          git config user.name "$bot_login"
+          git config user.email "${bot_id}+${bot_login}@users.noreply.github.com"
+
+      - name: Prepare release version
+        id: metadata
+        env:
+          VERSION: ${{ inputs.tag }}
+          RELEASE_REF: ${{ github.ref }}
+        run: bash .github/scripts/release.sh prepare
 
   build:
     needs: prepare
@@ -103,12 +132,20 @@ jobs:
   create-release:
     needs: [prepare, build]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
+      # Each job owns a short-lived token; prepare's token is revoked before build.
+      - name: Create release app token
+        id: release_app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: write
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ steps.release_app.outputs.token }}
 
       # Publish the exact commit that produced the package. Recheck the remote
       # after the build, since another release may have created the tag meanwhile.
@@ -116,7 +153,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
           RELEASE_SHA: ${{ needs.prepare.outputs.sha }}
-        run: bash .github/scripts/release-tag.sh create
+        run: bash .github/scripts/release.sh create
 
       # Download the package artifact for the release.
       - uses: actions/download-artifact@v4
@@ -126,9 +163,8 @@ jobs:
       
       # Create release and upload unitypackage.
       - uses: softprops/action-gh-release@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          token: ${{ steps.release_app.outputs.token }}
           tag_name: ${{ needs.prepare.outputs.version }}
           name: ${{ needs.prepare.outputs.version }}
           target_commitish: ${{ needs.prepare.outputs.sha }}

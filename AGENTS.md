@@ -22,7 +22,7 @@ Use Unity CLI through `.github/actions/setup-unity`.
 - Run tests on Linux.
 - Always report the final `Verification` check on pull requests. It passes only when change detection succeeds and all required EditMode matrix jobs succeed, or Unity tests are not required and are skipped.
 - Build the example player for Linux 64-bit and export the package only in the Release workflow.
-- Update the package version through a pull request before releasing. Release uses the committed `package.json` version as its tag and builds that exact commit.
+- Release accepts a version tag, updates `package.json` through the MackySoft Release GitHub App, and builds that exact commit. Configure `RELEASE_BOT_APP_ID`, `RELEASE_BOT_PRIVATE_KEY`, and the App's bypass for the pull request rule before releasing.
 - Run a Unity matrix that includes:
   - 2021.3.x (minimum baseline)
   - 2023.2+ (generic/variance feature gate)
