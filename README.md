@@ -205,6 +205,28 @@ Check the eligibility rules:
 - Does it derive from `UnityEngine.Object`?
 - Is `[HideInTypeMenu]` applied?
 
+### Why are child fields missing when I explicitly draw a `[HideInInspector]` reference?
+
+Unity's visible-child iteration can omit the children of a `[HideInInspector]` managed reference, even when you explicitly call `EditorGUILayout.PropertyField(property, true)`. This also occurs without `SubclassSelector` and in a regular EditorWindow, so it is not specific to xNode.
+
+To explicitly display the hidden children in a custom editor, set [`SerializedObject.forceChildVisibility`](https://docs.unity3d.com/2021.3/Documentation/ScriptReference/SerializedObject-forceChildVisibility.html) while drawing the property, then restore the previous setting:
+
+```csharp
+SerializedObject serializedOwner = conditionsProperty.serializedObject;
+bool previousVisibility = serializedOwner.forceChildVisibility;
+try
+{
+    serializedOwner.forceChildVisibility = true;
+    EditorGUILayout.PropertyField(conditionsProperty, true);
+}
+finally
+{
+    serializedOwner.forceChildVisibility = previousVisibility;
+}
+```
+
+This setting affects the owning `SerializedObject` and reveals hidden descendants too, including fields that have their own `[HideInInspector]`. Apply it only in the custom drawing scope where you want that behavior. If you need different visibility in a node body and a sidebar while preserving individual children's hiding rules, filter the field in the node body's custom editor instead of applying `[HideInInspector]` to the shared serialized field.
+
 ### Can I select MonoBehaviour / ScriptableObject?
 
 No. Unity does not allow `UnityEngine.Object` types in `SerializeReference`.
