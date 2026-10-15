@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -28,34 +29,52 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private const int MaxNamespaceNestCount = 16;
 
-        public static void AddTo (AdvancedDropdownItem root, IEnumerable<Type> types)
+        private readonly struct TypeMenuItem
         {
-            int itemCount = 0;
 
-            // Add null item.
-            var nullItem = new AdvancedTypePopupItem(null, TypeMenuUtility.NullDisplayName)
+            public Type Type { get; }
+            public string[] Path { get; }
+            public string Name { get; }
+
+            public TypeMenuItem (Type type)
             {
-                id = itemCount++
-            };
-            root.AddChild(nullItem);
+                Type = type;
+                Path = TypeMenuUtility.GetSplittedTypePath(type);
+                Name = Path.Length > 0 ? ObjectNames.NicifyVariableName(Path[Path.Length - 1]) : string.Empty;
+            }
 
-            Type[] typeArray = types.OrderByType().ToArray();
+        }
 
-            // Single namespace if the root has one namespace and the nest is unbranched.
-            bool isSingleNamespace = true;
+        private sealed class TypeMenu
+        {
+
+            public CultureInfo Culture { get; }
+            public TypeMenuItem[] Items { get; }
+            public bool IsSingleNamespace { get; }
+
+            public TypeMenu (IEnumerable<Type> types)
+            {
+                Culture = CultureInfo.CurrentCulture;
+                Items = types.OrderByType().Select(type => new TypeMenuItem(type)).ToArray();
+                IsSingleNamespace = HasSingleNamespace(Items);
+            }
+
+        }
+
+        private static bool HasSingleNamespace (TypeMenuItem[] items)
+        {
+            // Flatten an unbranched namespace unless an explicit menu requests a category.
             string[] namespaces = new string[MaxNamespaceNestCount];
-            foreach (Type type in typeArray)
+            foreach (TypeMenuItem item in items)
             {
-                string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type);
+                string[] splittedTypePath = item.Path;
                 if (splittedTypePath.Length <= 1)
                 {
                     continue;
                 }
-                // If they explicitly want sub category, let them do.
-                if (TypeMenuUtility.GetAttribute(type) != null)
+                if (TypeMenuUtility.GetAttribute(item.Type) != null)
                 {
-                    isSingleNamespace = false;
-                    break;
+                    return false;
                 }
                 for (int k = 0; (splittedTypePath.Length - 1) > k; k++)
                 {
@@ -66,21 +85,34 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     }
                     else if (ns != splittedTypePath[k])
                     {
-                        isSingleNamespace = false;
-                        break;
+                        return false;
                     }
                 }
-
-                if (!isSingleNamespace)
-                {
-                    break;
-                }
             }
+            return true;
+        }
+
+        public static void AddTo (AdvancedDropdownItem root, IEnumerable<Type> types)
+        {
+            // Direct callers still get a freshly sorted menu for their input.
+            AddTo(root, new TypeMenu(types));
+        }
+
+        private static void AddTo (AdvancedDropdownItem root, TypeMenu menu)
+        {
+            int itemCount = 0;
+
+            // Add null item.
+            var nullItem = new AdvancedTypePopupItem(null, TypeMenuUtility.NullDisplayName)
+            {
+                id = itemCount++
+            };
+            root.AddChild(nullItem);
 
             // Add type items.
-            foreach (Type type in typeArray)
+            foreach (TypeMenuItem menuItem in menu.Items)
             {
-                string[] splittedTypePath = TypeMenuUtility.GetSplittedTypePath(type);
+                string[] splittedTypePath = menuItem.Path;
                 if (splittedTypePath.Length == 0)
                 {
                     continue;
@@ -89,7 +121,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 AdvancedDropdownItem parent = root;
 
                 // Add namespace items.
-                if (!isSingleNamespace)
+                if (!menu.IsSingleNamespace)
                 {
                     for (int k = 0; (splittedTypePath.Length - 1) > k; k++)
                     {
@@ -111,7 +143,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 }
 
                 // Add type item.
-                var item = new AdvancedTypePopupItem(type, ObjectNames.NicifyVariableName(splittedTypePath[splittedTypePath.Length - 1]))
+                var item = new AdvancedTypePopupItem(menuItem.Type, menuItem.Name)
                 {
                     id = itemCount++
                 };
@@ -138,6 +170,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private static readonly float HeaderHeight = EditorGUIUtility.singleLineHeight * 2f;
 
         private Type[] types;
+        private TypeMenu menu;
 
         public event Action<AdvancedTypePopupItem> OnItemSelected;
 
@@ -150,12 +183,19 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         public void SetTypes (IEnumerable<Type> types)
         {
             this.types = types.ToArray();
+            menu = null;
         }
 
         protected override AdvancedDropdownItem BuildRoot ()
         {
             var root = new AdvancedDropdownItem("Select Type");
-            AddTo(root, types);
+
+            // Keep display metadata private to this snapshot. Ordering follows the current culture.
+            if (menu == null || !ReferenceEquals(menu.Culture, CultureInfo.CurrentCulture))
+            {
+                menu = new TypeMenu(types);
+            }
+            AddTo(root, menu);
             return root;
         }
 
