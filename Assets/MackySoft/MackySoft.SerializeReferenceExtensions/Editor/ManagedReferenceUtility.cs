@@ -11,26 +11,56 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         public static object SetManagedReference (this SerializedProperty property, Type type)
         {
-            object result = null;
-
 #if UNITY_2021_3_OR_NEWER
-            // NOTE: managedReferenceValue getter is available only in Unity 2021.3 or later.
-            if ((type != null) && (property.managedReferenceValue != null))
-            {
-                // Restore an previous values from json.
-                string json = JsonUtility.ToJson(property.managedReferenceValue);
-                result = JsonUtility.FromJson(json, type);
-            }
+            object result = CreateManagedReference(property.managedReferenceValue, type);
+#else
+            object result = (type != null) ? Activator.CreateInstance(type) : null;
 #endif
-
-            if (result == null)
-            {
-                result = (type != null) ? Activator.CreateInstance(type) : null;
-            }
-
             property.managedReferenceValue = result;
             return result;
+        }
 
+        internal static object CreateManagedReference (object previousValue, Type type)
+        {
+            if (type == null)
+            {
+                return null;
+            }
+            if (previousValue != null)
+            {
+                // Keep the existing field-name matching semantics for both type changes and same-type replacement.
+                object restored = JsonUtility.FromJson(JsonUtility.ToJson(previousValue), type);
+                if (restored != null)
+                {
+                    return restored;
+                }
+            }
+            return Activator.CreateInstance(type);
+        }
+
+        /// <summary> Applies previously validated and constructed replacements as one Undo operation. </summary>
+        /// <remarks> Properties and their SerializedObjects are borrowed from the enclosing command scope. </remarks>
+        internal static void ApplyManagedReferences (SerializedProperty[] properties, object[] values, string undoName, bool expandAssignedValues)
+        {
+            Undo.IncrementCurrentGroup();
+            int group = Undo.GetCurrentGroup();
+            Undo.SetCurrentGroupName(undoName);
+            try
+            {
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    properties[i].managedReferenceValue = values[i];
+                    if (expandAssignedValues)
+                    {
+                        properties[i].isExpanded = values[i] != null;
+                    }
+                    properties[i].serializedObject.ApplyModifiedProperties();
+                }
+            }
+            finally
+            {
+                Undo.CollapseUndoOperations(group);
+            }
         }
 
         public static Type GetType (string typeName)

@@ -61,6 +61,39 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         }
 
+        private sealed class SelectionSession : AdvancedDropdown
+        {
+            private readonly AdvancedTypePopup owner;
+            private Action<AdvancedTypePopupItem> callback;
+
+            internal SelectionSession (AdvancedTypePopup owner, AdvancedDropdownState state, Action<AdvancedTypePopupItem> callback) : base(state)
+            {
+                this.owner = owner;
+                this.callback = callback;
+                minimumSize = owner.minimumSize;
+            }
+
+            protected override AdvancedDropdownItem BuildRoot ()
+            {
+                return owner.BuildRoot();
+            }
+
+            protected override void ItemSelected (AdvancedDropdownItem item)
+            {
+                try
+                {
+                    if (item is AdvancedTypePopupItem typeItem)
+                    {
+                        callback?.Invoke(typeItem);
+                    }
+                }
+                finally
+                {
+                    callback = null;
+                }
+            }
+        }
+
         private static bool HasSingleNamespace (TypeMenuItem[] items)
         {
             // Flatten an unbranched namespace unless an explicit menu requests a category.
@@ -171,11 +204,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private Type[] types;
         private TypeMenu menu;
+        private readonly AdvancedDropdownState state;
 
         public event Action<AdvancedTypePopupItem> OnItemSelected;
 
         public AdvancedTypePopup (IEnumerable<Type> types, int maxLineCount, AdvancedDropdownState state) : base(state)
         {
+            this.state = state;
             SetTypes(types);
             minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * maxLineCount + HeaderHeight);
         }
@@ -184,6 +219,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         {
             this.types = types.ToArray();
             menu = null;
+        }
+
+        internal void ShowForSelection (Rect position, Action<AdvancedTypePopupItem> callback)
+        {
+            // Only the native window owns this session. The cached metadata owner retains no target callback.
+            new SelectionSession(this, state, callback).Show(position);
         }
 
         protected override AdvancedDropdownItem BuildRoot ()
