@@ -139,6 +139,15 @@ public struct StructCommand : ICommand {
 }
 ```
 
+### Copy and paste managed references
+
+Right-click a managed-reference field or an individual collection element and choose **Copy**. The copied snapshot remains available across script reloads during the current Editor session. To preserve unresolved reference data, copying null fields is disabled on objects that contain missing managed-reference types.
+
+- **Paste Values Only** copies matching serialized fields into the existing destination instance. It preserves the destination type and reference identity, and keeps destination fields absent from the copied data. The copied value and destination must both be non-null.
+- **Paste Type and Values** creates an independent instance of the copied type when that type is assignable to the destination field. It also works with an empty destination. Copying a null reference and using this command clears the destination.
+
+Copy and paste operate on one selected object at a time; the commands are disabled when multiple objects are selected. They apply to a single managed-reference property, including a nested field or collection element. Copying a whole regular `[SerializeField]` parent or an entire collection is outside these commands.
+
 ## Generic support (Unity 2023.2+)
 
 Unity 2023.2+ supports generic type instances for `SerializeReference` fields more reliably.
