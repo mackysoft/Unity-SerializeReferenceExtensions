@@ -30,6 +30,8 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             yield return new TestCaseData(typeof(HiddenSerializableClass), false).SetName("Candidates_ITestBase_HideInTypeMenu_NG");
             yield return new TestCaseData(typeof(UnityObjectDerived), false).SetName("Candidates_ITestBase_UnityObjectDerived_NG");
             yield return new TestCaseData(typeof(GenericCandidate<int>), false).SetName("Candidates_ITestBase_GenericClosed_NG");
+            yield return new TestCaseData(typeof(GenericCandidate<>), false).SetName("Candidates_ITestBase_GenericOpen_NG");
+            yield return new TestCaseData(typeof(ConcreteDerivedType), false).SetName("Candidates_ITestBase_Unrelated_NG");
         }
 
         [TestCaseSource(nameof(Cases))]
