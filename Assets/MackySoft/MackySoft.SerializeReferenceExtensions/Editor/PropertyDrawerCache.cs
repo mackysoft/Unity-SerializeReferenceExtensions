@@ -8,17 +8,21 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
     public static class PropertyDrawerCache
     {
 
-        private static readonly Dictionary<Type, PropertyDrawer> Caches = new Dictionary<Type, PropertyDrawer>();
+        private static readonly Dictionary<Type, Type> DrawerTypes = new Dictionary<Type, Type>();
 
+        /// <summary> Creates an unbound custom drawer registered for the specified type. </summary>
+        /// <param name="type"> The value type whose drawer registration is resolved. </param>
+        /// <param name="drawer"> A fresh drawer when a registration exists; otherwise, null. The caller owns this instance and must release it if it implements <see cref="IDisposable"/>. </param>
+        /// <returns> True when a custom drawer registration exists. </returns>
+        /// <remarks> A type-only lookup supplies neither declaring-field context nor Unity handler ownership. </remarks>
         public static bool TryGetPropertyDrawer (Type type, out PropertyDrawer drawer)
         {
-            if (!Caches.TryGetValue(type, out drawer))
+            if (!DrawerTypes.TryGetValue(type, out Type drawerType))
             {
-                Type drawerType = GetCustomPropertyDrawerType(type);
-                drawer = (drawerType != null) ? (PropertyDrawer)Activator.CreateInstance(drawerType) : null;
-
-                Caches.Add(type, drawer);
+                drawerType = GetCustomPropertyDrawerType(type);
+                DrawerTypes.Add(type, drawerType);
             }
+            drawer = (drawerType != null) ? (PropertyDrawer)Activator.CreateInstance(drawerType) : null;
             return (drawer != null);
         }
 

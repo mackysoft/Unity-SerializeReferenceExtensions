@@ -112,16 +112,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 {
                     using (new EditorGUI.IndentLevelScope())
                     {
-                        // Check if a custom property drawer exists for this type.
-                        PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
-                        if (customDrawer != null)
+                        if (UnityPropertyDrawerUtility.HasNextPropertyDrawer(property))
                         {
-                            // Draw the property with custom property drawer.
+                            // Let Unity invoke the next drawer with its declaring-field context and native ownership.
                             Rect indentedRect = position;
                             float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                            indentedRect.height = customDrawer.GetPropertyHeight(property, label);
+                            indentedRect.height = EditorGUI.GetPropertyHeight(property, label, true);
                             indentedRect.y += foldoutDifference;
-                            customDrawer.OnGUI(indentedRect, property, label);
+                            EditorGUI.PropertyField(indentedRect, property, label, true);
                         }
                         else
                         {
@@ -166,16 +164,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
 
             EditorGUI.EndProperty();
-        }
-
-        private PropertyDrawer GetCustomPropertyDrawer (SerializedProperty property)
-        {
-            Type propertyType = ManagedReferenceUtility.GetType(property.managedReferenceFullTypename);
-            if (propertyType != null && PropertyDrawerCache.TryGetPropertyDrawer(propertyType, out PropertyDrawer drawer))
-            {
-                return drawer;
-            }
-            return null;
         }
 
         private TypePopupCache GetTypePopup (SerializedProperty property)
@@ -270,10 +258,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             float height = EditorGUIUtility.singleLineHeight;
             height += EditorGUIUtility.standardVerticalSpacing;
 
-            PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
-            if (customDrawer != null)
+            if (UnityPropertyDrawerUtility.HasNextPropertyDrawer(property))
             {
-                height += customDrawer.GetPropertyHeight(property, label);
+                height += EditorGUI.GetPropertyHeight(property, label, true);
                 return height;
             }
 
