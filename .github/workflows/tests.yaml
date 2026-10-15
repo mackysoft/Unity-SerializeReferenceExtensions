@@ -58,11 +58,6 @@ jobs:
         with:
           lfs: true
 
-      - name: Prepare isolated PR 100 performance subjects
-        run: |
-          git fetch --no-tags origin 7c81c920b1c16678748a090c69b877676bb31ab1 be39689cc83f9ce694a01356314c4485ed1023d5
-          python3 Tools/Performance/pr100/prepare.py
-
       - name: Set up Unity
         uses: ./.github/actions/setup-unity
         with:

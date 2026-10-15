@@ -61,7 +61,9 @@ namespace MackySoft.SerializeReferenceExtensions.Performance
         public static Entry[] Read()
         {
             allocations.Stop();
-            if (allocations.WrappedAround || allocations.Count >= allocations.Capacity)
+            bool exhausted = allocations.WrappedAround || allocations.Count >= allocations.Capacity;
+            allocations.Dispose();
+            if (exhausted)
             {
                 throw new InvalidOperationException("Allocation probe capacity exhausted.");
             }
