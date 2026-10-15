@@ -125,6 +125,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                             }
                         }
                     }
+
+#if UNITY_6000_0_OR_NEWER
+                    // TextArea can defer its prefix label during Layout. Resolve it inside
+                    // this drawer's IMGUI context before UI Toolkit starts another one.
+                    GUIUtility.GetControlID(FocusType.Passive);
+#endif
                 }
             }
             else
