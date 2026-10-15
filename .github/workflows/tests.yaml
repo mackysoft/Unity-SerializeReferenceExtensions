@@ -2,9 +2,8 @@ name: Tests
 
 on:
   push:
-    branches-ignore:
-      - documentation
-      - gh-pages
+    branches:
+      - main
   pull_request: {}
   workflow_dispatch: {}
 

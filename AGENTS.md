@@ -10,7 +10,9 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 - Repository URL: `https://github.com/mackysoft/Unity-SerializeReferenceExtensions`
 - Package source: `Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
 - Editor code: `.../Editor/**`
-- Tests: `.../Tests/**`
+- Tests: `Assets/Tests/SerializeReferenceExtensions/Editor/**`
+
+Keep test code, fixtures, and test assembly definitions under `Assets/Tests`, outside both the UPM package root and the `Assets/MackySoft` unitypackage export scope.
 
 ## Unity compatibility (critical)
 - Minimum supported Unity: 2021.3 (baseline for development/testing).
@@ -29,15 +31,15 @@ Use Unity CLI through `.github/actions/setup-unity`.
 
 ## How to run tests locally
 ### EditMode
-Run tests through Unity CLI (which manages batch mode):
+Run tests through Unity CLI (which manages batch mode). Inspector interaction and
+rendering tests require graphics; do not pass `-nographics`. On headless Linux,
+run under Xvfb with software OpenGL, as configured in the Tests workflow:
 ```
 unity --non-interactive test . --editor-version 2021.3.45f2 \
   --mode EditMode --output Logs/TestResults/editmode.xml --timeout 900 \
   -- -logFile Logs/editmode.log
 ```
 Repeat with `--editor-version 2023.2.22f1` for the generic/variance feature gate.
-GUI interaction tests require a graphics device; do not pass `-nographics`. On headless Linux,
-run the command under `xvfb-run` with software OpenGL, as configured in the Tests workflow.
 
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).
