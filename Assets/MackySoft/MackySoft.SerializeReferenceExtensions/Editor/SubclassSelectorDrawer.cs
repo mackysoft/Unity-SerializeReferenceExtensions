@@ -22,6 +22,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
         }
 
+        private sealed class TypeChangeState
+        {
+            public bool Pending;
+        }
+
         private const int MaxTypePopupLineCount = 13;
 
         private static readonly GUIContent NullDisplayName = new GUIContent(TypeMenuUtility.NullDisplayName);
@@ -32,9 +37,12 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private readonly Dictionary<string, GUIContent> typeNameCaches = new Dictionary<string, GUIContent>();
 
         private SerializedProperty targetProperty;
+        private TypeChangeState targetTypeChangeState;
 
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
+            int controlID = GUIUtility.GetControlID(property.propertyPath.GetHashCode(), FocusType.Passive);
+            var typeChangeState = (TypeChangeState)GUIUtility.GetStateObject(typeof(TypeChangeState), controlID);
             bool isManagedReference = property.propertyType == SerializedPropertyType.ManagedReference;
 #if UNITY_2021_3_OR_NEWER
             // Prepare the label before BeginProperty captures it for rendering.
@@ -49,6 +57,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 #endif
 
             EditorGUI.BeginProperty(position, label, property);
+
+            // A type change can recreate the drawer. Keep its pending notification with the owning GUI control.
+            if (typeChangeState.Pending)
+            {
+                typeChangeState.Pending = false;
+                GUI.changed = true;
+            }
 
             if (isManagedReference)
             {
@@ -65,6 +80,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 {
                     TypePopupCache popup = GetTypePopup(property);
                     targetProperty = property;
+                    targetTypeChangeState = typeChangeState;
                     popup.TypePopup.Show(popupPosition);
                 }
 
@@ -182,6 +198,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                         individualObject.ApplyModifiedProperties();
                         individualObject.Update();
                     }
+
+                    targetTypeChangeState.Pending = true;
                 };
 
                 result = new TypePopupCache(popup, state);

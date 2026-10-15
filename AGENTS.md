@@ -32,7 +32,8 @@ Use Unity CLI through `.github/actions/setup-unity`.
 ## How to run tests locally
 ### EditMode
 Run tests through Unity CLI (which manages batch mode). Inspector interaction and
-rendering tests require graphics; run Linux tests under Xvfb as in CI:
+rendering tests require graphics; do not pass `-nographics`. On headless Linux,
+run under Xvfb with software OpenGL, as configured in the Tests workflow:
 ```
 unity --non-interactive test . --editor-version 2021.3.45f2 \
   --mode EditMode --output Logs/TestResults/editmode.xml --timeout 900 \
