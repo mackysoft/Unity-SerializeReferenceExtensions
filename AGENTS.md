@@ -10,7 +10,9 @@ Primary risk area: type discovery & filtering (what types appear in the selector
 - Repository URL: `https://github.com/mackysoft/Unity-SerializeReferenceExtensions`
 - Package source: `Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
 - Editor code: `.../Editor/**`
-- Tests: `.../Tests/**`
+- Tests: `Assets/Tests/SerializeReferenceExtensions/Editor/**`
+
+Keep test code, fixtures, and test assembly definitions under `Assets/Tests`, outside both the UPM package root and the `Assets/MackySoft` unitypackage export scope.
 
 ## Unity compatibility (critical)
 - Minimum supported Unity: 2021.3 (baseline for development/testing).
