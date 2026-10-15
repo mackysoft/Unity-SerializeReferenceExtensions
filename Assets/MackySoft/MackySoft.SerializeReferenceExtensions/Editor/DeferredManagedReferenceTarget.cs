@@ -46,10 +46,10 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             private readonly object value;
             private readonly object[] elements;
 
-            internal ContainerObservation (object value)
+            internal ContainerObservation (object value, bool captureSequence)
             {
                 this.value = SnapshotValue(value);
-                if (value is IList list)
+                if (captureSequence && value is IList list)
                 {
                     elements = new object[list.Count];
                     for (int i = 0; i < elements.Length; i++)
@@ -134,7 +134,8 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                         currentType = field.FieldType;
                     }
 
-                    containers.Add(new ContainerObservation(current));
+                    // A field owner may implement IList for unrelated purposes; only index steps observe its sequence.
+                    containers.Add(new ContainerObservation(current, step.Field == null));
                     steps.Add(step);
                     current = step.Read(current);
                     if (current != null)
