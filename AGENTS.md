@@ -33,9 +33,11 @@ Run tests through Unity CLI (which manages batch mode):
 ```
 unity --non-interactive test . --editor-version 2021.3.45f2 \
   --mode EditMode --output Logs/TestResults/editmode.xml --timeout 900 \
-  -- -nographics -logFile Logs/editmode.log
+  -- -logFile Logs/editmode.log
 ```
 Repeat with `--editor-version 2023.2.22f1` for the generic/variance feature gate.
+GUI interaction tests require a graphics device; do not pass `-nographics`. On headless Linux,
+run the command under `xvfb-run` with software OpenGL, as configured in the Tests workflow.
 
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).
