@@ -133,11 +133,22 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                             childPosition.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                             foreach (SerializedProperty childProperty in property.GetChildProperties())
                             {
-                                float height = EditorGUI.GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName, childProperty.tooltip), true);
-                                childPosition.height = height;
-                                EditorGUI.PropertyField(childPosition, childProperty, true);
+                                using (childProperty)
+                                {
+                                    float height = EditorGUI.GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName, childProperty.tooltip), true);
+                                    childPosition.height = height;
+                                    using (var changeCheck = new EditorGUI.ChangeCheckScope())
+                                    {
+                                        EditorGUI.PropertyField(childPosition, childProperty, true);
+                                        // A child can replace its structure and invalidate the active iterator.
+                                        if (changeCheck.changed)
+                                        {
+                                            break;
+                                        }
+                                    }
 
-                                childPosition.y += height + EditorGUIUtility.standardVerticalSpacing;
+                                    childPosition.y += height + EditorGUIUtility.standardVerticalSpacing;
+                                }
                             }
                         }
                     }
@@ -278,16 +289,19 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             foreach (SerializedProperty child in property.GetChildProperties())
             {
-                if (!first)
+                using (child)
                 {
-                    height += EditorGUIUtility.standardVerticalSpacing;
+                    if (!first)
+                    {
+                        height += EditorGUIUtility.standardVerticalSpacing;
+                    }
+                    first = false;
+
+                    TempChildLabel.text = child.displayName;
+                    TempChildLabel.tooltip = child.tooltip;
+
+                    height += EditorGUI.GetPropertyHeight(child, TempChildLabel, true);
                 }
-                first = false;
-
-                TempChildLabel.text = child.displayName;
-                TempChildLabel.tooltip = child.tooltip;
-
-                height += EditorGUI.GetPropertyHeight(child, TempChildLabel, true);
             }
 
             return height;
