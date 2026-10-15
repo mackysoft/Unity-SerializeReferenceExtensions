@@ -39,8 +39,6 @@ unity --non-interactive test . --editor-version 2021.3.45f2 \
   -- -logFile Logs/editmode.log
 ```
 Repeat with `--editor-version 2023.2.22f1` for the generic/variance feature gate.
-The contract-to-test map and known uncovered conditions are in
-`Documentation/Tests.md`.
 
 ## Architecture guardrails
 - Runtime surface area should remain minimal (mainly attributes / data structures).
