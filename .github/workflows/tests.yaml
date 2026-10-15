@@ -72,13 +72,16 @@ jobs:
           restore-keys: Library-${{ runner.os }}-${{ matrix.unityVersion }}-EditMode-
 
       - name: Run EditMode tests
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          unity --non-interactive test . \
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
+            unity --non-interactive test . \
             --editor-version "${{ matrix.unityVersion }}" \
             --mode EditMode \
             --output Logs/TestResults/editmode.xml \
             --timeout 900 \
-            -- -nographics -logFile Logs/editmode.log
+            -- -force-glcore -logFile Logs/editmode.log
 
       - name: Return Unity license
         if: always() && env.UNITY_LICENSE_ACTIVATION_ATTEMPTED == 'true'
