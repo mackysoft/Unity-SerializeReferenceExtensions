@@ -221,6 +221,12 @@ namespace MackySoft.SerializeReferenceExtensions.Performance
             foreach (var field in FindType(SubjectNamespace + subject + ".TypeMenuUtility").GetFields(BindingFlags.NonPublic | BindingFlags.Static))
             {
                 if (field.GetValue(null) is IDictionary dictionary) { dictionary.Clear(); }
+                if (field.GetValue(null) is IDictionary)
+                {
+                    MethodInfo trim = field.FieldType.GetMethod("TrimExcess", Type.EmptyTypes);
+                    Assert.That(trim, Is.Not.Null, "dictionary capacity reset unavailable");
+                    trim.Invoke(field.GetValue(null), null);
+                }
             }
         }
 
@@ -284,6 +290,15 @@ namespace MackySoft.SerializeReferenceExtensions.Performance
             Debug.Log("PR100_PERFORMANCE " + path);
         }
 
+        private static void MeasureShow(string operation, Action action)
+        {
+            long start = Stopwatch.GetTimestamp();
+            action();
+            double milliseconds = (Stopwatch.GetTimestamp() - start) * 1000.0 / Stopwatch.Frequency;
+            report.measurements.Add(new Measurement { operation = operation, iterations = 1, medianMs = milliseconds,
+                p95Ms = milliseconds, milliseconds = new[] { milliseconds }, medianAllocationEvents = -1, allocationEvents = new long[] { -1 } });
+        }
+
         public static void RunInteractive()
         {
             report = new Report { unity = Application.unityVersion, os = SystemInfo.operatingSystem,
@@ -303,54 +318,75 @@ namespace MackySoft.SerializeReferenceExtensions.Performance
             private SubclassSelectorDrawer drawer;
             private int phase;
             private int frames;
+            private int fieldIndex;
+            private UnityEngine.SceneManagement.Scene preview;
+            private static readonly string[] fieldNames = { "foodOne", "foodTwo", "foodThree" };
             private readonly GUIContent label = new GUIContent("Food");
 
             private void OnEnable()
             {
+                preview = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
                 target = new GameObject("Temporary PR100 probe");
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(target, preview);
                 var component = target.AddComponent(FindType("Example"));
                 serialized = new SerializedObject(component);
-                property = serialized.FindProperty("foodOne");
+                SelectField(component.GetType());
+            }
+
+            private void SelectField(Type componentType)
+            {
+                property?.Dispose();
+                property = serialized.FindProperty(fieldNames[fieldIndex]);
                 property.isExpanded = false;
                 drawer = new SubclassSelectorDrawer();
-                typeof(PropertyDrawer).GetField("m_Attribute", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(drawer, new SubclassSelectorAttribute());
-                typeof(PropertyDrawer).GetField("m_FieldInfo", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(drawer, component.GetType().GetField("foodOne"));
+                FieldInfo field = componentType.GetField(fieldNames[fieldIndex]);
+                typeof(PropertyDrawer).GetField("m_Attribute", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(drawer, Attribute.GetCustomAttribute(field, typeof(SubclassSelectorAttribute)));
+                typeof(PropertyDrawer).GetField("m_FieldInfo", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(drawer, field);
+                label.text = fieldNames[fieldIndex];
             }
 
             private void OnGUI()
             {
-                if (property == null) { return; }
+                if (property == null || phase >= 4) { return; }
                 var rect = new Rect(10, 15, 650, 350);
+                string key = "OnGUI/" + fieldNames[fieldIndex];
                 if (Event.current.type != EventType.Repaint) { drawer.OnGUI(rect, property, label); return; }
                 try
                 {
                     if (phase == 0)
                     {
-                        Measure("OnGUI/Food/collapsed-first-repaint-after-layout", 1, () => drawer.OnGUI(rect, property, label));
-                        Measure("OnGUI/Food/collapsed-repeat-repaint", 201, () => drawer.OnGUI(rect, property, label));
+                        Measure(key + "/collapsed-first-repaint-after-layout", 1, () => drawer.OnGUI(rect, property, label));
+                        Measure(key + "/collapsed-repeat-repaint", 201, () => drawer.OnGUI(rect, property, label));
                         property.isExpanded = true;
                         phase++;
                     }
                     else if (phase == 1)
                     {
-                        Measure("OnGUI/Food/expanded-first-repaint-after-layout", 1, () => drawer.OnGUI(rect, property, label));
-                        Measure("OnGUI/Food/expanded-repeat-repaint", 201, () => drawer.OnGUI(rect, property, label));
+                        Measure(key + "/expanded-first-repaint-after-layout", 1, () => drawer.OnGUI(rect, property, label));
+                        Measure(key + "/expanded-repeat-repaint", 201, () => drawer.OnGUI(rect, property, label));
                         Measure("SerializedProperty/managedReferenceFieldTypename", 201, () => sink = property.managedReferenceFieldTypename);
                         Measure("SerializedProperty/managedReferenceFullTypename", 201, () => sink = property.managedReferenceFullTypename);
                         phase++;
                     }
                     else if (phase == 2)
                     {
+                        if (fieldIndex < fieldNames.Length - 1)
+                        {
+                            fieldIndex++;
+                            SelectField(serialized.targetObject.GetType());
+                            phase = 0;
+                            Repaint();
+                            return;
+                        }
                         var popup = new Baseline.BenchPopup(TypeSearchService.TypeCandiateService.GetDisplayableTypes(FindType("Food")));
-                        Measure("AdvancedDropdown/Food/first-Show", 1, () => popup.Show(new Rect(10, 30, 600, 18)));
+                        MeasureShow("AdvancedDropdown/Food/first-Show", () => popup.Show(new Rect(10, 30, 600, 18)));
                         report.observations.Add("Real EditorWindow OnGUI and AdvancedDropdown.Show executed for existing Example.foodOne; timing is synchronous Show work only.");
                         phase++;
                     }
                     else if (++frames > 5)
                     {
                         Write("interactive");
-                        EditorApplication.delayCall += () => { Close(); EditorApplication.Exit(0); };
-                        phase = -100;
+                        phase = 4;
                     }
                 }
                 catch (Exception e)
@@ -363,10 +399,16 @@ namespace MackySoft.SerializeReferenceExtensions.Performance
                 Repaint();
             }
 
+            private void Update()
+            {
+                if (phase == 4) { phase = 5; Close(); EditorApplication.Exit(0); }
+            }
+
             private void OnDestroy()
             {
                 serialized?.Dispose();
                 if (target != null) { DestroyImmediate(target); }
+                if (preview.IsValid()) { UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(preview); }
             }
         }
     }
