@@ -1,0 +1,93 @@
+{
+  "harnessCommit": "b605dd934460c0f78644b1fe49b5ff0544f65adc",
+  "main": "7c81c920b1c16678748a090c69b877676bb31ab1",
+  "pr": "be39689cc83f9ce694a01356314c4485ed1023d5",
+  "unityCli": "1.0.0-beta.12",
+  "linuxRun": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/actions/runs/38716048268",
+  "files": [
+    {
+      "file": "linux-2021.3.45f2-batch.json.gz",
+      "rawSha256": "a9187ecc6507bcfa17e39f2121bc30bcae07cdd34da3d73575ebafd09aec23e9",
+      "gzipSha256": "092139d997e29d321fa78f9cc88c643c712ea9891b2d778b6dcedd3095848052",
+      "unity": "2021.3.45f2",
+      "os": "Linux 6.8 Ubuntu 22.04 64bit",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "startedUtc": "2026-10-15T09:54:55.4241360Z",
+      "assembliesAtInventory": 108,
+      "typesAtInventory": 22604
+    },
+    {
+      "file": "linux-2023.2.22f1-batch.json.gz",
+      "rawSha256": "af9bc4035074408fc2142bfe979c5ed9640e70689c89a270031e6980f87b2cea",
+      "gzipSha256": "2875837b9a5ae31837c4913f22f843decee1e92d4c1ba17ed214bdb9b94dc14e",
+      "unity": "2023.2.22f1",
+      "os": "Linux 6.8 Ubuntu 22.04 64bit",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "startedUtc": "2026-10-15T09:55:50.6219560Z",
+      "assembliesAtInventory": 141,
+      "typesAtInventory": 28892
+    },
+    {
+      "file": "macos-2021.3.45f2-batch.json.gz",
+      "rawSha256": "3920f92b3d9fc7cd7aed47ffc15e915d26aa07c036e1195370d712926732701b",
+      "gzipSha256": "763a4c81ec55373b6a4411290790ec25551808ecc0d08250ee3808aa0efe000b",
+      "unity": "2021.3.45f2",
+      "os": "Mac OS X 26.6.2",
+      "cpu": "Apple M1 Max",
+      "startedUtc": "2026-10-15T09:54:19.8146640Z",
+      "assembliesAtInventory": 112,
+      "typesAtInventory": 22935
+    },
+    {
+      "file": "macos-2021.3.45f2-interactive.json.gz",
+      "rawSha256": "d923267d1ee617825bc2f8ad46b34874fff65f0a73ed2823591d07114ddd1c1c",
+      "gzipSha256": "d6fbb6174806c563b26cf50ebba6d33f3c54ed9561fc5845d0da696a54f82abf",
+      "unity": "2021.3.45f2",
+      "os": "Mac OS X 26.6.2",
+      "cpu": "Apple M1 Max",
+      "startedUtc": "2026-10-15T09:56:03.3967950Z",
+      "assembliesAtInventory": null,
+      "typesAtInventory": null
+    },
+    {
+      "file": "macos-2023.2.22f1-batch.json.gz",
+      "rawSha256": "65e3504d8ab934f2e0dd7c0082d42749480255a8f15f986ebf25979d8f1e9ab4",
+      "gzipSha256": "24abc3f7cb44c9aca4692dd7b723d3b5e5fbddd155594c8f26e360c3938a4a55",
+      "unity": "2023.2.22f1",
+      "os": "Mac OS X 26.6.2",
+      "cpu": "Apple M1 Max",
+      "startedUtc": "2026-10-15T09:52:02.2078500Z",
+      "assembliesAtInventory": 143,
+      "typesAtInventory": 29081
+    },
+    {
+      "file": "macos-2023.2.22f1-interactive.json.gz",
+      "rawSha256": "c4bca556d69c458571de46c2b731124a8c58bea1f9d2a44a43d1f675229a0194",
+      "gzipSha256": "1f22ab2f4877c3f9a926a7ef9363412df744c43eb78ad9830965d0bf2761ba4e",
+      "unity": "2023.2.22f1",
+      "os": "Mac OS X 26.6.2",
+      "cpu": "Apple M1 Max",
+      "startedUtc": "2026-10-15T09:51:24.2455870Z",
+      "assembliesAtInventory": null,
+      "typesAtInventory": null
+    }
+  ],
+  "linuxTests": [
+    {
+      "unity": "2021.3.45f2",
+      "result": "Passed",
+      "total": "23",
+      "passed": "23",
+      "failed": "0",
+      "skipped": "0"
+    },
+    {
+      "unity": "2023.2.22f1",
+      "result": "Passed",
+      "total": "26",
+      "passed": "26",
+      "failed": "0",
+      "skipped": "0"
+    }
+  ]
+}
