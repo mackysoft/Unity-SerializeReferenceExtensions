@@ -32,111 +32,148 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private static void OnContextualPropertyMenu (GenericMenu menu, SerializedProperty property)
         {
-            if (property.propertyType == SerializedPropertyType.ManagedReference)
+            if (property.propertyType != SerializedPropertyType.ManagedReference)
             {
-                // NOTE: When the callback function is called, the SerializedProperty is rewritten to the property that was being moused over at the time,
-                // so a new SerializedProperty instance must be created.
-                SerializedProperty clonedProperty = property.Copy();
-                // Resolve clipboard targets by path because a property iterator can become invalid while the menu is open.
-                object clipboardTarget = (property.serializedObject, property.propertyPath);
+                return;
+            }
+            string path = property.propertyPath;
+            DeferredManagedReferenceTarget target = DeferredManagedReferenceTarget.Capture(property);
+            ClipboardSnapshot snapshot = ReadClipboard();
+            bool canCopy = false;
+            bool canPasteValues = false;
+            bool canPasteType = false;
+            bool hasInstances = false;
+            target?.TryInspect(properties =>
+            {
+                if (properties.Length == 1)
+                {
+                    canCopy = CanCopy(properties[0]);
+                    canPasteValues = CanPasteValuesOnly(properties[0], snapshot);
+                    canPasteType = CanPasteTypeAndValues(properties[0], snapshot, out _);
+                }
+                hasInstances = true;
+                foreach (SerializedProperty current in properties)
+                {
+                    if (!current.editable || current.managedReferenceValue == null)
+                    {
+                        hasInstances = false;
+                        break;
+                    }
+                }
+            });
 
-                var copyContent = new GUIContent($"Copy \"{property.propertyPath}\" property");
-                if (CanCopy(clonedProperty))
-                {
-                    menu.AddItem(copyContent, false, Copy, clipboardTarget);
-                }
-                else
-                {
-                    menu.AddDisabledItem(copyContent);
-                }
+            var copyContent = new GUIContent($"Copy \"{path}\" property");
+            if (canCopy)
+            {
+                menu.AddItem(copyContent, false, Copy, target);
+            }
+            else
+            {
+                menu.AddDisabledItem(copyContent);
+            }
+            if (canPasteValues)
+            {
+                menu.AddItem(new GUIContent(PasteValuesOnlyContent.text, $"Copy matching serialized fields from \"{snapshot.sourcePropertyPath}\"."), false, PasteValuesOnly, target);
+            }
+            else
+            {
+                menu.AddDisabledItem(PasteValuesOnlyContent);
+            }
+            if (canPasteType)
+            {
+                menu.AddItem(new GUIContent(PasteTypeAndValuesContent.text, $"Replace this reference with a copy of \"{snapshot.sourcePropertyPath}\"."), false, PasteTypeAndValues, target);
+            }
+            else
+            {
+                menu.AddDisabledItem(PasteTypeAndValuesContent);
+            }
 
-                ClipboardSnapshot snapshot = ReadClipboard();
-                if (CanPasteValuesOnly(clonedProperty, snapshot))
-                {
-                    menu.AddItem(new GUIContent(PasteValuesOnlyContent.text, $"Copy matching serialized fields from \"{snapshot.sourcePropertyPath}\"."), false, PasteValuesOnly, clipboardTarget);
-                }
-                else
-                {
-                    menu.AddDisabledItem(PasteValuesOnlyContent);
-                }
-
-                if (CanPasteTypeAndValues(clonedProperty, snapshot, out _))
-                {
-                    menu.AddItem(new GUIContent(PasteTypeAndValuesContent.text, $"Replace this reference with a copy of \"{snapshot.sourcePropertyPath}\"."), false, PasteTypeAndValues, clipboardTarget);
-                }
-                else
-                {
-                    menu.AddDisabledItem(PasteTypeAndValuesContent);
-                }
-
-                menu.AddSeparator("");
-
-                bool hasInstance = clonedProperty.managedReferenceValue != null;
-                if (hasInstance)
-                {
-                    menu.AddItem(NewInstanceContent, false, NewInstance, clonedProperty);
-                    menu.AddItem(ResetAndNewInstanceContent, false, ResetAndNewInstance, clonedProperty);
-                }
-                else
-                {
-                    menu.AddDisabledItem(NewInstanceContent);
-                    menu.AddDisabledItem(ResetAndNewInstanceContent);
-                }
+            menu.AddSeparator("");
+            if (hasInstances)
+            {
+                menu.AddItem(NewInstanceContent, false, NewInstance, target);
+                menu.AddItem(ResetAndNewInstanceContent, false, ResetAndNewInstance, target);
+            }
+            else
+            {
+                menu.AddDisabledItem(NewInstanceContent);
+                menu.AddDisabledItem(ResetAndNewInstanceContent);
             }
         }
 
         private static void Copy (object customData)
         {
-            if (!TryPrepareSingleTargetProperty(customData, out SerializedProperty property) || !CanCopy(property))
+            ((DeferredManagedReferenceTarget)customData).TryExecute(properties =>
             {
-                return;
-            }
+                if (properties.Length != 1 || !CanCopy(properties[0]))
+                {
+                    return false;
+                }
 
-            object value = property.managedReferenceValue;
-            var snapshot = new ClipboardSnapshot
-            {
-                sourcePropertyPath = property.propertyPath,
-                typeName = value?.GetType().AssemblyQualifiedName,
-                json = (value != null) ? JsonUtility.ToJson(value) : string.Empty
-            };
-            SessionState.SetString(ClipboardKey, JsonUtility.ToJson(snapshot));
+                SerializedProperty property = properties[0];
+                object value = property.managedReferenceValue;
+                var snapshot = new ClipboardSnapshot
+                {
+                    sourcePropertyPath = property.propertyPath,
+                    typeName = value?.GetType().AssemblyQualifiedName,
+                    json = (value != null) ? JsonUtility.ToJson(value) : string.Empty
+                };
+                SessionState.SetString(ClipboardKey, JsonUtility.ToJson(snapshot));
+                return true;
+            });
         }
 
         private static void PasteValuesOnly (object customData)
         {
-            ClipboardSnapshot snapshot = ReadClipboard();
-            if (!TryPrepareSingleTargetProperty(customData, out SerializedProperty property) || !CanPasteValuesOnly(property, snapshot))
+            ((DeferredManagedReferenceTarget)customData).TryExecute(properties =>
             {
-                return;
-            }
+                ClipboardSnapshot snapshot = ReadClipboard();
+                if (properties.Length != 1 || !CanPasteValuesOnly(properties[0], snapshot))
+                {
+                    return false;
+                }
 
-            UnityEngine.Object targetObject = property.serializedObject.targetObject;
-            Undo.RecordObject(targetObject, PasteValuesOnlyContent.text);
-            JsonUtility.FromJsonOverwrite(snapshot.json, property.managedReferenceValue);
+                SerializedProperty property = properties[0];
+                UnityEngine.Object targetObject = property.serializedObject.targetObject;
+                Undo.IncrementCurrentGroup();
+                int group = Undo.GetCurrentGroup();
+                Undo.SetCurrentGroupName(PasteValuesOnlyContent.text);
+                try
+                {
+                    Undo.RecordObject(targetObject, PasteValuesOnlyContent.text);
+                    JsonUtility.FromJsonOverwrite(snapshot.json, property.managedReferenceValue);
 
-            // The live instance was changed without a SerializedProperty setter, so record persistence and refresh the Inspector cache.
-            PrefabUtility.RecordPrefabInstancePropertyModifications(targetObject);
-            if (targetObject is ScriptableObject)
-            {
-                EditorUtility.SetDirty(targetObject);
-            }
-            property.serializedObject.Update();
+                    // A live overwrite needs explicit persistence because it bypasses SerializedProperty assignment.
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(targetObject);
+                    if (targetObject is ScriptableObject)
+                    {
+                        EditorUtility.SetDirty(targetObject);
+                    }
+                    property.serializedObject.Update();
+                }
+                finally
+                {
+                    Undo.CollapseUndoOperations(group);
+                }
+                return true;
+            });
         }
 
         private static void PasteTypeAndValues (object customData)
         {
-            ClipboardSnapshot snapshot = ReadClipboard();
-            if (!TryPrepareSingleTargetProperty(customData, out SerializedProperty property) || !CanPasteTypeAndValues(property, snapshot, out Type copiedType))
+            ((DeferredManagedReferenceTarget)customData).TryExecute(properties =>
             {
-                return;
-            }
+                ClipboardSnapshot snapshot = ReadClipboard();
+                if (properties.Length != 1 || !CanPasteTypeAndValues(properties[0], snapshot, out Type copiedType))
+                {
+                    return false;
+                }
 
-            // A copied null has no type name; an unresolvable non-null type never reaches this assignment.
-            object value = (copiedType != null) ? JsonUtility.FromJson(snapshot.json, copiedType) : null;
-            Undo.SetCurrentGroupName(PasteTypeAndValuesContent.text);
-            property.managedReferenceValue = value;
-            property.serializedObject.ApplyModifiedProperties();
-            property.serializedObject.Update();
+                // A copied null has no type name; an unresolvable non-null type never reaches this assignment.
+                object value = (copiedType != null) ? JsonUtility.FromJson(snapshot.json, copiedType) : null;
+                ManagedReferenceUtility.ApplyManagedReferences(properties, new[] { value }, PasteTypeAndValuesContent.text, false);
+                return true;
+            });
         }
 
         private static ClipboardSnapshot ReadClipboard ()
@@ -182,43 +219,38 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return fieldType != null && fieldType.IsAssignableFrom(copiedType);
         }
 
-        private static bool TryPrepareSingleTargetProperty (object customData, out SerializedProperty property)
-        {
-            var (serializedObject, propertyPath) = ((SerializedObject, string))customData;
-            property = null;
-            if (serializedObject.targetObject == null || serializedObject.isEditingMultipleObjects)
-            {
-                return false;
-            }
-
-            // Apply pending Inspector edits before reading the live instance or refreshing the serialized cache.
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            property = serializedObject.FindProperty(propertyPath);
-            return property != null && property.propertyType == SerializedPropertyType.ManagedReference;
-        }
-
         private static void NewInstance (object customData)
         {
-            SerializedProperty property = (SerializedProperty)customData;
-            string json = JsonUtility.ToJson(property.managedReferenceValue);
-
-            Undo.RecordObject(property.serializedObject.targetObject, "New Instance");
-            property.managedReferenceValue = JsonUtility.FromJson(json, property.managedReferenceValue.GetType());
-            property.serializedObject.ApplyModifiedProperties();
-
-            Debug.Log($"Create new instance of \"{property.propertyPath}\".");
+            ReplaceInstances((DeferredManagedReferenceTarget)customData, false);
         }
 
         private static void ResetAndNewInstance (object customData)
         {
-            SerializedProperty property = (SerializedProperty)customData;
+            ReplaceInstances((DeferredManagedReferenceTarget)customData, true);
+        }
 
-            Undo.RecordObject(property.serializedObject.targetObject, "Reset and New Instance");
-            property.managedReferenceValue = Activator.CreateInstance(property.managedReferenceValue.GetType());
-            property.serializedObject.ApplyModifiedProperties();
-
-            Debug.Log($"Reset property and created new instance of \"{property.propertyPath}\".");
+        private static void ReplaceInstances (DeferredManagedReferenceTarget target, bool reset)
+        {
+            target.TryExecute(properties =>
+            {
+                foreach (SerializedProperty property in properties)
+                {
+                    if (!property.editable || property.managedReferenceValue == null)
+                    {
+                        return false;
+                    }
+                }
+                var values = new object[properties.Length];
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    object current = properties[i].managedReferenceValue;
+                    values[i] = reset ? Activator.CreateInstance(current.GetType()) :
+                        ManagedReferenceUtility.CreateManagedReference(current, current.GetType());
+                }
+                ManagedReferenceUtility.ApplyManagedReferences(properties, values,
+                    reset ? ResetAndNewInstanceContent.text : NewInstanceContent.text, false);
+                return true;
+            });
         }
     }
 }

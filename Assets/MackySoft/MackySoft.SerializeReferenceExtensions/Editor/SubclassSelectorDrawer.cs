@@ -36,9 +36,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private readonly Dictionary<string, TypePopupCache> typePopups = new Dictionary<string, TypePopupCache>();
         private readonly Dictionary<string, GUIContent> typeNameCaches = new Dictionary<string, GUIContent>();
 
-        private SerializedProperty targetProperty;
-        private TypeChangeState targetTypeChangeState;
-
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
             int controlID = GUIUtility.GetControlID(property.propertyPath.GetHashCode(), FocusType.Passive);
@@ -57,114 +54,120 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 #endif
 
             EditorGUI.BeginProperty(position, label, property);
-
-            // A type change can recreate the drawer. Keep its pending notification with the owning GUI control.
-            if (typeChangeState.Pending)
+            try
             {
-                typeChangeState.Pending = false;
-                GUI.changed = true;
-            }
-
-            if (isManagedReference)
-            {
-                // Render label first to avoid label overlap for lists
-                Rect foldoutLabelRect = new Rect(position);
-                foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
-
-                // NOTE: IndentedRect should be disabled as it causes extra indentation.
-                //foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
-                Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
-
-                // Draw the subclass selector popup.
-                if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
+                // A type change can recreate the drawer. Keep its pending notification with the owning GUI control.
+                if (typeChangeState.Pending)
                 {
-                    TypePopupCache popup = GetTypePopup(property);
-                    targetProperty = property;
-                    targetTypeChangeState = typeChangeState;
-                    popup.TypePopup.Show(popupPosition);
+                    typeChangeState.Pending = false;
+                    GUI.changed = true;
                 }
 
-                // Draw the foldout.
-                if (!string.IsNullOrEmpty(property.managedReferenceFullTypename))
+                if (isManagedReference)
                 {
-                    Rect foldoutRect = new Rect(position);
-                    foldoutRect.height = EditorGUIUtility.singleLineHeight;
+                    // Render label first to avoid label overlap for lists
+                    Rect foldoutLabelRect = new Rect(position);
+                    foldoutLabelRect.height = EditorGUIUtility.singleLineHeight;
 
-#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER && !UNITY_2022_3
-                    // NOTE: Position x must be adjusted.
-                    // FIXME: Is there a more essential solution...?
-                    // The most promising is UI Toolkit, but it is currently unable to reproduce all of SubclassSelector features. (Complete provision of contextual menu, e.g.)
-                    // 2021.3: No adjustment
-                    // 2022.1: No adjustment
-                    // 2022.2: Adjustment required
-                    // 2022.3: Adjustment required
-                    // 2023.1: Adjustment required
-                    // 2023.2: Adjustment required
-                    // 6000.0: No adjustment
-                    foldoutRect.x -= 12;
-#endif
+                    // NOTE: IndentedRect should be disabled as it causes extra indentation.
+                    //foldoutLabelRect = EditorGUI.IndentedRect(foldoutLabelRect);
+                    Rect popupPosition = EditorGUI.PrefixLabel(foldoutLabelRect, label);
 
-                    property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
-                }
-
-                // Draw property if expanded.
-                if (property.isExpanded)
-                {
-                    using (new EditorGUI.IndentLevelScope())
+                    // Draw the subclass selector popup.
+                    if (EditorGUI.DropdownButton(popupPosition, GetTypeName(property), FocusType.Keyboard))
                     {
-                        // Check if a custom property drawer exists for this type.
-                        PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
-                        if (customDrawer != null)
+                        TypePopupCache popup = GetTypePopup(property);
+                        DeferredManagedReferenceTarget target = DeferredManagedReferenceTarget.Capture(property);
+                        if (target != null)
                         {
-                            // Draw the property with custom property drawer.
-                            Rect indentedRect = position;
-                            float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                            indentedRect.height = customDrawer.GetPropertyHeight(property, label);
-                            indentedRect.y += foldoutDifference;
-                            customDrawer.OnGUI(indentedRect, property, label);
+                            popup.TypePopup.ShowForSelection(popupPosition, item => SelectType(target, item.Type, typeChangeState));
                         }
-                        else
-                        {
-                            // Draw the properties of the child elements.
-                            // NOTE: In the following code, since the foldout layout isn't working properly, I'll iterate through the properties of the child elements myself.
-                            // EditorGUI.PropertyField(position, property, GUIContent.none, true);
-
-                            Rect childPosition = position;
-                            childPosition.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                            foreach (SerializedProperty childProperty in property.GetChildProperties())
-                            {
-                                float height = EditorGUI.GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName, childProperty.tooltip), true);
-                                childPosition.height = height;
-                                EditorGUI.PropertyField(childPosition, childProperty, true);
-
-                                childPosition.y += height + EditorGUIUtility.standardVerticalSpacing;
-                            }
-                        }
+                        return;
                     }
 
-#if UNITY_6000_0_OR_NEWER
-                    // TextArea can defer its prefix label during Layout. Resolve it inside
-                    // this drawer's IMGUI context before UI Toolkit starts another one.
-                    GUIUtility.GetControlID(FocusType.Passive);
+                    // Draw the foldout.
+                    if (!string.IsNullOrEmpty(property.managedReferenceFullTypename))
+                    {
+                        Rect foldoutRect = new Rect(position);
+                        foldoutRect.height = EditorGUIUtility.singleLineHeight;
+
+#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER && !UNITY_2022_3
+                        // NOTE: Position x must be adjusted.
+                        // FIXME: Is there a more essential solution...?
+                        // The most promising is UI Toolkit, but it is currently unable to reproduce all of SubclassSelector features. (Complete provision of contextual menu, e.g.)
+                        // 2021.3: No adjustment
+                        // 2022.1: No adjustment
+                        // 2022.2: Adjustment required
+                        // 2022.3: Adjustment required
+                        // 2023.1: Adjustment required
+                        // 2023.2: Adjustment required
+                        // 6000.0: No adjustment
+                        foldoutRect.x -= 12;
 #endif
+
+                        property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
+                    }
+
+                    // Draw property if expanded.
+                    if (property.isExpanded)
+                    {
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            if (UnityPropertyDrawerUtility.HasNextPropertyDrawer(property))
+                            {
+                                // Let Unity invoke the next drawer with its declaring-field context and native ownership.
+                                Rect indentedRect = position;
+                                float foldoutDifference = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                                indentedRect.height = EditorGUI.GetPropertyHeight(property, label, true);
+                                indentedRect.y += foldoutDifference;
+                                EditorGUI.PropertyField(indentedRect, property, label, true);
+                            }
+                            else
+                            {
+                                // Draw the properties of the child elements.
+                                // NOTE: In the following code, since the foldout layout isn't working properly, I'll iterate through the properties of the child elements myself.
+                                // EditorGUI.PropertyField(position, property, GUIContent.none, true);
+
+                                Rect childPosition = position;
+                                childPosition.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                                foreach (SerializedProperty childProperty in property.GetChildProperties())
+                                {
+                                    using (childProperty)
+                                    {
+                                        float height = EditorGUI.GetPropertyHeight(childProperty, new GUIContent(childProperty.displayName, childProperty.tooltip), true);
+                                        childPosition.height = height;
+                                        using (var changeCheck = new EditorGUI.ChangeCheckScope())
+                                        {
+                                            EditorGUI.PropertyField(childPosition, childProperty, true);
+                                            // A child can replace its structure and invalidate the active iterator.
+                                            if (changeCheck.changed)
+                                            {
+                                                break;
+                                            }
+                                        }
+
+                                        childPosition.y += height + EditorGUIUtility.standardVerticalSpacing;
+                                    }
+                                }
+                            }
+                        }
+
+#if UNITY_6000_0_OR_NEWER
+                        // TextArea can defer its prefix label during Layout. Resolve it inside
+                        // this drawer's IMGUI context before UI Toolkit starts another one.
+                        GUIUtility.GetControlID(FocusType.Passive);
+#endif
+                    }
+                }
+                else
+                {
+                    EditorGUI.LabelField(position, label, IsNotManagedReferenceLabel);
                 }
             }
-            else
+            finally
             {
-                EditorGUI.LabelField(position, label, IsNotManagedReferenceLabel);
+                EditorGUI.EndProperty();
             }
-
-            EditorGUI.EndProperty();
-        }
-
-        private PropertyDrawer GetCustomPropertyDrawer (SerializedProperty property)
-        {
-            Type propertyType = ManagedReferenceUtility.GetType(property.managedReferenceFullTypename);
-            if (propertyType != null && PropertyDrawerCache.TryGetPropertyDrawer(propertyType, out PropertyDrawer drawer))
-            {
-                return drawer;
-            }
-            return null;
         }
 
         private TypePopupCache GetTypePopup (SerializedProperty property)
@@ -183,29 +186,36 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     MaxTypePopupLineCount,
                     state
                 );
-                popup.OnItemSelected += item =>
-                {
-                    Type type = item.Type;
-
-                    // Apply changes to individual serialized objects.
-                    foreach (var targetObject in targetProperty.serializedObject.targetObjects)
-                    {
-                        SerializedObject individualObject = new SerializedObject(targetObject);
-                        SerializedProperty individualProperty = individualObject.FindProperty(targetProperty.propertyPath);
-                        object obj = individualProperty.SetManagedReference(type);
-                        individualProperty.isExpanded = (obj != null);
-
-                        individualObject.ApplyModifiedProperties();
-                        individualObject.Update();
-                    }
-
-                    targetTypeChangeState.Pending = true;
-                };
-
                 result = new TypePopupCache(popup, state);
                 typePopups.Add(managedReferenceFieldTypename, result);
             }
             return result;
+        }
+
+        private static void SelectType (DeferredManagedReferenceTarget target, Type type, TypeChangeState changeState)
+        {
+            if (target.TryExecute(properties =>
+            {
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    Type fieldType = ManagedReferenceUtility.GetType(properties[i].managedReferenceFieldTypename.Replace('/', '+'));
+                    if (!properties[i].editable || (type != null && (fieldType == null || !fieldType.IsAssignableFrom(type))))
+                    {
+                        return false;
+                    }
+                }
+
+                var values = new object[properties.Length];
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    values[i] = ManagedReferenceUtility.CreateManagedReference(properties[i].managedReferenceValue, type);
+                }
+                ManagedReferenceUtility.ApplyManagedReferences(properties, values, "Change Managed Reference Type", true);
+                return true;
+            }))
+            {
+                changeState.Pending = true;
+            }
         }
 
         private GUIContent GetTypeName (SerializedProperty property)
@@ -259,10 +269,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             float height = EditorGUIUtility.singleLineHeight;
             height += EditorGUIUtility.standardVerticalSpacing;
 
-            PropertyDrawer customDrawer = GetCustomPropertyDrawer(property);
-            if (customDrawer != null)
+            if (UnityPropertyDrawerUtility.HasNextPropertyDrawer(property))
             {
-                height += customDrawer.GetPropertyHeight(property, label);
+                height += EditorGUI.GetPropertyHeight(property, label, true);
                 return height;
             }
 
@@ -278,16 +287,19 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             foreach (SerializedProperty child in property.GetChildProperties())
             {
-                if (!first)
+                using (child)
                 {
-                    height += EditorGUIUtility.standardVerticalSpacing;
+                    if (!first)
+                    {
+                        height += EditorGUIUtility.standardVerticalSpacing;
+                    }
+                    first = false;
+
+                    TempChildLabel.text = child.displayName;
+                    TempChildLabel.tooltip = child.tooltip;
+
+                    height += EditorGUI.GetPropertyHeight(child, TempChildLabel, true);
                 }
-                first = false;
-
-                TempChildLabel.text = child.displayName;
-                TempChildLabel.tooltip = child.tooltip;
-
-                height += EditorGUI.GetPropertyHeight(child, TempChildLabel, true);
             }
 
             return height;
