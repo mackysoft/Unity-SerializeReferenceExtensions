@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       TARGET_FILE: ./Assets/MackySoft/MackySoft.SerializeReferenceExtensions/package.json
     outputs:
@@ -26,13 +26,14 @@ jobs:
     steps:
       - name: Create release app token
         id: release_app
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          # GitHub accepts the existing App ID as a JWT issuer, as well as a client ID.
+          client-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
           permission-contents: write
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
           token: ${{ steps.release_app.outputs.token }}
@@ -59,7 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           lfs: true
@@ -110,13 +111,13 @@ jobs:
 
       # Store artifacts.
       - name: Upload example player
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: StandaloneLinux64
           path: Build/StandaloneLinux64.tar.gz
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: SerializeReference-Extensions.unitypackage
           path: ./Build/SerializeReference-Extensions.unitypackage
@@ -124,25 +125,25 @@ jobs:
 
       - name: Upload Unity logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Release-Logs
           path: Logs/
 
   create-release:
     needs: [prepare, build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # Each job owns a short-lived token; prepare's token is revoked before build.
       - name: Create release app token
         id: release_app
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          client-id: ${{ vars.RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
           permission-contents: write
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           token: ${{ steps.release_app.outputs.token }}
@@ -156,7 +157,7 @@ jobs:
         run: bash .github/scripts/release.sh create
 
       # Download the package artifact for the release.
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: SerializeReference-Extensions.unitypackage
           path: SerializeReference-Extensions.unitypackage
