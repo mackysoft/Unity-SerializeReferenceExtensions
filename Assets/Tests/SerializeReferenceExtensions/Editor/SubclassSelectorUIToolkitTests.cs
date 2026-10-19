@@ -25,6 +25,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         {
             Undo.ClearAll();
             Asset.ProbeDecoratorDrawer.DrawnHeadings.Clear();
+            Asset.ProbeDecoratorDrawer.ObserveRepaint = null;
             Asset.SelfApplyingNodeDrawer.ApplyValue = null;
             Asset.SelfApplyingNodeDrawer.Repainted = false;
             asset = ScriptableObject.CreateInstance<Asset>();
@@ -37,6 +38,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         [TearDown]
         public void TearDown ()
         {
+            Asset.ProbeDecoratorDrawer.ObserveRepaint = null;
             Asset.SelfApplyingNodeDrawer.ApplyValue = null;
             Asset.SelfApplyingNodeDrawer.Repainted = false;
             if (window != null)
@@ -394,14 +396,20 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                     "The same typed drawer must render in native and selector collections before layout comparison.");
                 string previous = null;
                 int stable = 0;
+                var observations = new Queue<string>();
                 yield return WaitFor(() =>
                 {
                     string current = string.Join(";", collections.Select(path => Marker("nativeReference", path).worldBound.ToString()
                         + Marker("reference", path).worldBound));
                     stable = current == previous ? stable + 1 : 0;
                     previous = current;
+                    observations.Enqueue(current);
+                    if (observations.Count > 4)
+                    {
+                        observations.Dequeue();
+                    }
                     return stable >= 3;
-                }, "Both real drawer layouts must settle after resizing.");
+                }, "Both real drawer layouts must settle after resizing.", () => string.Join("\n", observations));
                 foreach (string path in collections)
                 {
                     IntegerField actual = Marker("reference", path);
@@ -904,14 +912,20 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                     "Paired native and selector collections must bind before comparing their bodies.", () => DescribeInputs(inspector));
                 string previous = null;
                 int stableFrames = 0;
+                var observations = new Queue<string>();
                 yield return WaitFor(() =>
                 {
                     string current = string.Join(";", pairs.Select(pair => Child(pair.Item2).labelElement.worldBound.ToString()
                         + InputArea(Child(pair.Item2)).worldBound));
                     stableFrames = current == previous ? stableFrames + 1 : 0;
                     previous = current;
+                    observations.Enqueue(current);
+                    if (observations.Count > 4)
+                    {
+                        observations.Dequeue();
+                    }
                     return stableFrames >= 3;
-                }, "The native collection body must settle before comparison.");
+                }, "The native collection body must settle before comparison.", () => string.Join("\n", observations));
                 foreach (var pair in pairs)
                 {
                     Assert.That(Child(pair.Item1).labelElement.worldBound.x,
@@ -1286,13 +1300,16 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         {
             asset.reference = new Asset.UIToolkitDecoratedCompositeNode();
             PropertyField host = Bind(nameof(Asset.reference));
-            boundObject.FindProperty("reference.details").isExpanded = true;
-            boundObject.FindProperty("reference.rows").isExpanded = true;
-            boundObject.FindProperty("reference.rows.Array.data[0]").isExpanded = true;
+            yield return WaitFor(() => IsVisible(Header(host, "reference")), "The selector header must bind before opening its body.");
+            Selector(host, "reference").value = true;
+            yield return WaitFor(() => IsVisible(Selector(host, "reference.details"))
+                && IsVisible(Selector(host, "reference.rows")),
+                "Both parent headers must bind before opening their children.", () => DescribeInputs(host));
+            Selector(host, "reference.details").value = true;
+            Selector(host, "reference.rows").value = true;
             yield return WaitFor(() => Selector(host, "reference.details") != null
                 && Selector(host, "reference.rows.Array.data[0]") != null,
-                "The decorated composite groups must be available before opening them.");
-            Selector(host, "reference.details").value = true;
+                "The decorated composite groups must be available before opening them.", () => DescribeInputs(host));
             Selector(host, "reference.rows.Array.data[0]").value = true;
             yield return WaitFor(() => host.Query<Label>().ToList().Any(label => label.text == "UITK group heading")
                 && host.Query<Label>().ToList().Any(label => label.text == "UITK collection heading")
@@ -1316,16 +1333,38 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             PropertyField host = Bind(nameof(Asset.decoratedReference));
             host.label = "Decorated UITK selector";
             int? notifiedValue = null;
-            host.RegisterValueChangeCallback(evt => notifiedValue = ReadInt(asset, "decoratedReference.value"));
+            int notifications = 0;
+            host.RegisterValueChangeCallback(evt =>
+            {
+                notifiedValue = ReadInt(asset, "decoratedReference.value");
+                notifications++;
+            });
             yield return WaitFor(() => Asset.ProbeDecoratorDrawer.DrawCount > drawsBefore
                 && Asset.ProbeDecoratorDrawer.LastHeading == "Selector heading"
                 && Selector(host, "decoratedReference")?.text == "Decorated UITK selector"
+                && IsVisible(host.Q<PopupField<string>>())
                 && VisibleInput(host, "Relative value", 293) != null,
                 "The selector's decorator and custom label must preserve a UITK-only subtype drawer.");
+            IMGUIContainer heading = host.Query<IMGUIContainer>().ToList().First(IsVisible);
+            Assert.That(heading.worldBound.yMax, Is.LessThanOrEqualTo(host.Q<PopupField<string>>().worldBound.yMin),
+                "The native decorator must remain above the entire selector header.");
 
             Input(host, "Relative value").value = 307;
             yield return WaitFor(() => ReadInt(asset, "decoratedReference.value") == 307 && notifiedValue == 307,
                 "A decorated selector's UITK-only input must commit and notify its host.");
+            int beforeExpansion = notifications;
+            foreach (bool expanded in new[] { false, true })
+            {
+                Selector(host, "decoratedReference").value = expanded;
+                yield return WaitFor(() => IsVisible(Input(host, "Relative value")) == expanded,
+                    "Decorated selector expansion must preserve the native view state.");
+                for (int frame = 0; frame < 8; frame++)
+                {
+                    yield return null;
+                }
+            }
+            Assert.That(notifications, Is.EqualTo(beforeExpansion),
+                "A decorator wrapper must not turn view expansion into a value notification.");
 
             ReplaceReference(asset, "decoratedReference", new Asset.PlainNode { value = 311 });
             yield return WaitFor(() => VisibleInput(host, "Value", 311) != null,
@@ -1346,11 +1385,12 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             asset.reference = new Asset.DecoratedSelectorNode { child = new Asset.RelativeNode { value = 331 } };
             int drawsBefore = Asset.ProbeDecoratorDrawer.DrawCount;
             PropertyField host = Bind(nameof(Asset.reference));
-            yield return WaitFor(() => Selector(host, "reference.child") != null && IsVisible(Selector(host, "reference.child")),
-                "The nested selector's header was not displayed.");
-            // This case verifies the decorated body's binding, rather than startup expansion
-            // synchronization. Establish the opened state on the public control and property.
-            boundObject.FindProperty("reference.child").isExpanded = true;
+            yield return WaitFor(() => IsVisible(Header(host, "reference")), "The selector header must bind before opening its body.");
+            Selector(host, "reference").value = true;
+            // The header is outside the collapsible body. A closed body's zero
+            // height says nothing about whether its visible header can be opened.
+            yield return WaitFor(() => IsVisible(Header(host, "reference.child")),
+                "The nested selector's header was not displayed.", () => DescribeInputs(host));
             Selector(host, "reference.child").value = true;
             yield return WaitFor(() => Asset.ProbeDecoratorDrawer.DrawCount > drawsBefore
                 && Asset.ProbeDecoratorDrawer.LastHeading == "Nested selector heading"
@@ -1371,6 +1411,57 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             Input(host, "Relative value").value = 349;
             yield return WaitFor(() => ReadInt(asset, "reference.child.value") == 349,
                 "The replacement nested drawer did not save to its current property path.");
+        }
+
+        [UnityTest]
+        public IEnumerator DecoratedArray_DrawsItsHeadingOnlyAboveTheCollection ()
+            => VerifyCollectionHeading("array", "Array selector heading");
+
+        [UnityTest]
+        public IEnumerator DecoratedList_DrawsItsHeadingOnlyAboveTheCollection ()
+            => VerifyCollectionHeading("list", "List selector heading");
+
+        private IEnumerator VerifyCollectionHeading (string collection, string heading)
+        {
+            var node = new Asset.DecoratedCollectionNode();
+            Asset.INode[] values = { new Asset.RelativeNode { value = 331 }, new Asset.RelativeNode { value = 337 } };
+            if (collection == "array")
+            {
+                node.array = values;
+            }
+            else
+            {
+                node.list.AddRange(values);
+            }
+            asset.reference = node;
+            PropertyField host = Bind(nameof(Asset.reference));
+            yield return WaitFor(() => IsVisible(Header(host, "reference")), "The parent selector must bind before opening its collection.");
+            Selector(host, "reference").value = true;
+            string path = "reference." + collection;
+            yield return WaitFor(() => IsVisible(Selector(host, path)), "The collection header must bind before opening its rows.");
+            Selector(host, path).value = true;
+            for (int i = 0; i < values.Length; i++)
+            {
+                string row = path + ".Array.data[" + i + "]";
+                yield return WaitFor(() => IsVisible(Header(host, row)), "Each row must display its native header.");
+                Selector(host, row).value = true;
+                int expected = ((Asset.RelativeNode)values[i]).value;
+                yield return WaitFor(() => VisibleInput(Element(host, row), "Relative value", expected) != null,
+                    "Both row bodies must render before observing collection decorations.");
+            }
+            var positions = new HashSet<Vector2>();
+            Asset.ProbeDecoratorDrawer.ObserveRepaint = (text, position) =>
+            {
+                if (text == heading)
+                {
+                    positions.Add(position);
+                }
+            };
+            window.Repaint();
+            yield return WaitFor(() => positions.Count > 0, "The visible collection heading must be painted.");
+            Asset.ProbeDecoratorDrawer.ObserveRepaint = null;
+            Assert.That(positions.Count, Is.EqualTo(1),
+                "The collection heading must occupy one visible location, without repetition inside its rows.");
         }
 
         [UnityTest]

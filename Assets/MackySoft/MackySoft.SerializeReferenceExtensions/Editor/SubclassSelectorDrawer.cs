@@ -47,7 +47,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             // A drawer can be shared by several properties. Each binding owns its view and popup target.
             var selector = new SubclassSelectorField(property, GetPropertyLabel(property), ((SubclassSelectorAttribute)attribute).UseToStringAsLabel,
                 UnityPropertyDrawerUtility.CaptureNextNestingLevel(property));
-            return selector;
+            return DecoratorGUI.CreateGUI(selector, property);
         }
 
 #if UNITY_2023_2_OR_NEWER

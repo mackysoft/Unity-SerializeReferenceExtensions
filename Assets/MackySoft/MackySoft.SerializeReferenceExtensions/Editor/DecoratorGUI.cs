@@ -1,4 +1,3 @@
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,19 +7,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
     internal static class DecoratorGUI
     {
 #if !UNITY_2022_2_OR_NEWER
-        internal static VisualElement CreateGUI (VisualElement propertyGUI, FieldInfo field) => CreateOwnedGUI(propertyGUI, field);
+        internal static VisualElement CreateGUI (VisualElement propertyGUI, SerializedProperty property) => CreateOwnedGUI(propertyGUI, property);
 #else
-        internal static VisualElement CreateGUI (VisualElement propertyGUI, FieldInfo field) => propertyGUI;
+        internal static VisualElement CreateGUI (VisualElement propertyGUI, SerializedProperty property) => propertyGUI;
 #endif
 
 #if !UNITY_6000_0_OR_NEWER
-        internal static VisualElement CreateOwnedGUI (VisualElement propertyGUI, FieldInfo field)
+        internal static VisualElement CreateOwnedGUI (VisualElement propertyGUI, SerializedProperty property)
         {
-            if (field == null)
-            {
-                return propertyGUI;
-            }
-            DecoratorDrawer[] decorators = PropertyDrawerCache.CreateDecoratorDrawers(field);
+            DecoratorDrawer[] decorators = UnityPropertyDrawerUtility.GetDecoratorDrawers(property);
             if (decorators.Length == 0)
             {
                 return propertyGUI;
@@ -80,7 +75,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             });
         }
 #else
-        internal static VisualElement CreateOwnedGUI (VisualElement propertyGUI, FieldInfo field) => propertyGUI;
+        internal static VisualElement CreateOwnedGUI (VisualElement propertyGUI, SerializedProperty property) => propertyGUI;
 #endif
 
 #if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER

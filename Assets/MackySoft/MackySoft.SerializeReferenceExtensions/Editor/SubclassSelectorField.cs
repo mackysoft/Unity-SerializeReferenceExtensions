@@ -133,18 +133,16 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
             // PopupField belongs at the property's depth. Its actual BaseField
             // owns the native label/input split, outside this body Foldout.
-            VisualElement branch = this;
-            while (branch.hierarchy.parent != host && branch.hierarchy.parent != null)
-            {
-                branch = branch.hierarchy.parent;
-            }
-            int branchIndex = host.hierarchy.IndexOf(branch);
-            if (nativeHeader.hierarchy.parent != host || host.hierarchy.IndexOf(nativeHeader) != branchIndex - 1)
+            // Stay beside this Foldout inside any decorator wrapper. The wrapper's
+            // preceding native decorators must remain above the entire property row.
+            VisualElement container = hierarchy.parent;
+            int branchIndex = container.hierarchy.IndexOf(this);
+            if (nativeHeader.hierarchy.parent != container || container.hierarchy.IndexOf(nativeHeader) != branchIndex - 1)
             {
                 // The same host can clear and reattach this view before delayed
                 // cleanup runs. Restore its renderer as well as its body.
                 nativeHeader.RemoveFromHierarchy();
-                host.hierarchy.Insert(host.hierarchy.IndexOf(branch), nativeHeader);
+                container.hierarchy.Insert(container.hierarchy.IndexOf(this), nativeHeader);
             }
             if (header.hierarchy.parent != nativeHeader)
             {

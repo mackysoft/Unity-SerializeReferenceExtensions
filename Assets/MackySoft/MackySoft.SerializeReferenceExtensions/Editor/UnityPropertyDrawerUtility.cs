@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using UnityEditor;
@@ -24,6 +25,9 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private static readonly Func<SerializedProperty, bool> HasNextDrawer = BindHasNextDrawer();
         private static readonly Func<SerializedProperty, int> NextLevel = BindNextLevel();
         private static readonly Func<SerializedProperty, int, PropertyDrawer> DrawerAtLevel = BindDrawerAtLevel();
+#if !UNITY_6000_0_OR_NEWER
+        private static readonly Func<SerializedProperty, List<DecoratorDrawer>> Decorators = BindDecorators();
+#endif
         private static readonly Action<PropertyField, VisualElement> PropagateParent = BindPropagateParent();
 
         internal static bool HasNextPropertyDrawer (SerializedProperty property)
@@ -37,6 +41,13 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         internal static PropertyDrawer GetPropertyDrawer (SerializedProperty property, int nestingLevel)
             => DrawerAtLevel(property, nestingLevel);
+
+#if !UNITY_6000_0_OR_NEWER
+        // PropertyHandler owns ordering and collection-element exclusions. Capture
+        // its actual drawers for this view instead of rediscovering field attributes.
+        internal static DecoratorDrawer[] GetDecoratorDrawers (SerializedProperty property)
+            => Decorators(property)?.ToArray() ?? Array.Empty<DecoratorDrawer>();
+#endif
 
         internal static void SetParentProperty (PropertyField parent, PropertyField child) => PropagateParent(parent, child);
 
@@ -70,6 +81,17 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 handler => Expression.Call(handler, ApplyContext, level),
                 handler => Expression.Property(handler, Drawer));
         }
+
+#if !UNITY_6000_0_OR_NEWER
+        private static Func<SerializedProperty, List<DecoratorDrawer>> BindDecorators ()
+        {
+            FieldInfo decorators = HandlerType.GetField("m_DecoratorDrawers", NativeMembers)
+                ?? throw new MissingFieldException(HandlerType.FullName, "m_DecoratorDrawers");
+            var property = Expression.Parameter(typeof(SerializedProperty), "property");
+            return Expression.Lambda<Func<SerializedProperty, List<DecoratorDrawer>>>(
+                Expression.Field(Expression.Call(GetHandler, property), decorators), property).Compile();
+        }
+#endif
 
         private static T BindNativeCall<T> (ParameterExpression[] parameters,
             Func<Expression, Expression> enterContext, Func<Expression, Expression> operation) where T : Delegate

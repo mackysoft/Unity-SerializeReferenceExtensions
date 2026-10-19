@@ -263,7 +263,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 // An annotated scalar selector owns its decorators, and an array element
                 // must never repeat the collection field's decorators.
                 return isElement || (reference && field != null && field.IsDefined(typeof(SubclassSelectorAttribute), true))
-                    ? result : DecoratorGUI.CreateGUI(result, field);
+                    ? result : DecoratorGUI.CreateGUI(result, property);
             }
 
             private VisualElement CreateGroup (SerializedProperty property, Type type, SerializedObject[] objects)
@@ -274,7 +274,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 {
                     owner.CreateChildren(property, type, this, group, children, objects);
                 }
-                return isElement ? group : DecoratorGUI.CreateOwnedGUI(group, field);
+                return isElement ? group : DecoratorGUI.CreateOwnedGUI(group, property);
             }
 
             private VisualElement CreateCollection (SerializedProperty property)
@@ -331,7 +331,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 list.itemsRemoved += OnItemsChanged;
                 list.itemIndexChanged += OnItemIndexChanged;
                 collectionView = list;
-                return DecoratorGUI.CreateOwnedGUI(list, field);
+                return DecoratorGUI.CreateOwnedGUI(list, property);
             }
 
             private void OnItemsChanged (IEnumerable<int> indices) => InvalidateRows();

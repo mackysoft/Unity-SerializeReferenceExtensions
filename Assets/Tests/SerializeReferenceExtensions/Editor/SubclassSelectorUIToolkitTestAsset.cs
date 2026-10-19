@@ -535,6 +535,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             public static int DrawCount { get; private set; }
             public static string LastHeading { get; private set; }
             public static readonly HashSet<string> DrawnHeadings = new HashSet<string>();
+            public static Action<string, Vector2> ObserveRepaint;
 
             public override float GetHeight () => EditorGUIUtility.singleLineHeight;
 
@@ -543,6 +544,10 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                 DrawCount++;
                 LastHeading = ((ProbeDecoratorAttribute)attribute).Heading;
                 DrawnHeadings.Add(LastHeading);
+                if (Event.current.type == EventType.Repaint)
+                {
+                    ObserveRepaint?.Invoke(LastHeading, GUIUtility.GUIToScreenPoint(position.position));
+                }
                 EditorGUI.LabelField(position, LastHeading);
             }
         }
