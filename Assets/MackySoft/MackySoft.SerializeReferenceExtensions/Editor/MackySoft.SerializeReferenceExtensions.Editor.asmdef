@@ -18,6 +18,21 @@
             "name": "Unity",
             "expression": "[2022.3.24f1,2022.4)",
             "define": "SERIALIZE_REFERENCE_EXTENSIONS_UNITY_2022_3_MR_TRACKER"
+        },
+        {
+            "name": "Unity",
+            "expression": "[2022.3.5f1,2022.4)",
+            "define": "SERIALIZE_REFERENCE_EXTENSIONS_MULTIPLE_SELECTION"
+        },
+        {
+            "name": "Unity",
+            "expression": "[2023.1.2f1,2023.2)",
+            "define": "SERIALIZE_REFERENCE_EXTENSIONS_MULTIPLE_SELECTION"
+        },
+        {
+            "name": "Unity",
+            "expression": "[2022.2.16f1,2022.3)",
+            "define": "SERIALIZE_REFERENCE_EXTENSIONS_COLLECTION_DISABLED_CLICKS"
         }
     ],
     "noEngineReferences": false

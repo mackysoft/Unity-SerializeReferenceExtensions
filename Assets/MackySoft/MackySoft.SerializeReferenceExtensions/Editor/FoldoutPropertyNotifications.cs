@@ -32,7 +32,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             field.UnregisterCallback(native);
             field.RegisterCallback<ChangeEvent<bool>>(change =>
             {
-                if (change.target != field)
+                if (!(change.target is Foldout))
                 {
                     native(change);
                 }

@@ -87,24 +87,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return null;
         }
 
-        private static bool HasDrawer (Type type)
-            => type != null && PropertyDrawerCache.HasPropertyDrawer(type);
-
-        private static bool HasAttributeDrawer (FieldInfo field)
-        {
-            if (field != null)
-            {
-                foreach (PropertyAttribute attribute in field.GetCustomAttributes(typeof(PropertyAttribute), true))
-                {
-                    if (HasDrawer(attribute.GetType()))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         private struct Observation : IEquatable<Observation>
         {
             internal bool Exists;
@@ -181,9 +163,11 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 monitorsShape = reference && !selector;
                 observations = monitorsShape ? Capture(objects) : null;
                 Type groupType = reference ? (CommonReferenceType() ? property.managedReferenceValue?.GetType() : null) : declaredType;
+                // Unity's property context includes managed-reference base-drawer fallback;
+                // a type-only lookup cannot decide whether this child owns a custom drawer.
                 bool native = selector || field == null || property.isFixedBuffer
-                    || (!collection && (HasAttributeDrawer(field) || HasDrawer(declaredType)
-                        || (reference ? HasDrawer(groupType) : property.propertyType != SerializedPropertyType.Generic)));
+                    || (!collection && (UnityPropertyDrawerUtility.GetPropertyDrawer(property, 0) != null
+                        || (!reference && property.propertyType != SerializedPropertyType.Generic)));
                 if (row != null && !row.PrepareMode(native))
                 {
                     return false;
@@ -285,6 +269,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             private VisualElement CreateGroup (SerializedProperty property, Type type, SerializedObject[] objects)
             {
                 var group = new Foldout { bindingPath = path, text = property.displayName, tooltip = property.tooltip };
+                NativePropertyFieldControls.ConfigureFoldout(group);
                 if (type != null && !IsCycle(objects))
                 {
                     owner.CreateChildren(property, type, this, group, children, objects);
@@ -310,6 +295,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     reorderable = reorderable,
                     reorderMode = reorderable ? ListViewReorderMode.Animated : ListViewReorderMode.Simple
                 };
+                NativePropertyFieldControls.ConfigureListView(list);
                 Type elementType = declaredType.IsArray ? declaredType.GetElementType() : declaredType.GetGenericArguments()[0];
                 list.makeItem = () => new Row(this);
                 list.bindItem = (element, index) =>

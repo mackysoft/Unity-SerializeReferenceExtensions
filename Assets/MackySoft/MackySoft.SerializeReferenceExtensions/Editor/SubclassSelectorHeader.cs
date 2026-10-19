@@ -16,7 +16,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private readonly Toggle toggle;
         private readonly VisualElement checkmark;
-        private Type displayedType;
 
         internal PropertyField Host { get; }
         internal SubclassSelectorTypeField TypeField { get; }
@@ -56,12 +55,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             toggle.showMixedValue = false;
             checkmark.style.visibility = mixedTypes || string.IsNullOrEmpty(property.managedReferenceFullTypename)
                 ? Visibility.Hidden : Visibility.Visible;
+            bool wasMixed = TypeField.showMixedValue;
             TypeField.showMixedValue = mixedTypes;
-            Type type = property.managedReferenceValue?.GetType();
-            if (displayedType != type)
+            string displayName = TypeMenuUtility.GetTypeDisplayName(property.managedReferenceValue?.GetType());
+            // Clearing native mixed presentation does not restore its text. Recent
+            // PopupFields retain the value, so the transition also needs a refresh.
+            if (!mixedTypes && (wasMixed || TypeField.value != displayName))
             {
-                displayedType = type;
-                TypeField.SetValueWithoutNotify(TypeMenuUtility.GetTypeDisplayName(type));
+                TypeField.SetValueWithoutNotify(displayName);
             }
             // Older bindings discover a Foldout header with a physical Q<Toggle>.
             // This header is still the bound Toggle, but now occupies the prefix slot.
@@ -72,7 +73,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         {
             Assembly assembly = typeof(PropertyField).Assembly;
             Type helpers = assembly.GetType("UnityEditor.UIElements.BindingsStyleHelpers")
-                ?? assembly.GetType("UnityEditor.UIElements.Bindings.BindingsStyleHelpers", true);
+                ?? assembly.GetType("UnityEditor.UIElements.Bindings.BindingsStyleHelpers");
+            if (helpers == null)
+            {
+                // Some Editors put PropertyField in CoreModule while binding styles
+                // remain in UIElementsModule. Both are native Editor-owned assemblies.
+                Assembly bindings = Assembly.Load("UnityEditor.UIElementsModule");
+                helpers = bindings.GetType("UnityEditor.UIElements.BindingsStyleHelpers")
+                    ?? bindings.GetType("UnityEditor.UIElements.Bindings.BindingsStyleHelpers", true);
+            }
             MethodInfo method = helpers.GetMethod("UpdatePrefabStateStyle", BindingFlags.Static | BindingFlags.NonPublic,
                 null, new[] { typeof(VisualElement), typeof(SerializedProperty) }, null)
                 ?? throw new MissingMethodException(helpers.FullName, "UpdatePrefabStateStyle");

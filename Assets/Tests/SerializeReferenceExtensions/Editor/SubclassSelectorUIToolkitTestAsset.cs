@@ -96,6 +96,54 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         }
 
         [Serializable]
+        public class BaseDrawerNode : INode
+        {
+            public int marker;
+        }
+
+        [Serializable]
+        public sealed class DerivedDrawerNode : BaseDrawerNode { }
+
+        [CustomPropertyDrawer(typeof(BaseDrawerNode))]
+        public sealed class BaseDrawerNodeDrawer : PropertyDrawer
+        {
+            public override VisualElement CreatePropertyGUI (SerializedProperty property)
+                => new IntegerField("Inherited drawer value") { bindingPath = nameof(BaseDrawerNode.marker) };
+        }
+
+        [Serializable]
+        public sealed class FoldoutStateNode : INode
+        {
+            public FoldoutStateDetails details = new FoldoutStateDetails();
+        }
+
+        [Serializable]
+        public sealed class FoldoutStateDetails
+        {
+            public bool value;
+            public int[] numbers = { 11, 13, 17 };
+        }
+
+        [Serializable]
+        public sealed class BooleanGroupNode : INode
+        {
+            public BooleanGroupValue details = new BooleanGroupValue();
+        }
+
+        [Serializable]
+        public sealed class BooleanGroupValue
+        {
+            public bool value;
+        }
+
+        [Serializable]
+        public sealed class CollectionSelectionNode : INode
+        {
+            public int[] numbers = { 11, 13, 17 };
+            public List<int> list = new List<int> { 11, 13, 17 };
+        }
+
+        [Serializable]
         public sealed class CompositeChildGraphNode : INode
         {
             public CompositeChildGraph details = new CompositeChildGraph();

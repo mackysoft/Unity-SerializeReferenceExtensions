@@ -64,6 +64,222 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         }
 
         [UnityTest]
+        public IEnumerator ManagedReferenceBaseDrawer_MatchesNativeChildAndRemainsEditable ()
+        {
+            asset.reference = new Asset.UnannotatedChildNode { child = new Asset.DerivedDrawerNode { marker = 431 } };
+            asset.nativeReference = new Asset.UnannotatedChildNode { child = new Asset.DerivedDrawerNode { marker = 439 } };
+            PropertyField host = Bind(nameof(Asset.reference));
+            boundObject.FindProperty("nativeReference").isExpanded = true;
+            var native = new PropertyField(boundObject.FindProperty("nativeReference"));
+            window.rootVisualElement.Add(native);
+            native.Bind(boundObject);
+            yield return WaitFor(() => IsVisible(Input(native, "Inherited drawer value"))
+                && IsVisible(Input(host, "Inherited drawer value")),
+                "A managed-reference child must use the same base-type drawer as Unity's native PropertyField.");
+            Input(host, "Inherited drawer value").value = 443;
+            yield return WaitFor(() => ReadInt(asset, "reference.child.marker") == 443,
+                "The inherited drawer must edit the child through its actual property binding.");
+            Assert.That(ReadInt(asset, "nativeReference.child.marker"), Is.EqualTo(439));
+        }
+
+        [UnityTest]
+        public IEnumerator MixedTypeHeader_RestoresTheUnchangedFirstTargetsTypeName ()
+        {
+            asset.reference = new Asset.PlainNode { value = 449 };
+            secondAsset.reference = new Asset.PlainNode { value = 457 };
+            PropertyField host = Bind(nameof(Asset.reference), asset, secondAsset);
+            PopupField<string> Popup () => host.Q<PopupField<string>>();
+            bool ShowsType () => Popup() != null && !Popup().showMixedValue
+                && Popup().Query<TextElement>().ToList().Any(text => text.text == "Plain Node");
+            yield return WaitFor(ShowsType, "The initial shared type name must be displayed.");
+            ReplaceReference(secondAsset, "reference", new Asset.AlternateNode { other = 461 });
+            yield return WaitFor(() => Popup() != null && Popup().showMixedValue,
+                "Changing only the second target must display mixed types.");
+            ReplaceReference(secondAsset, "reference", new Asset.PlainNode { value = 463 });
+            yield return WaitFor(ShowsType, "Leaving mixed types must restore the unchanged first target's actual type name.");
+            Assert.That(ReadInt(asset, "reference.value"), Is.EqualTo(449));
+        }
+
+        [UnityTest]
+        public IEnumerator DisabledFoldouts_KeepNativeInspectionWithoutAllowingValueEdits ()
+        {
+            asset.reference = new Asset.FoldoutStateNode();
+            asset.nativeReference = new Asset.FoldoutStateNode();
+            PropertyField host = Bind(nameof(Asset.reference));
+            boundObject.FindProperty("nativeReference").isExpanded = true;
+            var native = new PropertyField(boundObject.FindProperty("nativeReference"));
+            window.rootVisualElement.Add(native);
+            native.Bind(boundObject);
+            Foldout Details (VisualElement root, string prefix) => root.Query<Foldout>().ToList()
+                .FirstOrDefault(field => field.bindingPath == prefix + ".details");
+            yield return WaitFor(() => Details(host, "reference") != null && Details(native, "nativeReference") != null,
+                "Both native and selector foldouts must bind before disabling the Inspector.");
+            Details(host, "reference").value = false;
+            Details(native, "nativeReference").value = false;
+            Selector(host, "reference").value = false;
+            native.Q<Foldout>().value = false;
+            yield return null;
+            host.SetEnabled(false);
+            native.SetEnabled(false);
+            Toggle Prefix (VisualElement root) => root.Query<Toggle>(className: Foldout.toggleUssClassName).ToList()
+                .First(field => IsVisible(field));
+            // Establish that this route performs a real native click before comparing
+            // disabled behavior (2021.3's own Clickable rejects disabled mouse-up).
+            native.SetEnabled(true);
+            Click(Prefix(native).Q(className: Toggle.checkmarkUssClassName));
+            yield return WaitFor(() => native.Q<Foldout>().value,
+                "The input route must open an enabled native foldout.");
+            native.Q<Foldout>().value = false;
+            native.SetEnabled(false);
+            Click(Prefix(native).Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            bool nativeExpanded = native.Q<Foldout>().value;
+            Click(Prefix(host).Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            Assert.That(Selector(host, "reference").value, Is.EqualTo(nativeExpanded),
+                "A disabled selector must preserve this Editor's native viewing behavior.");
+
+            // Prepare visible child headers independently of the disabled-root outcome.
+            native.SetEnabled(true);
+            host.SetEnabled(true);
+            native.Q<Foldout>().value = true;
+            Selector(host, "reference").value = true;
+            yield return WaitFor(() => IsVisible(Details(native, "nativeReference")) && IsVisible(Details(host, "reference")),
+                "Both child headers must be visible before comparing disabled input.");
+            native.SetEnabled(false);
+            host.SetEnabled(false);
+            Click(Details(native, "nativeReference").Q<Toggle>().Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            nativeExpanded = Details(native, "nativeReference").value;
+            Click(Details(host, "reference").Q<Toggle>().Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            Assert.That(Details(host, "reference").value, Is.EqualTo(nativeExpanded),
+                "Disabled child viewing must match the native property foldout.");
+            Details(native, "nativeReference").value = true;
+            Details(host, "reference").value = true;
+            ListView Numbers (VisualElement root, string prefix) => root.Query<ListView>().ToList()
+                .FirstOrDefault(list => list.bindingPath == prefix + ".details.numbers");
+            yield return WaitFor(() => Numbers(native, "nativeReference")?.Q<Foldout>() != null
+                && Numbers(host, "reference")?.Q<Foldout>() != null,
+                "Native and selector collection headers must be available.");
+            Foldout nativeCollection = Numbers(native, "nativeReference").Q<Foldout>();
+            Foldout actualCollection = Numbers(host, "reference").Q<Foldout>();
+            nativeCollection.value = false;
+            actualCollection.value = false;
+            yield return null;
+            Click(nativeCollection.Q<Toggle>().Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            nativeExpanded = nativeCollection.value;
+            Click(actualCollection.Q<Toggle>().Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            Assert.That(actualCollection.value, Is.EqualTo(nativeExpanded),
+                "Disabled collection viewing must match the same native collection header.");
+            Toggle value = host.Query<Toggle>().ToList().First(field => field.bindingPath == "reference.details.value");
+            Click(value.Q(className: Toggle.checkmarkUssClassName));
+            yield return null;
+            using (var saved = new SerializedObject(asset))
+            {
+                Assert.That(saved.FindProperty("reference.details.value").boolValue, Is.False,
+                    "Allowing view expansion must not enable serialized boolean edits.");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator NestedExpansion_DoesNotNotifyValuesButBooleanEditsDo ()
+        {
+            asset.reference = new Asset.BooleanGroupNode();
+            PropertyField host = Bind(nameof(Asset.reference));
+            Foldout Details () => host.Query<Foldout>().ToList().FirstOrDefault(field => field.bindingPath == "reference.details");
+            Toggle Value () => host.Query<Toggle>().ToList().FirstOrDefault(field => field.bindingPath == "reference.details.value");
+            yield return WaitFor(() => Details() != null, "The nested view state must be available before observation.");
+            Details().value = true;
+            yield return WaitFor(() => IsVisible(Value()), "The nested boolean must bind before observing view-only changes.");
+            int notifications = 0;
+            bool editPublished = false;
+            host.RegisterValueChangeCallback(evt =>
+            {
+                notifications++;
+                editPublished |= ((Asset.BooleanGroupNode)asset.reference).details.value;
+            });
+            // Observe a committed edit first so initial native binding notifications
+            // cannot be mistaken for notifications from the following view changes.
+            Value().value = true;
+            yield return WaitFor(() => editPublished && ((Asset.BooleanGroupNode)asset.reference).details.value,
+                "The host must publish the child edit before counting view-only notifications.");
+            int before = notifications;
+            foreach (bool expanded in new[] { false, true })
+            {
+                Details().value = expanded;
+                yield return WaitFor(() => boundObject.FindProperty("reference.details").isExpanded == expanded
+                    && IsVisible(Value()) == expanded,
+                    "A child foldout must retain its native expansion binding.");
+                for (int frame = 0; frame < 8; frame++)
+                {
+                    yield return null;
+                }
+            }
+            Assert.That(notifications, Is.EqualTo(before), "Viewing a child must not report a serialized value edit.");
+            Value().value = false;
+            yield return WaitFor(() => notifications > before && !((Asset.BooleanGroupNode)asset.reference).details.value,
+                "Expansion filtering must preserve real child boolean commits and value notifications.");
+        }
+
+        [UnityTest]
+        public IEnumerator CollectionSelectionAndRemoval_MatchTheCurrentNativeVersion ()
+            => VerifyCollectionSelectionAndRemoval("numbers");
+
+        [UnityTest]
+        public IEnumerator ListSelectionAndRemoval_MatchTheCurrentNativeVersion ()
+            => VerifyCollectionSelectionAndRemoval("list");
+
+        private IEnumerator VerifyCollectionSelectionAndRemoval (string collection)
+        {
+            asset.reference = new Asset.CollectionSelectionNode();
+            asset.nativeReference = new Asset.CollectionSelectionNode();
+            PropertyField host = Bind(nameof(Asset.reference));
+            boundObject.FindProperty("nativeReference").isExpanded = true;
+            var native = new PropertyField(boundObject.FindProperty("nativeReference"));
+            window.rootVisualElement.Add(native);
+            native.Bind(boundObject);
+            ListView Control (VisualElement root, string prefix) => root.Query<ListView>().ToList()
+                .FirstOrDefault(list => list.bindingPath == prefix + "." + collection);
+            yield return WaitFor(() => Control(host, "reference")?.itemsSource != null
+                && Control(native, "nativeReference")?.itemsSource != null,
+                "Native and selector collections must bind before selecting rows.");
+            foreach (Foldout foldout in window.rootVisualElement.Query<Foldout>().ToList())
+            {
+                foldout.value = true;
+            }
+            ListView actual = Control(host, "reference");
+            ListView standard = Control(native, "nativeReference");
+            Assert.That(actual.selectionType, Is.EqualTo(standard.selectionType),
+                "The displayed native collection's public selection mode must be preserved.");
+            int selected = standard.selectionType == SelectionType.Multiple ? 2 : 1;
+            void SelectRows (ListView list, string prefix)
+            {
+                // Prepare only the selection permitted by the native mode. Selection
+                // mode is asserted separately because SetSelection bypasses that policy.
+                list.SetSelection(Enumerable.Range(0, selected).Select(index =>
+                    CollectionIndex(list, prefix + "." + collection + ".Array.data[" + index + "]")));
+            }
+            SelectRows(standard, "nativeReference");
+            SelectRows(actual, "reference");
+            yield return WaitFor(() => IsVisible(CollectionButton(native, "nativeReference." + collection, "-"))
+                && IsVisible(CollectionButton(host, "reference." + collection, "-")), "Both native removal controls must be visible.");
+            Submit(CollectionButton(native, "nativeReference." + collection, "-"));
+            yield return WaitFor(() => ReadArraySize(asset, "nativeReference." + collection) == 3 - selected,
+                "Native removal must establish the expected retained rows.");
+            Submit(CollectionButton(host, "reference." + collection, "-"));
+            yield return WaitFor(() => ReadArraySize(asset, "reference." + collection) == 3 - selected,
+                "The selector must remove the same selected rows as native.");
+            for (int i = 0; i < 3 - selected; i++)
+            {
+                Assert.That(ReadInt(asset, "reference." + collection + ".Array.data[" + i + "]"),
+                    Is.EqualTo(ReadInt(asset, "nativeReference." + collection + ".Array.data[" + i + "]")));
+            }
+        }
+
+        [UnityTest]
         public IEnumerator CollectionRows_MatchNativePropertyFieldLayout ()
             => VerifyCollectionLayout(new InspectorElement());
 
@@ -2533,6 +2749,38 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                 released.type = EventType.KeyUp;
                 window.SendEvent(released);
             }
+        }
+
+        private void Click (VisualElement element)
+        {
+            Assert.That(IsVisible(element), Is.True, "The native click target must be visible.");
+            Vector2 point = element.worldBound.center;
+            window.SendEvent(new Event { type = EventType.MouseMove, mousePosition = point });
+            // Keep disabled controls in the UITK event route; the EditorWindow's
+            // IMGUI bridge can discard them before their native Clickable receives input.
+            using (EventBase down = ClickEvent(new Event
+                { type = EventType.MouseDown, mousePosition = point, button = 0, clickCount = 1 }))
+            {
+                down.target = element;
+                element.SendEvent(down);
+            }
+            using (EventBase up = ClickEvent(new Event
+                { type = EventType.MouseUp, mousePosition = point, button = 0 }))
+            {
+                up.target = element;
+                element.SendEvent(up);
+            }
+        }
+
+        private static EventBase ClickEvent (Event input)
+        {
+#if UNITY_2023_2_OR_NEWER
+            return input.type == EventType.MouseDown
+                ? (EventBase)PointerDownEvent.GetPooled(input) : PointerUpEvent.GetPooled(input);
+#else
+            return input.type == EventType.MouseDown
+                ? (EventBase)MouseDownEvent.GetPooled(input) : MouseUpEvent.GetPooled(input);
+#endif
         }
 
         private static void Submit (Button button)

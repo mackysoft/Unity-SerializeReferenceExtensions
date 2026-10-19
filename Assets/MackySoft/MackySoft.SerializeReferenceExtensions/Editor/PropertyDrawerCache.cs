@@ -91,8 +91,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return drawerType;
         }
 
-        internal static bool HasPropertyDrawer (Type type) => GetPropertyDrawerType(type) != null;
-
         private static Type GetCustomPropertyDrawerType (Type type)
         {
             // Resolve the most specific class first, then an inherited interface drawer.

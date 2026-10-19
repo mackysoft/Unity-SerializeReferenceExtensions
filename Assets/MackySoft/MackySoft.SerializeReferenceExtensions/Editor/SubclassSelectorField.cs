@@ -51,6 +51,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             this.RegisterValueChangedCallback(OnExpansionChanged);
             FoldoutPropertyNotifications.Install(this);
             header = this.Q<Toggle>(className: Foldout.toggleUssClassName);
+            NativePropertyFieldControls.ConfigureFoldout(this);
             // Keep the actual native Toggle. Its binding and Inspector styles are
             // established before the header is placed beside the native PopupField.
 
@@ -66,7 +67,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         {
             // The native binding owns isExpanded. Ancestor custom drawers must not turn
             // this view state into a serialized value-change notification.
-            if (evt.target == this)
+            if (evt.target is Foldout)
             {
                 evt.StopPropagation();
             }
