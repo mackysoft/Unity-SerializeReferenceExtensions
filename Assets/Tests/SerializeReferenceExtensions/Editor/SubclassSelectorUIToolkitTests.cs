@@ -389,43 +389,42 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                 return collections.All(path => IsVisible(Marker("nativeReference", path)) && IsVisible(Marker("reference", path)));
             }
             VisualElement InputArea (IntegerField field) => field.Q<VisualElement>(className: BaseField<int>.inputUssClassName);
+            (Rect header, Rect content, Rect label, Rect input) Sample (string prefix, string collection)
+            {
+                IntegerField field = Marker(prefix, collection);
+                Foldout foldout = field.GetFirstAncestorOfType<Foldout>();
+                return (foldout.Q<Toggle>().worldBound, foldout.contentContainer.worldBound,
+                    field.labelElement.worldBound, InputArea(field).worldBound);
+            }
             foreach (float width in new[] { 520f, 700f })
             {
                 window.position = new Rect(100, 100, width, 1000);
-                yield return WaitFor(() => Ready() && Mathf.Abs(inspector.worldBound.width - scroll.contentViewport.worldBound.width) < 0.25f,
+                yield return WaitFor(() => Mathf.Abs(window.rootVisualElement.worldBound.width - width) < 0.25f
+                    && Ready() && Mathf.Abs(inspector.worldBound.width - scroll.contentViewport.worldBound.width) < 0.25f,
                     "The same typed drawer must render in native and selector collections before layout comparison.");
-                string previous = null;
-                int stable = 0;
-                var observations = new Queue<string>();
-                yield return WaitFor(() =>
+                var actual = new (Rect header, Rect content, Rect label, Rect input)[collections.Length];
+                var native = new (Rect header, Rect content, Rect label, Rect input)[collections.Length];
+                yield return ObserveInspectorPaint(inspector, width, () =>
                 {
-                    string current = string.Join(";", collections.Select(path => Marker("nativeReference", path).worldBound.ToString()
-                        + Marker("reference", path).worldBound));
-                    stable = current == previous ? stable + 1 : 0;
-                    previous = current;
-                    observations.Enqueue(current);
-                    if (observations.Count > 4)
+                    for (int i = 0; i < collections.Length; i++)
                     {
-                        observations.Dequeue();
+                        actual[i] = Sample("reference", collections[i]);
+                        native[i] = Sample("nativeReference", collections[i]);
                     }
-                    return stable >= 3;
-                }, "Both real drawer layouts must settle after resizing.", () => string.Join("\n", observations));
-                foreach (string path in collections)
+                });
+                for (int i = 0; i < collections.Length; i++)
                 {
-                    IntegerField actual = Marker("reference", path);
-                    IntegerField native = Marker("nativeReference", path);
-                    Foldout actualFoldout = actual.GetFirstAncestorOfType<Foldout>();
-                    Foldout nativeFoldout = native.GetFirstAncestorOfType<Foldout>();
-                    Assert.That(actualFoldout.Q<Toggle>().worldBound.x,
-                        Is.EqualTo(nativeFoldout.Q<Toggle>().worldBound.x).Within(0.25f), "Drawer header indentation: " + path);
-                    Assert.That(actualFoldout.contentContainer.worldBound.x,
-                        Is.EqualTo(nativeFoldout.contentContainer.worldBound.x).Within(0.25f), "Drawer content indentation: " + path);
-                    Assert.That(actual.labelElement.worldBound.x,
-                        Is.EqualTo(native.labelElement.worldBound.x).Within(0.25f), "Drawer label indentation: " + path);
-                    Assert.That(InputArea(actual).worldBound.xMin,
-                        Is.EqualTo(InputArea(native).worldBound.xMin).Within(0.25f), "Drawer input column: " + path);
-                    Assert.That(InputArea(actual).worldBound.xMax,
-                        Is.EqualTo(InputArea(native).worldBound.xMax).Within(0.25f), "Drawer input right margin: " + path);
+                    string path = collections[i];
+                    Assert.That(actual[i].header.x,
+                        Is.EqualTo(native[i].header.x).Within(0.25f), "Drawer header indentation: " + path);
+                    Assert.That(actual[i].content.x,
+                        Is.EqualTo(native[i].content.x).Within(0.25f), "Drawer content indentation: " + path);
+                    Assert.That(actual[i].label.x,
+                        Is.EqualTo(native[i].label.x).Within(0.25f), "Drawer label indentation: " + path);
+                    Assert.That(actual[i].input.xMin,
+                        Is.EqualTo(native[i].input.xMin).Within(0.25f), "Drawer input column: " + path);
+                    Assert.That(actual[i].input.xMax,
+                        Is.EqualTo(native[i].input.xMax).Within(0.25f), "Drawer input right margin: " + path);
                 }
             }
             Marker("reference", "simpleList").value = 997;
@@ -905,35 +904,36 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                 return pairs.All(pair => Child(pair.Item1) != null && Child(pair.Item2) != null
                     && Child(pair.Item2).worldBound.width > 0f);
             }
+            (Rect label, Rect input) Sample (string collection)
+            {
+                IntegerField field = Child(collection);
+                return (field.labelElement.worldBound, InputArea(field).worldBound);
+            }
             foreach (float width in new[] { 520f, 700f })
             {
                 window.position = new Rect(100, 100, width, 700);
-                yield return WaitFor(() => Mathf.Abs(inspector.worldBound.width - scroll.contentViewport.worldBound.width) < 0.25f && Ready(),
+                yield return WaitFor(() => Mathf.Abs(window.rootVisualElement.worldBound.width - width) < 0.25f
+                    && Mathf.Abs(inspector.worldBound.width - scroll.contentViewport.worldBound.width) < 0.25f && Ready(),
                     "Paired native and selector collections must bind before comparing their bodies.", () => DescribeInputs(inspector));
-                string previous = null;
-                int stableFrames = 0;
-                var observations = new Queue<string>();
-                yield return WaitFor(() =>
+                var actual = new (Rect label, Rect input)[pairs.Length];
+                var native = new (Rect label, Rect input)[pairs.Length];
+                yield return ObserveInspectorPaint(inspector, width, () =>
                 {
-                    string current = string.Join(";", pairs.Select(pair => Child(pair.Item2).labelElement.worldBound.ToString()
-                        + InputArea(Child(pair.Item2)).worldBound));
-                    stableFrames = current == previous ? stableFrames + 1 : 0;
-                    previous = current;
-                    observations.Enqueue(current);
-                    if (observations.Count > 4)
+                    for (int i = 0; i < pairs.Length; i++)
                     {
-                        observations.Dequeue();
+                        actual[i] = Sample(pairs[i].Item1);
+                        native[i] = Sample(pairs[i].Item2);
                     }
-                    return stableFrames >= 3;
-                }, "The native collection body must settle before comparison.", () => string.Join("\n", observations));
-                foreach (var pair in pairs)
+                });
+                for (int i = 0; i < pairs.Length; i++)
                 {
-                    Assert.That(Child(pair.Item1).labelElement.worldBound.x,
-                        Is.EqualTo(Child(pair.Item2).labelElement.worldBound.x).Within(0.25f), "Native child indentation: " + pair.Item1);
-                    Assert.That(InputArea(Child(pair.Item1)).worldBound.x,
-                        Is.EqualTo(InputArea(Child(pair.Item2)).worldBound.x).Within(0.25f), "Native child input column: " + pair.Item1);
-                    Assert.That(InputArea(Child(pair.Item1)).worldBound.width,
-                        Is.EqualTo(InputArea(Child(pair.Item2)).worldBound.width).Within(0.25f), "Native child width and right margin: " + pair.Item1);
+                    string path = pairs[i].Item1;
+                    Assert.That(actual[i].label.x,
+                        Is.EqualTo(native[i].label.x).Within(0.25f), "Native child indentation: " + path);
+                    Assert.That(actual[i].input.x,
+                        Is.EqualTo(native[i].input.x).Within(0.25f), "Native child input column: " + path);
+                    Assert.That(actual[i].input.width,
+                        Is.EqualTo(native[i].input.width).Within(0.25f), "Native child width and right margin: " + path);
                 }
             }
             foreach (string path in new[] { "array", "list" })
@@ -2798,6 +2798,30 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             window.rootVisualElement.Add(host);
             host.Bind(boundObject);
             return host;
+        }
+
+        private IEnumerator ObserveInspectorPaint (InspectorElement inspector, float width, Action observe)
+        {
+            bool painted = false;
+            Action<MeshGenerationContext> observePaint = _ =>
+            {
+                if (!painted && Mathf.Abs(window.rootVisualElement.worldBound.width - width) < 0.25f)
+                {
+                    observe();
+                    painted = true;
+                }
+            };
+            inspector.generateVisualContent += observePaint;
+            try
+            {
+                inspector.MarkDirtyRepaint();
+                yield return WaitFor(() => painted, "The Inspector must paint at the requested width before comparison.",
+                    () => "Requested width=" + width + "; root=" + window.rootVisualElement.worldBound);
+            }
+            finally
+            {
+                inspector.generateVisualContent -= observePaint;
+            }
         }
 
         private IEnumerator WaitFor (Func<bool> condition, string failure, Func<string> observation = null)
