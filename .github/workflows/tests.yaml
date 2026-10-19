@@ -71,17 +71,31 @@ jobs:
           key: Library-${{ runner.os }}-${{ matrix.unityVersion }}-EditMode-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
           restore-keys: Library-${{ runner.os }}-${{ matrix.unityVersion }}-EditMode-
 
+      - name: Install window manager for Editor windows
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends openbox x11-utils
+
       - name: Run EditMode tests
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
+          UNITY_EDITOR_VERSION: ${{ matrix.unityVersion }}
         run: |
+          mkdir -p Logs
           xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
-            unity --non-interactive test . \
-            --editor-version "${{ matrix.unityVersion }}" \
+            bash -euo pipefail <<'DISPLAY_SESSION'
+          # Xvfb supplies a display, but EditorWindow resize/focus also needs a WM.
+          openbox --sm-disable > Logs/window-manager.log 2>&1 &
+          window_manager_pid=$!
+          trap 'kill "$window_manager_pid" 2>/dev/null || true' EXIT
+          timeout 15 bash -c 'until xprop -root _NET_SUPPORTING_WM_CHECK | grep -q "window id"; do sleep 0.1; done'
+          unity --non-interactive test . \
+            --editor-version "$UNITY_EDITOR_VERSION" \
             --mode EditMode \
             --output Logs/TestResults/editmode.xml \
             --timeout 900 \
             -- -force-glcore -logFile Logs/editmode.log
+          DISPLAY_SESSION
 
       - name: Return Unity license
         if: always() && env.UNITY_LICENSE_ACTIVATION_ATTEMPTED == 'true'
