@@ -109,6 +109,10 @@ public class DebugCommand : ICommand {
 	public void Execute () {
 		Debug.Log(m_Message);
 	}
+
+	public override string ToString () {
+		return m_Message;
+	}
 }
 
 [Serializable]
@@ -138,6 +142,17 @@ public struct StructCommand : ICommand {
 	}
 }
 ```
+
+### Customize field labels
+
+Set `UseToStringAsLabel = true` to use the selected instance's `ToString()` result as the field label:
+
+```cs
+[SerializeReference, SubclassSelector(UseToStringAsLabel = true)]
+ICommand m_Command;
+```
+
+For example, `DebugCommand` above returns its message from `ToString()`. The option also applies to individual array and `List<T>` elements. Null references and mixed values in a multi-object selection keep the default field label.
 
 ### Copy and paste managed references
 
@@ -231,7 +246,7 @@ Also, [this thread](https://forum.unity.com/threads/serializereference-data-loss
 
 # <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
 
-I welcome feature requests and bug reports in [issues](https://github.com/mackysoft/XPool/issues) and [pull requests](https://github.com/mackysoft/XPool/pulls).
+I welcome feature requests and bug reports in [issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues).
 
 If you feel that my works are worthwhile, I would greatly appreciate it if you could sponsor me.
 
