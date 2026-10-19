@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace MackySoft.SerializeReferenceExtensions.Tests
 {
@@ -43,6 +45,79 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             else
             {
                 GetField<GenericMenu.MenuFunction>(item, "func")();
+            }
+        }
+
+        public static IDisposable CaptureNativeRequests (VisualElement root, Action<SerializedProperty> observe)
+        {
+            return new NativeRequestCapture(root, observe);
+        }
+
+#if UNITY_2022_2_OR_NEWER
+        public static void RequestFromUi (VisualElement input)
+        {
+            var systemEvent = new Event { type = EventType.MouseUp, button = 1, mousePosition = input.worldBound.center };
+            using (var evt = PointerUpEvent.GetPooled(systemEvent))
+            {
+                evt.target = input;
+                input.SendEvent(evt);
+            }
+        }
+#else
+        public static void RequestFromUi (VisualElement input)
+        {
+            var systemEvent = new Event { type = EventType.MouseUp, button = 1, mousePosition = input.worldBound.center };
+            using (var evt = MouseUpEvent.GetPooled(systemEvent))
+            {
+                evt.target = input;
+                input.SendEvent(evt);
+            }
+        }
+#endif
+
+        private sealed class NativeRequestCapture : IDisposable
+        {
+            private readonly VisualElement root;
+            private readonly Action<SerializedProperty> observe;
+
+            internal NativeRequestCapture (VisualElement root, Action<SerializedProperty> observe)
+            {
+                this.root = root;
+                this.observe = observe;
+                Register();
+            }
+
+#if UNITY_2022_2_OR_NEWER
+            private void Register () => root.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+            public void Dispose () => root.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+            private void OnPointerUp (PointerUpEvent evt) => Capture(evt, evt.button);
+#else
+            private void Register () => root.RegisterCallback<MouseUpEvent>(OnMouseUp, TrickleDown.TrickleDown);
+            public void Dispose () => root.UnregisterCallback<MouseUpEvent>(OnMouseUp, TrickleDown.TrickleDown);
+            private void OnMouseUp (MouseUpEvent evt) => Capture(evt, evt.button);
+#endif
+
+            private void Capture (EventBase evt, int button)
+            {
+                // Unity's binding stores the current property on its native menu receiver:
+                // a label in older Editors, or the containing BaseField in recent Editors.
+                // Observe that handoff before the native callback presents an OS menu;
+                // menu presentation and command execution have separate GUI coverage.
+                if (button != (int)MouseButton.RightMouse || !(evt.target is VisualElement element))
+                {
+                    return;
+                }
+                for (VisualElement receiver = element; receiver != null && receiver != root; receiver = receiver.hierarchy.parent)
+                {
+                    if (receiver.userData is SerializedProperty property
+                        && (receiver == element || receiver.ClassListContains(BaseField<bool>.ussClassName)))
+                    {
+                        evt.PreventDefault();
+                        evt.StopImmediatePropagation();
+                        observe(property);
+                        return;
+                    }
+                }
             }
         }
 

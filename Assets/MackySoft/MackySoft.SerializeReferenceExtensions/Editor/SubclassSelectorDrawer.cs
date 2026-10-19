@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
@@ -36,22 +37,35 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private readonly Dictionary<string, TypePopupCache> typePopups = new Dictionary<string, TypePopupCache>();
         private readonly Dictionary<string, GUIContent> typeNameCaches = new Dictionary<string, GUIContent>();
 
+        public override VisualElement CreatePropertyGUI (SerializedProperty property)
+        {
+            if (property.propertyType != SerializedPropertyType.ManagedReference)
+            {
+                return new HelpBox(IsNotManagedReferenceLabel.text, HelpBoxMessageType.Error);
+            }
+
+            // A drawer can be shared by several properties. Each binding owns its view and popup target.
+            var selector = new SubclassSelectorField(property, GetPropertyLabel(property), ((SubclassSelectorAttribute)attribute).UseToStringAsLabel,
+                UnityPropertyDrawerUtility.CaptureNextNestingLevel(property));
+            return DecoratorGUI.CreateGUI(selector, property);
+        }
+
+#if UNITY_2023_2_OR_NEWER
+        private string GetPropertyLabel (SerializedProperty property) => preferredLabel ?? property.displayName;
+#else
+        private string GetPropertyLabel (SerializedProperty property) => property.displayName;
+#endif
+
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
         {
             int controlID = GUIUtility.GetControlID(property.propertyPath.GetHashCode(), FocusType.Passive);
             var typeChangeState = (TypeChangeState)GUIUtility.GetStateObject(typeof(TypeChangeState), controlID);
             bool isManagedReference = property.propertyType == SerializedPropertyType.ManagedReference;
-#if UNITY_2021_3_OR_NEWER
             // Prepare the label before BeginProperty captures it for rendering.
-            if (isManagedReference && ((SubclassSelectorAttribute)attribute).UseToStringAsLabel && !property.hasMultipleDifferentValues)
+            if (isManagedReference)
             {
-                object managedReferenceValue = property.managedReferenceValue;
-                if (managedReferenceValue != null)
-                {
-                    label.text = managedReferenceValue.ToString();
-                }
+                UpdatePropertyLabel(property, label);
             }
-#endif
 
             EditorGUI.BeginProperty(position, label, property);
             try
@@ -88,22 +102,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     // Draw the foldout.
                     if (!string.IsNullOrEmpty(property.managedReferenceFullTypename))
                     {
-                        Rect foldoutRect = new Rect(position);
-                        foldoutRect.height = EditorGUIUtility.singleLineHeight;
-
-#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER && !UNITY_2022_3
-                        // NOTE: Position x must be adjusted.
-                        // FIXME: Is there a more essential solution...?
-                        // The most promising is UI Toolkit, but it is currently unable to reproduce all of SubclassSelector features. (Complete provision of contextual menu, e.g.)
-                        // 2021.3: No adjustment
-                        // 2022.1: No adjustment
-                        // 2022.2: Adjustment required
-                        // 2022.3: Adjustment required
-                        // 2023.1: Adjustment required
-                        // 2023.2: Adjustment required
-                        // 6000.0: No adjustment
-                        foldoutRect.x -= 12;
-#endif
+                        Rect foldoutRect = GetFoldoutRect(position);
 
                         property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, GUIContent.none, true);
                     }
@@ -152,11 +151,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                             }
                         }
 
-#if UNITY_6000_0_OR_NEWER
-                        // TextArea can defer its prefix label during Layout. Resolve it inside
-                        // this drawer's IMGUI context before UI Toolkit starts another one.
-                        GUIUtility.GetControlID(FocusType.Passive);
-#endif
+                        CompleteIMGUI();
                     }
                 }
                 else
@@ -169,6 +164,38 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 EditorGUI.EndProperty();
             }
         }
+
+#if UNITY_2021_3_OR_NEWER
+        private void UpdatePropertyLabel (SerializedProperty property, GUIContent label)
+        {
+            if (((SubclassSelectorAttribute)attribute).UseToStringAsLabel && !property.hasMultipleDifferentValues)
+            {
+                object value = property.managedReferenceValue;
+                if (value != null)
+                {
+                    label.text = value.ToString();
+                }
+            }
+        }
+#else
+        private void UpdatePropertyLabel (SerializedProperty property, GUIContent label) { }
+#endif
+
+#if UNITY_2022_2_OR_NEWER && !UNITY_6000_0_OR_NEWER && !UNITY_2022_3
+        private static Rect GetFoldoutRect (Rect position) => new Rect(position.x - 12, position.y, position.width, EditorGUIUtility.singleLineHeight);
+#else
+        private static Rect GetFoldoutRect (Rect position) => new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+#endif
+
+#if UNITY_6000_0_OR_NEWER
+        private static void CompleteIMGUI ()
+        {
+            // Resolve TextArea's deferred prefix label before UI Toolkit starts another context.
+            GUIUtility.GetControlID(FocusType.Passive);
+        }
+#else
+        private static void CompleteIMGUI () { }
+#endif
 
         private TypePopupCache GetTypePopup (SerializedProperty property)
         {
@@ -194,25 +221,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private static void SelectType (DeferredManagedReferenceTarget target, Type type, TypeChangeState changeState)
         {
-            if (target.TryExecute(properties =>
-            {
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    Type fieldType = ManagedReferenceUtility.GetType(properties[i].managedReferenceFieldTypename.Replace('/', '+'));
-                    if (!properties[i].editable || (type != null && (fieldType == null || !fieldType.IsAssignableFrom(type))))
-                    {
-                        return false;
-                    }
-                }
-
-                var values = new object[properties.Length];
-                for (int i = 0; i < properties.Length; i++)
-                {
-                    values[i] = ManagedReferenceUtility.CreateManagedReference(properties[i].managedReferenceValue, type);
-                }
-                ManagedReferenceUtility.ApplyManagedReferences(properties, values, "Change Managed Reference Type", true);
-                return true;
-            }))
+            if (ManagedReferenceSelection.SelectType(target, type, null))
             {
                 changeState.Pending = true;
             }
@@ -233,24 +242,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
 
             Type type = ManagedReferenceUtility.GetType(managedReferenceFullTypename);
-            string typeName = null;
-
-            AddTypeMenuAttribute typeMenu = TypeMenuUtility.GetAttribute(type);
-            if (typeMenu != null)
-            {
-                typeName = typeMenu.GetTypeNameWithoutPath();
-                if (!string.IsNullOrWhiteSpace(typeName))
-                {
-                    typeName = ObjectNames.NicifyVariableName(typeName);
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(typeName))
-            {
-                typeName = ObjectNames.NicifyVariableName(type.Name);
-            }
-
-            GUIContent result = new GUIContent(typeName);
+            GUIContent result = new GUIContent(TypeMenuUtility.GetTypeDisplayName(type));
             typeNameCaches.Add(managedReferenceFullTypename, result);
             return result;
         }

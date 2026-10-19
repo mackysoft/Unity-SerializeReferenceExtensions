@@ -7,7 +7,6 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 {
     public static class PropertyDrawerCache
     {
-
         private static readonly Dictionary<Type, Type> DrawerTypes = new Dictionary<Type, Type>();
 
         /// <summary> Creates an unbound custom drawer registered for the specified type. </summary>
@@ -17,68 +16,71 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         /// <remarks> A type-only lookup supplies neither declaring-field context nor Unity handler ownership. </remarks>
         public static bool TryGetPropertyDrawer (Type type, out PropertyDrawer drawer)
         {
+            Type drawerType = GetPropertyDrawerType(type);
+            drawer = drawerType != null ? (PropertyDrawer)Activator.CreateInstance(drawerType) : null;
+            return drawer != null;
+        }
+
+        private static Type GetPropertyDrawerType (Type type)
+        {
             if (!DrawerTypes.TryGetValue(type, out Type drawerType))
             {
                 drawerType = GetCustomPropertyDrawerType(type);
+                if (drawerType != null && !typeof(PropertyDrawer).IsAssignableFrom(drawerType))
+                {
+                    drawerType = null;
+                }
                 DrawerTypes.Add(type, drawerType);
             }
-            drawer = (drawerType != null) ? (PropertyDrawer)Activator.CreateInstance(drawerType) : null;
-            return (drawer != null);
+            return drawerType;
         }
 
         private static Type GetCustomPropertyDrawerType (Type type)
         {
-            Type[] interfaceTypes = type.GetInterfaces();
-
-            var types = TypeCache.GetTypesWithAttribute<CustomPropertyDrawer>();
-            foreach (Type drawerType in types)
+            // Resolve the most specific class first, then an inherited interface drawer.
+            // TypeCache enumeration order must not let a base drawer hide an exact match.
+            for (Type candidate = type; candidate != null; candidate = candidate.BaseType)
             {
-                var customPropertyDrawerAttributes = drawerType.GetCustomAttributes(typeof(CustomPropertyDrawer), true);
-                foreach (CustomPropertyDrawer customPropertyDrawer in customPropertyDrawerAttributes)
+                Type drawerType = GetExactDrawerType(candidate, candidate != type);
+                if (drawerType == null && candidate.IsGenericType && !candidate.IsGenericTypeDefinition)
                 {
-                    var field = customPropertyDrawer.GetType().GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (field != null)
-                    {
-                        var fieldType = field.GetValue(customPropertyDrawer) as Type;
-                        if (fieldType != null)
-                        {
-                            if (fieldType == type)
-                            {
-                                return drawerType;
-                            }
-
-                            // If the property drawer also allows for being applied to child classes, check if they match
-                            var useForChildrenField = customPropertyDrawer.GetType().GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance);
-                            if (useForChildrenField != null)
-                            {
-                                object useForChildrenValue = useForChildrenField.GetValue(customPropertyDrawer);
-                                if (useForChildrenValue is bool && (bool)useForChildrenValue)
-                                {
-                                    // Check interfaces
-                                    if (Array.Exists(interfaceTypes, interfaceType => interfaceType == fieldType))
-                                    {
-                                        return drawerType;
-                                    }
-
-                                    // Check derived types
-                                    Type baseType = type.BaseType;
-                                    while (baseType != null)
-                                    {
-                                        if (baseType == fieldType)
-                                        {
-                                            return drawerType;
-                                        }
-
-                                        baseType = baseType.BaseType;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    drawerType = GetExactDrawerType(candidate.GetGenericTypeDefinition(), candidate != type);
+                }
+                if (drawerType != null)
+                {
+                    return drawerType;
+                }
+            }
+            foreach (Type interfaceType in type.GetInterfaces())
+            {
+                Type drawerType = GetExactDrawerType(interfaceType, true);
+                if (drawerType != null)
+                {
+                    return drawerType;
                 }
             }
             return null;
         }
 
+        private static Type GetExactDrawerType (Type type, bool requireUseForChildren)
+        {
+            foreach (Type drawerType in TypeCache.GetTypesWithAttribute<CustomPropertyDrawer>())
+            {
+                foreach (CustomPropertyDrawer attribute in drawerType.GetCustomAttributes(typeof(CustomPropertyDrawer), true))
+                {
+                    var typeField = typeof(CustomPropertyDrawer).GetField("m_Type", BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (typeField?.GetValue(attribute) as Type != type)
+                    {
+                        continue;
+                    }
+                    var childrenField = typeof(CustomPropertyDrawer).GetField("m_UseForChildren", BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (!requireUseForChildren || childrenField?.GetValue(attribute) is true)
+                    {
+                        return drawerType;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

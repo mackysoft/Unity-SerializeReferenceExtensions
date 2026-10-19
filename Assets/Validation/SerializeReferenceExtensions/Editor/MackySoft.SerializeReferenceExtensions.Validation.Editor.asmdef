@@ -1,0 +1,6 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions.Validation.Editor",
+    "rootNamespace": "MackySoft.SerializeReferenceExtensions.Validation",
+    "references": ["MackySoft.SerializeReferenceExtensions.Validation"],
+    "includePlatforms": ["Editor"]
+}

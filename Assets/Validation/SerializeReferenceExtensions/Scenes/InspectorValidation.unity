@@ -1,0 +1,1507 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 9
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogMode: 3
+  m_FogDensity: 0.01
+  m_LinearFogStart: 0
+  m_LinearFogEnd: 300
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 0
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 1
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 1
+    m_PVRDenoiserTypeIndirect: 1
+    m_PVRDenoiserTypeAO: 1
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 5
+    m_PVRFilteringGaussRadiusAO: 2
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 2
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1001 &123237373
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 812996986223018854, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3643911779340852749, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: reference
+      value: 5296744878394310694
+      objectReference: {fileID: 0}
+    - target: {fileID: 3643911779340852749, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: managedReferences[5296744878394310694]
+      value: MackySoft.SerializeReferenceExtensions.Validation MackySoft.SerializeReferenceExtensions.Validation.NumberValue
+      objectReference: {fileID: 0}
+    - target: {fileID: 3643911779340852749, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: managedReferences[5296744878394310694].text
+      value: Prefab override
+      objectReference: {fileID: 0}
+    - target: {fileID: 3643911779340852749, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: managedReferences[5296744878394310694].number
+      value: 99
+      objectReference: {fileID: 0}
+    - target: {fileID: 7685932144513737918, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+      propertyPath: m_Name
+      value: 03 Prefab instance (with override)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dc9dc408bc4cb41df9f622c80ca6ccbc, type: 3}
+--- !u!1 &448786551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 448786553}
+  - component: {fileID: 448786552}
+  m_Layer: 0
+  m_Name: 02 IMGUI Inspector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &448786552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448786551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f52e8406cbe5486d83e20193b233630, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nativeNumber: 7
+  nativePopup: 32
+  nativeReference:
+    rid: 5296744878394310772
+  nativeArray:
+  - rid: 5296744878394310773
+  - rid: -2
+  - rid: 5296744878394310774
+  nativeList:
+  - rid: 5296744878394310775
+  - rid: -2
+  - rid: 5296744878394310776
+  nativeSimpleArray:
+  - rid: 5296744878394310777
+  - rid: -2
+  - rid: 5296744878394310778
+  nativeSimpleList:
+  - rid: 5296744878394310779
+  - rid: -2
+  - rid: 5296744878394310780
+  reference:
+    rid: 5296744878394310781
+  nullReference:
+    rid: -2
+  emptyValue:
+    rid: 5296744878394310782
+  described:
+    rid: 5296744878394310783
+  array:
+  - rid: 5296744878394310784
+  - rid: -2
+  - rid: 5296744878394310785
+  list:
+  - rid: 5296744878394310786
+  - rid: -2
+  - rid: 5296744878394310787
+  simpleArray:
+  - rid: 5296744878394310788
+  - rid: -2
+  - rid: 5296744878394310789
+  simpleList:
+  - rid: 5296744878394310790
+  - rid: -2
+  - rid: 5296744878394310791
+  emptyArray: []
+  emptyList: []
+  nested:
+    rid: 5296744878394310792
+  imguiDrawer:
+    rid: 5296744878394310793
+  uitoolkitDrawer:
+    rid: 5296744878394310794
+  dualDrawer:
+    rid: 5296744878394310795
+  inheritedDrawer:
+    rid: 5296744878394310796
+  drawerArray:
+  - rid: 5296744878394310797
+  - rid: 5296744878394310798
+  - rid: 5296744878394310799
+  - rid: -2
+  decorated:
+    rid: 5296744878394310800
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5296744878394310772
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310773
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310774
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310775
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310776
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310777
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310778
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310779
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310780
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310781
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310782
+      type: {class: EmptyValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data: 
+    - rid: 5296744878394310783
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 51
+        text: ToString label
+    - rid: 5296744878394310784
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310785
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310786
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310787
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310788
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310789
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310790
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310791
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310792
+      type: {class: NestedValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        nativeNumber: 17
+        child:
+          rid: 5296744878394310801
+        array:
+        - rid: 5296744878394310802
+        - rid: -2
+        - rid: 5296744878394310803
+        list:
+        - rid: 5296744878394310804
+        - rid: -2
+        - rid: 5296744878394310805
+        simpleArray:
+        - rid: 5296744878394310806
+        - rid: -2
+        - rid: 5296744878394310807
+        simpleList:
+        - rid: 5296744878394310808
+        - rid: -2
+        - rid: 5296744878394310809
+    - rid: 5296744878394310793
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310794
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310795
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310796
+      type: {class: InheritedDrawerValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310797
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310798
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310799
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310800
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310801
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310802
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310803
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310804
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310805
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310806
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310807
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310808
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310809
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+--- !u!4 &448786553
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448786551}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1114239486
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1114239488}
+  - component: {fileID: 1114239487}
+  m_Layer: 0
+  m_Name: 04 Multi selection A
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1114239487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114239486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd96a9122b2b4d6fa310c7e3e00823e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nativeNumber: 7
+  nativePopup: 32
+  nativeReference:
+    rid: 5296744878394310734
+  nativeArray:
+  - rid: 5296744878394310735
+  - rid: -2
+  - rid: 5296744878394310736
+  nativeList:
+  - rid: 5296744878394310737
+  - rid: -2
+  - rid: 5296744878394310738
+  nativeSimpleArray:
+  - rid: 5296744878394310739
+  - rid: -2
+  - rid: 5296744878394310740
+  nativeSimpleList:
+  - rid: 5296744878394310741
+  - rid: -2
+  - rid: 5296744878394310742
+  reference:
+    rid: 5296744878394310743
+  nullReference:
+    rid: -2
+  emptyValue:
+    rid: 5296744878394310744
+  described:
+    rid: 5296744878394310745
+  array:
+  - rid: 5296744878394310746
+  - rid: -2
+  - rid: 5296744878394310747
+  list:
+  - rid: 5296744878394310748
+  - rid: -2
+  - rid: 5296744878394310749
+  simpleArray:
+  - rid: 5296744878394310750
+  - rid: -2
+  - rid: 5296744878394310751
+  simpleList:
+  - rid: 5296744878394310752
+  - rid: -2
+  - rid: 5296744878394310753
+  emptyArray: []
+  emptyList: []
+  nested:
+    rid: 5296744878394310754
+  imguiDrawer:
+    rid: 5296744878394310755
+  uitoolkitDrawer:
+    rid: 5296744878394310756
+  dualDrawer:
+    rid: 5296744878394310757
+  inheritedDrawer:
+    rid: 5296744878394310758
+  drawerArray:
+  - rid: 5296744878394310759
+  - rid: 5296744878394310760
+  - rid: 5296744878394310761
+  - rid: -2
+  decorated:
+    rid: 5296744878394310762
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5296744878394310734
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310735
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310736
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310737
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310738
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310739
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310740
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310741
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310742
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310743
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310744
+      type: {class: EmptyValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data: 
+    - rid: 5296744878394310745
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 51
+        text: ToString label
+    - rid: 5296744878394310746
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310747
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310748
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310749
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310750
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310751
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310752
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310753
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310754
+      type: {class: NestedValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        nativeNumber: 17
+        child:
+          rid: 5296744878394310763
+        array:
+        - rid: 5296744878394310764
+        - rid: -2
+        - rid: 5296744878394310765
+        list:
+        - rid: 5296744878394310766
+        - rid: -2
+        - rid: 5296744878394310767
+        simpleArray:
+        - rid: 5296744878394310768
+        - rid: -2
+        - rid: 5296744878394310769
+        simpleList:
+        - rid: 5296744878394310770
+        - rid: -2
+        - rid: 5296744878394310771
+    - rid: 5296744878394310755
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310756
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310757
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310758
+      type: {class: InheritedDrawerValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310759
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310760
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310761
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310762
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310763
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310764
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310765
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310766
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310767
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310768
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310769
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310770
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310771
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+--- !u!4 &1114239488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114239486}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1448649267
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1448649269}
+  - component: {fileID: 1448649268}
+  m_Layer: 0
+  m_Name: 05 Multi selection B
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1448649268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448649267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd96a9122b2b4d6fa310c7e3e00823e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nativeNumber: 7
+  nativePopup: 32
+  nativeReference:
+    rid: 5296744878394310695
+  nativeArray:
+  - rid: 5296744878394310696
+  - rid: -2
+  - rid: 5296744878394310697
+  nativeList:
+  - rid: 5296744878394310698
+  - rid: -2
+  - rid: 5296744878394310699
+  nativeSimpleArray:
+  - rid: 5296744878394310700
+  - rid: -2
+  - rid: 5296744878394310701
+  nativeSimpleList:
+  - rid: 5296744878394310702
+  - rid: -2
+  - rid: 5296744878394310703
+  reference:
+    rid: 5296744878394310733
+  nullReference:
+    rid: -2
+  emptyValue:
+    rid: 5296744878394310705
+  described:
+    rid: 5296744878394310706
+  array:
+  - rid: 5296744878394310707
+  - rid: -2
+  - rid: 5296744878394310708
+  list:
+  - rid: 5296744878394310709
+  - rid: -2
+  - rid: 5296744878394310710
+  simpleArray:
+  - rid: 5296744878394310711
+  - rid: -2
+  - rid: 5296744878394310712
+  simpleList:
+  - rid: 5296744878394310713
+  - rid: -2
+  - rid: 5296744878394310714
+  emptyArray: []
+  emptyList: []
+  nested:
+    rid: 5296744878394310715
+  imguiDrawer:
+    rid: 5296744878394310716
+  uitoolkitDrawer:
+    rid: 5296744878394310717
+  dualDrawer:
+    rid: 5296744878394310718
+  inheritedDrawer:
+    rid: 5296744878394310719
+  drawerArray:
+  - rid: 5296744878394310720
+  - rid: 5296744878394310721
+  - rid: 5296744878394310722
+  - rid: -2
+  decorated:
+    rid: 5296744878394310723
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5296744878394310695
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310696
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310697
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310698
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310699
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310700
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310701
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310702
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310703
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310705
+      type: {class: EmptyValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data: 
+    - rid: 5296744878394310706
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 51
+        text: ToString label
+    - rid: 5296744878394310707
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310708
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310709
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310710
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310711
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310712
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310713
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310714
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310715
+      type: {class: NestedValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        nativeNumber: 17
+        child:
+          rid: 5296744878394310724
+        array:
+        - rid: 5296744878394310725
+        - rid: -2
+        - rid: 5296744878394310726
+        list:
+        - rid: 5296744878394310727
+        - rid: -2
+        - rid: 5296744878394310728
+        simpleArray:
+        - rid: 5296744878394310729
+        - rid: -2
+        - rid: 5296744878394310730
+        simpleList:
+        - rid: 5296744878394310731
+        - rid: -2
+        - rid: 5296744878394310732
+    - rid: 5296744878394310716
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310717
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310718
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310719
+      type: {class: InheritedDrawerValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310720
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310721
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310722
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310723
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310724
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310725
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310726
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310727
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310728
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310729
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310730
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310731
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310732
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310733
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+--- !u!4 &1448649269
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448649267}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1581035334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1581035336}
+  - component: {fileID: 1581035335}
+  m_Layer: 0
+  m_Name: 01 UI Toolkit Inspector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1581035335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581035334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd96a9122b2b4d6fa310c7e3e00823e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nativeNumber: 7
+  nativePopup: 32
+  nativeReference:
+    rid: 5296744878394310810
+  nativeArray:
+  - rid: 5296744878394310811
+  - rid: -2
+  - rid: 5296744878394310812
+  nativeList:
+  - rid: 5296744878394310813
+  - rid: -2
+  - rid: 5296744878394310814
+  nativeSimpleArray:
+  - rid: 5296744878394310815
+  - rid: -2
+  - rid: 5296744878394310816
+  nativeSimpleList:
+  - rid: 5296744878394310817
+  - rid: -2
+  - rid: 5296744878394310818
+  reference:
+    rid: 5296744878394310819
+  nullReference:
+    rid: -2
+  emptyValue:
+    rid: 5296744878394310820
+  described:
+    rid: 5296744878394310821
+  array:
+  - rid: 5296744878394310822
+  - rid: -2
+  - rid: 5296744878394310823
+  list:
+  - rid: 5296744878394310824
+  - rid: -2
+  - rid: 5296744878394310825
+  simpleArray:
+  - rid: 5296744878394310826
+  - rid: -2
+  - rid: 5296744878394310827
+  simpleList:
+  - rid: 5296744878394310828
+  - rid: -2
+  - rid: 5296744878394310829
+  emptyArray: []
+  emptyList: []
+  nested:
+    rid: 5296744878394310830
+  imguiDrawer:
+    rid: 5296744878394310831
+  uitoolkitDrawer:
+    rid: 5296744878394310832
+  dualDrawer:
+    rid: 5296744878394310833
+  inheritedDrawer:
+    rid: 5296744878394310834
+  drawerArray:
+  - rid: 5296744878394310835
+  - rid: 5296744878394310836
+  - rid: 5296744878394310837
+  - rid: -2
+  decorated:
+    rid: 5296744878394310838
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5296744878394310810
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310811
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310812
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310813
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310814
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310815
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310816
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310817
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310818
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310819
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310820
+      type: {class: EmptyValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data: 
+    - rid: 5296744878394310821
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 51
+        text: ToString label
+    - rid: 5296744878394310822
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 101
+        text: first
+    - rid: 5296744878394310823
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 103
+        text: last
+    - rid: 5296744878394310824
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 201
+        text: first
+    - rid: 5296744878394310825
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 203
+        text: last
+    - rid: 5296744878394310826
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 301
+        text: first
+    - rid: 5296744878394310827
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 303
+        text: last
+    - rid: 5296744878394310828
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 401
+        text: first
+    - rid: 5296744878394310829
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 403
+        text: last
+    - rid: 5296744878394310830
+      type: {class: NestedValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        nativeNumber: 17
+        child:
+          rid: 5296744878394310839
+        array:
+        - rid: 5296744878394310840
+        - rid: -2
+        - rid: 5296744878394310841
+        list:
+        - rid: 5296744878394310842
+        - rid: -2
+        - rid: 5296744878394310843
+        simpleArray:
+        - rid: 5296744878394310844
+        - rid: -2
+        - rid: 5296744878394310845
+        simpleList:
+        - rid: 5296744878394310846
+        - rid: -2
+        - rid: 5296744878394310847
+    - rid: 5296744878394310831
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310832
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310833
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310834
+      type: {class: InheritedDrawerValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310835
+      type: {class: IMGUIValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310836
+      type: {class: UIToolkitValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310837
+      type: {class: DualValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310838
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310839
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310840
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310841
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310842
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310843
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310844
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310845
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+    - rid: 5296744878394310846
+      type: {class: NumberValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 42
+        text: preserve this value when changing type
+    - rid: 5296744878394310847
+      type: {class: TextValue, ns: MackySoft.SerializeReferenceExtensions.Validation, asm: MackySoft.SerializeReferenceExtensions.Validation}
+      data:
+        number: 84
+        text: 'TextArea
+
+          Second line'
+--- !u!4 &1581035336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581035334}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

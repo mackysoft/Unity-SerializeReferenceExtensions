@@ -9,8 +9,8 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
     [CustomPropertyDrawer(typeof(DrawerContextTestAsset.StatefulNode))]
     public sealed class ContextualNodeDrawer : PropertyDrawer, IDisposable
     {
-        public static readonly List<(int TargetId, string PropertyPath)> DisposedContexts = new List<(int, string)>();
-        private int observedTargetId;
+        public static readonly List<(UnityEngine.Object Target, string PropertyPath)> DisposedContexts = new List<(UnityEngine.Object, string)>();
+        private UnityEngine.Object observedTarget;
         private string observedPath;
         private int edits;
 
@@ -27,7 +27,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         {
             if (observedPath == null)
             {
-                observedTargetId = property.serializedObject.targetObject.GetInstanceID();
+                observedTarget = property.serializedObject.targetObject;
                 observedPath = property.propertyPath;
             }
 
@@ -61,7 +61,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             IsDisposed = true;
             if (observedPath != null)
             {
-                DisposedContexts.Add((observedTargetId, observedPath));
+                DisposedContexts.Add((observedTarget, observedPath));
             }
         }
     }

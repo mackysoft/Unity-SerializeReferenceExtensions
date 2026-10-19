@@ -1,0 +1,5 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions.Validation",
+    "rootNamespace": "MackySoft.SerializeReferenceExtensions.Validation",
+    "references": ["MackySoft.SerializeReferenceExtensions"]
+}

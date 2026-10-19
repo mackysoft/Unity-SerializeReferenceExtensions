@@ -47,6 +47,14 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             Undo.SetCurrentGroupName(undoName);
             try
             {
+                // Incremental diffs can lose subtype data after collection reordering or
+                // Prefab reference-ID reuse. One complete snapshot owns Undo for this edit.
+                var targets = new UnityEngine.Object[properties.Length];
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    targets[i] = properties[i].serializedObject.targetObject;
+                }
+                Undo.RegisterCompleteObjectUndo(targets, undoName);
                 for (int i = 0; i < properties.Length; i++)
                 {
                     properties[i].managedReferenceValue = values[i];
@@ -54,7 +62,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                     {
                         properties[i].isExpanded = values[i] != null;
                     }
-                    properties[i].serializedObject.ApplyModifiedProperties();
+                    properties[i].serializedObject.ApplyModifiedPropertiesWithoutUndo();
                 }
             }
             finally
