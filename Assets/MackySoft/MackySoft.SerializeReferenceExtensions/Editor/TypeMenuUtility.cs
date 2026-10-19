@@ -15,6 +15,17 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             return Attribute.GetCustomAttribute(type, typeof(AddTypeMenuAttribute)) as AddTypeMenuAttribute;
         }
 
+        internal static string GetTypeDisplayName (Type type)
+        {
+            if (type == null)
+            {
+                return NullDisplayName;
+            }
+
+            string typeName = GetAttribute(type)?.GetTypeNameWithoutPath();
+            return ObjectNames.NicifyVariableName(!string.IsNullOrWhiteSpace(typeName) ? typeName : type.Name);
+        }
+
         public static string[] GetSplittedTypePath (Type type)
         {
             AddTypeMenuAttribute typeMenu = GetAttribute(type);

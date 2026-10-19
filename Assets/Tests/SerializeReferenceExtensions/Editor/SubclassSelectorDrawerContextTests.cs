@@ -56,6 +56,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                     UnityEngine.Object.DestroyImmediate(targets[i]);
                 }
             }
+            ContextualNodeDrawer.DisposedContexts.Clear();
         }
 
         [Test]
@@ -85,14 +86,14 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         {
             AssertContext(0, "native", "Native reference", 0);
             AssertContext(0, "primary", "Primary selector", 0);
-            int hostId = targets[0].GetInstanceID();
-            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.TargetId == hostId && context.PropertyPath == "native"), Is.False);
-            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.TargetId == hostId && context.PropertyPath == "primary"), Is.False);
+            UnityEngine.Object host = targets[0];
+            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.Target == host && context.PropertyPath == "native"), Is.False);
+            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.Target == host && context.PropertyPath == "primary"), Is.False);
 
             ReleaseEditor(0);
 
-            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.TargetId == hostId && context.PropertyPath == "native"), Is.True);
-            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.TargetId == hostId && context.PropertyPath == "primary"), Is.True);
+            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.Target == host && context.PropertyPath == "native"), Is.True);
+            Assert.That(ContextualNodeDrawer.DisposedContexts.Any(context => context.Target == host && context.PropertyPath == "primary"), Is.True);
         }
 
         [Test]

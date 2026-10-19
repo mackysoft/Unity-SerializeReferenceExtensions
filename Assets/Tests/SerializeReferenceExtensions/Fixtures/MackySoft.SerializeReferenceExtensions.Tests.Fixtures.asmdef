@@ -1,0 +1,8 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions.Tests.Fixtures",
+    "rootNamespace": "MackySoft.SerializeReferenceExtensions.Tests",
+    "references": ["MackySoft.SerializeReferenceExtensions"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

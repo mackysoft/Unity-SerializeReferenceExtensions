@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -49,7 +47,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         public IEnumerator SelectingType_NotifiesTheOwningPropertyChangeCheck ()
         {
             OpenPopup(1);
-            SelectItem("Beta");
+            TypePopupInteraction.SelectVisibleItem(popup, "Beta");
             yield return null;
             window.DrawNow();
 
@@ -63,7 +61,7 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
         public IEnumerator SelectingNull_NotifiesTheOwningPropertyChangeCheck ()
         {
             OpenPopup(1);
-            SelectItem("<null>");
+            TypePopupInteraction.SelectVisibleItem(popup, "<null>");
             yield return null;
             window.DrawNow();
 
@@ -100,30 +98,6 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             popup = Resources.FindObjectsOfTypeAll<EditorWindow>()
                 .SingleOrDefault(candidate => candidate.GetType().Name == "AdvancedDropdownWindow");
             Assert.That(popup, Is.Not.Null, "Clicking the property selector must open its type popup.");
-        }
-
-        private void SelectItem (string name)
-        {
-            // Unity exposes popup input through SendEvent, but its visible rows and keyboard selection are internal.
-            // Read those solely to navigate the real control; do not invoke the drawer's selection callback.
-            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var tree = (AdvancedDropdownItem)popup.GetType().GetField("m_CurrentlyRenderedTree", flags).GetValue(popup);
-            object state = popup.GetType().GetField("m_State", flags).GetValue(popup);
-            MethodInfo getSelectedIndex = state.GetType().GetMethod("GetSelectedIndex", flags);
-            AdvancedDropdownItem[] rows = tree.children.ToArray();
-            int targetIndex = Array.FindIndex(rows, row => row.name == name);
-            Assert.That(targetIndex, Is.GreaterThanOrEqualTo(0), "Popup item missing: " + name);
-
-            for (int step = 0; step <= rows.Length; step++)
-            {
-                if ((int)getSelectedIndex.Invoke(state, new object[] { tree }) == targetIndex)
-                {
-                    popup.SendEvent(new Event { type = EventType.KeyDown, keyCode = KeyCode.Return });
-                    return;
-                }
-                popup.SendEvent(new Event { type = EventType.KeyDown, keyCode = KeyCode.DownArrow });
-            }
-            Assert.Fail("Keyboard navigation did not reach popup item: " + name);
         }
 
         public interface IValue { }

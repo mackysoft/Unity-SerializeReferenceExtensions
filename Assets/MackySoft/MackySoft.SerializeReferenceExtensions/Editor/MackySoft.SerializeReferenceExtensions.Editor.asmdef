@@ -13,6 +13,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "[2022.3.24f1,2022.4)",
+            "define": "SERIALIZE_REFERENCE_EXTENSIONS_UNITY_2022_3_MR_TRACKER"
+        }
+    ],
     "noEngineReferences": false
 }
