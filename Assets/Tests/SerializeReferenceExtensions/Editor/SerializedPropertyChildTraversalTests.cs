@@ -27,12 +27,11 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
             }
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void CyclicReferences_ReturnTheRequestedFiniteDepth (bool mutual)
+        [Test]
+        public void MutualReferences_ReturnTheRequestedFiniteDepth ()
         {
             var first = new Asset.Cycle();
-            var second = mutual ? new Asset.Cycle() : first;
+            var second = new Asset.Cycle();
             first.next = second;
             second.next = first;
             target.reference = first;
@@ -48,6 +47,34 @@ namespace MackySoft.SerializeReferenceExtensions.Tests
                     "reference.visibleValue", "reference.next", "reference.next.visibleValue",
                     "reference.next.next", "reference.next.tailValue", "reference.tailValue"
                 }));
+            }
+        }
+
+        [Test]
+        public void SelfReference_StaysWithinTheRequestedDepthAndPreservesTheParent ()
+        {
+            var node = new Asset.Cycle();
+            node.next = node;
+            target.reference = node;
+            using (var serialized = new SerializedObject(target))
+            using (SerializedProperty parent = serialized.FindProperty("reference"))
+            {
+                var paths = new HashSet<string>();
+                // Native NextVisible can suppress re-entry into the same managed
+                // reference. Maximum depth does not require that re-entry to occur.
+                foreach (SerializedProperty child in parent.GetChildProperties(2))
+                {
+                    using (child)
+                    {
+                        Assert.That(child.depth, Is.InRange(parent.depth + 1, parent.depth + 2));
+                        Assert.That(paths.Add(child.propertyPath), Is.True, "Each returned property must be distinct.");
+                    }
+                }
+                Assert.That(paths, Does.Contain("reference.visibleValue"));
+                Assert.That(paths, Does.Contain("reference.next"));
+                Assert.That(paths, Does.Contain("reference.tailValue"));
+                Assert.That(parent.propertyPath, Is.EqualTo("reference"));
+                Assert.That(parent.managedReferenceValue, Is.SameAs(node));
             }
         }
 
