@@ -212,15 +212,9 @@ The dropdown list is built by:
 
 Unity does not allow `UnityEngine.Object` types, including `MonoBehaviour` and `ScriptableObject`, in `SerializeReference` fields. Its [SerializeReference documentation](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/SerializeReference.html) also excludes value types. Boxed structs may work in some scenarios; if you rely on them, verify serialization on your target Unity versions and prefer classes when possible.
 
-## ❓ FAQ
-
-<a id="if-the-type-is-renamed-the-reference-is-lost"></a>
-
-For answers to common questions, see the [FAQ](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/categories/faq).
-
 # <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
 
-If you have a question, first check [Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions) and existing [Issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues). If you cannot find a solution, open a new issue.
+If you have a question, first check [Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions), including the [FAQ](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/categories/faq), and existing [Issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues). If you cannot find a solution, open a new issue.
 
 If you feel that my works are worthwhile, I would greatly appreciate it if you could sponsor me.
 
