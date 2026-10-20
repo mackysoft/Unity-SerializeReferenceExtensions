@@ -50,6 +50,7 @@ jobs:
         unityVersion:
           - 2021.3.45f2
           - 6000.6.6f1
+          - 7000.0.0a11
 
     steps:
       - name: Checkout
