@@ -7,6 +7,8 @@ on:
         description: Package version and Git tag (for example 1.7.1).
         required: true
         type: string
+  release:
+    types: [published]
 
 concurrency:
   group: release-${{ github.ref }}
@@ -17,6 +19,7 @@ permissions:
 
 jobs:
   prepare:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     env:
       TARGET_FILE: ./Assets/MackySoft/MackySoft.SerializeReferenceExtensions/package.json
@@ -24,6 +27,32 @@ jobs:
       sha: ${{ steps.metadata.outputs.sha }}
       version: ${{ steps.metadata.outputs.version }}
     steps:
+      - name: Check signing credentials
+        env:
+          UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
+          UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
+        run: |
+          for setting in UPM_SERVICE_ACCOUNT_KEY_ID UPM_SERVICE_ACCOUNT_KEY_SECRET UPM_ORG_ID; do
+            if [[ -z "${!setting}" ]]; then
+              echo "::error::Repository secret $setting is required for signed OpenUPM releases."
+              exit 1
+            fi
+          done
+
+      # The Git tracker must stop packing unsigned source before a new tag exists.
+      - name: Require OpenUPM release asset tracking
+        run: |
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/openupm/openupm/master/data/packages/com.mackysoft.serializereference-extensions.yml \
+            --output "$RUNNER_TEMP/openupm-package.yml"
+          if ! yq --exit-status \
+            '.trackingMode == "githubRelease" and .githubReleaseAssetName == "com.mackysoft.serializereference-extensions-"' \
+            "$RUNNER_TEMP/openupm-package.yml" > /dev/null; then
+            echo "::error::Merge the OpenUPM metadata change to signed GitHub Release assets before releasing."
+            exit 1
+          fi
+
       - name: Create release app token
         id: release_app
         uses: actions/create-github-app-token@v3
@@ -54,6 +83,42 @@ jobs:
           VERSION: ${{ inputs.tag }}
           RELEASE_REF: ${{ github.ref }}
         run: bash .github/scripts/release.sh prepare
+
+  sign-upm:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+
+      - name: Install Unity UPM CLI
+        run: |
+          curl --fail --silent --show-error --location \
+            https://cdn.packages.unity.com/upm-cli/install.sh \
+            --output "$RUNNER_TEMP/install-upm.sh"
+          bash "$RUNNER_TEMP/install-upm.sh" v9.35.0
+          echo "$HOME/.upm/bin" >> "$GITHUB_PATH"
+          "$HOME/.upm/bin/upm" --version
+
+      - name: Pack and sign UPM package
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
+          UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
+        run: |
+          bash .github/scripts/sign-upm.sh \
+            Assets/MackySoft/MackySoft.SerializeReferenceExtensions \
+            "$RUNNER_TEMP/signed-upm"
+
+      - name: Upload signed UPM package
+        uses: actions/upload-artifact@v7
+        with:
+          name: Signed-UPM
+          path: ${{ runner.temp }}/signed-upm/*.tgz
+          if-no-files-found: error
 
   build:
     needs: prepare
@@ -131,7 +196,7 @@ jobs:
           path: Logs/
 
   create-release:
-    needs: [prepare, build]
+    needs: [prepare, build, sign-upm]
     runs-on: ubuntu-24.04
     steps:
       # Each job owns a short-lived token; prepare's token is revoked before build.
@@ -161,8 +226,14 @@ jobs:
         with:
           name: SerializeReference-Extensions.unitypackage
           path: SerializeReference-Extensions.unitypackage
-      
-      # Create release and upload unitypackage.
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: Signed-UPM
+          path: Signed-UPM
+
+      # Keep the release draft until its notes are ready. Both packages must be
+      # attached before publication makes the signed tarball visible to OpenUPM.
       - uses: softprops/action-gh-release@v3
         with:
           token: ${{ steps.release_app.outputs.token }}
@@ -171,4 +242,31 @@ jobs:
           target_commitish: ${{ needs.prepare.outputs.sha }}
           draft: true
           prerelease: false
-          files: SerializeReference-Extensions.unitypackage/SerializeReference-Extensions.unitypackage
+          fail_on_unmatched_files: true
+          files: |
+            SerializeReference-Extensions.unitypackage/SerializeReference-Extensions.unitypackage
+            Signed-UPM/*.tgz
+
+  publish-openupm:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Publish signed release to OpenUPM
+        id: openupm
+        uses: openupm/openupm-action@v1
+        with:
+          package: com.mackysoft.serializereference-extensions
+          tag: ${{ github.event.release.tag_name }}
+
+      - name: Require a signed OpenUPM version
+        env:
+          SIGNED: ${{ steps.openupm.outputs.signed }}
+        run: |
+          if [[ "$SIGNED" != true ]]; then
+            echo "::error::OpenUPM did not publish the signed package."
+            exit 1
+          fi
