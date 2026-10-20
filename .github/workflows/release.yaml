@@ -26,6 +26,7 @@ jobs:
     outputs:
       sha: ${{ steps.metadata.outputs.sha }}
       version: ${{ steps.metadata.outputs.version }}
+      asset_basename: ${{ steps.metadata.outputs.asset_basename }}
     steps:
       - name: Check signing credentials
         env:
@@ -148,12 +149,16 @@ jobs:
           tar -czf Build/StandaloneLinux64.tar.gz -C Build StandaloneLinux64
 
       - name: Export unitypackage
+        env:
+          RELEASE_ASSET_BASENAME: ${{ needs.prepare.outputs.asset_basename }}
         run: |
           unity --non-interactive run . \
             --editor-version 2021.3.45f2 \
             --log-file Logs/package.log \
             --timeout 900 \
             -- -nographics -executeMethod MackySoft.PackageTools.Editor.UnityPackageExporter.Export
+          mv -- Build/SerializeReference-Extensions.unitypackage \
+            "Build/$RELEASE_ASSET_BASENAME.unitypackage"
 
       - name: check all .meta is commited
         run: |
@@ -184,8 +189,8 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: SerializeReference-Extensions.unitypackage
-          path: ./Build/SerializeReference-Extensions.unitypackage
+          name: ${{ needs.prepare.outputs.asset_basename }}.unitypackage
+          path: ./Build/${{ needs.prepare.outputs.asset_basename }}.unitypackage
           if-no-files-found: error
 
       - name: Upload Unity logs
@@ -224,8 +229,8 @@ jobs:
       # Download the package artifact for the release.
       - uses: actions/download-artifact@v8
         with:
-          name: SerializeReference-Extensions.unitypackage
-          path: SerializeReference-Extensions.unitypackage
+          name: ${{ needs.prepare.outputs.asset_basename }}.unitypackage
+          path: UnityPackage
 
       - uses: actions/download-artifact@v8
         with:
@@ -244,7 +249,7 @@ jobs:
           prerelease: false
           fail_on_unmatched_files: true
           files: |
-            SerializeReference-Extensions.unitypackage/SerializeReference-Extensions.unitypackage
+            UnityPackage/${{ needs.prepare.outputs.asset_basename }}.unitypackage
             Signed-UPM/*.tgz
 
   publish-openupm:
