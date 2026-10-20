@@ -215,7 +215,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
 
             // Unity uses '/' for nested types in its static field type name; reflection uses '+'.
-            Type fieldType = ManagedReferenceUtility.GetType(property.managedReferenceFieldTypename.Replace('/', '+'));
+            Type fieldType = ManagedReferenceUtility.GetType(property.managedReferenceFieldTypename);
             return fieldType != null && fieldType.IsAssignableFrom(copiedType);
         }
 

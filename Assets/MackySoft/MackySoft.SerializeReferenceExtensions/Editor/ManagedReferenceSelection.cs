@@ -11,7 +11,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             {
                 for (int i = 0; i < properties.Length; i++)
                 {
-                    Type fieldType = ManagedReferenceUtility.GetType(properties[i].managedReferenceFieldTypename.Replace('/', '+'));
+                    Type fieldType = ManagedReferenceUtility.GetType(properties[i].managedReferenceFieldTypename);
                     if (!properties[i].editable || (type != null && (fieldType == null || !fieldType.IsAssignableFrom(type))))
                     {
                         return false;

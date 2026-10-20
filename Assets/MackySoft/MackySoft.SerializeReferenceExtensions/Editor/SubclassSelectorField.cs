@@ -420,7 +420,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             {
                 return;
             }
-            Type baseType = ManagedReferenceUtility.GetType(fieldTypeName.Replace('/', '+'));
+            Type baseType = ManagedReferenceUtility.GetType(fieldTypeName);
             var types = TypeSearchService.TypeCandiateService.GetDisplayableTypes(baseType);
             if (typePopup == null)
             {
