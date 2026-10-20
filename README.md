@@ -214,7 +214,7 @@ Unity does not allow `UnityEngine.Object` types, including `MonoBehaviour` and `
 
 # <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
 
-If you have a question, first check [Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions), including the [FAQ](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/categories/faq), and existing [Issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues). If you cannot find a solution, open a new issue.
+If you have a question, first check [Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions) and existing [Issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues). If you cannot find a solution, open a new issue.
 
 If you feel that my works are worthwhile, I would greatly appreciate it if you could sponsor me.
 
