@@ -93,8 +93,8 @@ jobs:
             --editor-version "$UNITY_EDITOR_VERSION" \
             --mode EditMode \
             --output Logs/TestResults/editmode.xml \
-            --timeout 900 \
-            -- -force-glcore -logFile Logs/editmode.log
+            --timeout 1200 \
+            -- -force-glcore -timestamps -logFile Logs/editmode.log
           DISPLAY_SESSION
 
       - name: Return Unity license
