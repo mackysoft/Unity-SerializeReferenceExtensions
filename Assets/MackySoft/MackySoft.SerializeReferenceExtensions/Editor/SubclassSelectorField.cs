@@ -96,6 +96,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             if (nativeHeader != null)
             {
                 nativeHeader.style.display = DisplayStyle.None;
+                nativeHeader.PrefixSlot.style.display = DisplayStyle.None;
             }
             // A parent can be traversing its children during Detach. Release the
             // owned header after that traversal, unless this view is reattached.
@@ -108,6 +109,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             if (nativeHeader != null && (panel == null || nativeHeader.Host != GetFirstAncestorOfType<PropertyField>()))
             {
                 hierarchy.Insert(0, header);
+                nativeHeader.PrefixSlot.RemoveFromHierarchy();
                 nativeHeader.RemoveFromHierarchy();
                 nativeHeader = null;
             }
@@ -128,6 +130,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             }
             if (nativeHeader?.Host != host)
             {
+                nativeHeader?.PrefixSlot.RemoveFromHierarchy();
                 nativeHeader?.RemoveFromHierarchy();
                 nativeHeader = new SubclassSelectorHeader(host, header, ShowTypePopup, HasCurrentMenuProperty);
             }
@@ -144,11 +147,17 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 nativeHeader.RemoveFromHierarchy();
                 container.hierarchy.Insert(container.hierarchy.IndexOf(this), nativeHeader);
             }
-            if (header.hierarchy.parent != nativeHeader)
+            if (nativeHeader.PrefixSlot.hierarchy.parent != container
+                || container.hierarchy.IndexOf(nativeHeader.PrefixSlot) != container.hierarchy.IndexOf(nativeHeader) - 1)
+            {
+                nativeHeader.PrefixSlot.RemoveFromHierarchy();
+                container.hierarchy.Insert(container.hierarchy.IndexOf(nativeHeader), nativeHeader.PrefixSlot);
+            }
+            if (header.hierarchy.parent != nativeHeader.PrefixSlot)
             {
                 // Native Add preserves Foldout as logical owner (including Simple
                 // ListView's direct-child selectors) while declaring its prefix slot.
-                headerSlot = nativeHeader;
+                headerSlot = nativeHeader.PrefixSlot;
                 try
                 {
                     Insert(0, header);
@@ -405,7 +414,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private void ShowTypePopup ()
         {
             if (panel == null || serializedObject.targetObject == null || !enabledInHierarchy
-                || nativeHeader == null || !nativeHeader.TypeField.enabledInHierarchy)
+                || nativeHeader == null || !nativeHeader.enabledInHierarchy)
             {
                 return;
             }
@@ -430,7 +439,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
             {
                 typePopup.SetTypes(types);
             }
-            typePopup.ShowForSelection(nativeHeader.TypeField.Input.worldBound, item => SelectType(target, item.Type));
+            typePopup.ShowForSelection(nativeHeader.Input.worldBound, item => SelectType(target, item.Type));
         }
 
         private void SelectType (DeferredManagedReferenceTarget target, Type type)

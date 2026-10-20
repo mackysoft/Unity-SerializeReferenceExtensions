@@ -9,7 +9,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 {
     // PopupField owns the line's flow and native input column. Foldout's actual
     // Toggle owns the prefix; neither control supplies measurements to the other.
-    internal sealed class SubclassSelectorHeader : VisualElement
+    internal sealed class SubclassSelectorHeader : SubclassSelectorTypeField
     {
         private static readonly Action<VisualElement, SerializedProperty> UpdatePrefabStyle = BindPrefabStyle();
         private static readonly Action<VisualElement> UpdateInspectorStyle = BindInspectorStyle();
@@ -18,23 +18,24 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
         private readonly VisualElement checkmark;
 
         internal PropertyField Host { get; }
-        internal SubclassSelectorTypeField TypeField { get; }
+        internal VisualElement PrefixSlot { get; }
 
         internal SubclassSelectorHeader (PropertyField host, Toggle toggle, Action showPopup, Func<bool> hasCurrentProperty)
+            : base(showPopup)
         {
             Host = host;
             this.toggle = toggle;
+            // Keep the native Foldout prefix outside PopupField's own margins.
+            // Its absolute Toggle consumes no flow height; the PopupField remains
+            // a direct child of PropertyField for Unity's list-row selectors.
+            PrefixSlot = new VisualElement { pickingMode = PickingMode.Ignore };
             toggle.showMixedValue = false;
             checkmark = toggle.Q(className: Toggle.checkmarkUssClassName);
-            pickingMode = PickingMode.Ignore;
-            style.justifyContent = Justify.Center;
-            TypeField = new SubclassSelectorTypeField(showPopup);
-            TypeField.SetValueWithoutNotify(TypeMenuUtility.NullDisplayName);
+            SetValueWithoutNotify(TypeMenuUtility.NullDisplayName);
             // The popup's real label region still participates in native alignment.
             // The Foldout Toggle renders the visible prefix, including its arrow.
-            TypeField.labelElement.style.visibility = Visibility.Hidden;
-            TypeField.Input.AddManipulator(new FoldoutPropertyMenuManipulator(toggle, hasCurrentProperty));
-            Add(TypeField);
+            labelElement.style.visibility = Visibility.Hidden;
+            Input.AddManipulator(new FoldoutPropertyMenuManipulator(toggle, hasCurrentProperty));
             toggle.style.position = Position.Absolute;
             toggle.style.left = 0;
             toggle.style.right = 0;
@@ -45,24 +46,26 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         internal void Refresh (SerializedProperty property, string label, bool mixedTypes, bool enabled, string tooltip)
         {
-            TypeField.label = label;
-            TypeField.tooltip = tooltip;
+            PrefixSlot.style.display = style.display;
+            PrefixSlot.visible = visible;
+            this.label = label;
+            this.tooltip = tooltip;
             toggle.tooltip = tooltip;
-            TypeField.SetEnabled(enabled);
+            SetEnabled(enabled);
             toggle.SetEnabled(enabled);
             // Foldout's bool is expansion state. Mixed serialized child values must
             // not replace its label or checkmark with Toggle's mixed-value content.
             toggle.showMixedValue = false;
             checkmark.style.visibility = mixedTypes || string.IsNullOrEmpty(property.managedReferenceFullTypename)
                 ? Visibility.Hidden : Visibility.Visible;
-            bool wasMixed = TypeField.showMixedValue;
-            TypeField.showMixedValue = mixedTypes;
+            bool wasMixed = showMixedValue;
+            showMixedValue = mixedTypes;
             string displayName = TypeMenuUtility.GetTypeDisplayName(property.managedReferenceValue?.GetType());
             // Clearing native mixed presentation does not restore its text. Recent
             // PopupFields retain the value, so the transition also needs a refresh.
-            if (!mixedTypes && (wasMixed || TypeField.value != displayName))
+            if (!mixedTypes && (wasMixed || value != displayName))
             {
-                TypeField.SetValueWithoutNotify(displayName);
+                SetValueWithoutNotify(displayName);
             }
             // Older bindings discover a Foldout header with a physical Q<Toggle>.
             // This header is still the bound Toggle, but now occupies the prefix slot.
