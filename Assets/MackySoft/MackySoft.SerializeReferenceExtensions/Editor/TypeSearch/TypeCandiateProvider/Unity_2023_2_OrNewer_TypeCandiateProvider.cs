@@ -73,7 +73,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
         private static IEnumerable<Type> EnumerateAllTypesSafely ()
         {
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var asm in GetLoadedAssemblies())
             {
                 Type[] types;
                 try
@@ -99,6 +99,16 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
                 }
             }
         }
+
+#if UNITY_7000_0_OR_NEWER
+        // CoreCLR can retain assemblies from unloading code contexts. Unity's
+        // assembly list excludes them so candidates belong to the current code.
+        private static IEnumerable<Assembly> GetLoadedAssemblies ()
+            => UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+        private static IEnumerable<Assembly> GetLoadedAssemblies ()
+            => AppDomain.CurrentDomain.GetAssemblies();
+#endif
     }
 }
 #endif
