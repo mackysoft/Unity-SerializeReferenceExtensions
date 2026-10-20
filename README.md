@@ -208,45 +208,19 @@ The dropdown list is built by:
 |generic base type (Unity < 2023.2)|⚠️| Unity engine limitations may prevent correct serialization of generic instances|
 
 
+### Unity serialization constraints
+
+Unity does not allow `UnityEngine.Object` types, including `MonoBehaviour` and `ScriptableObject`, in `SerializeReference` fields. Its [SerializeReference documentation](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/SerializeReference.html) also excludes value types. Boxed structs may work in some scenarios; if you rely on them, verify serialization on your target Unity versions and prefer classes when possible.
+
 ## ❓ FAQ
 
-### Why is my type not shown in the dropdown?
+<a id="if-the-type-is-renamed-the-reference-is-lost"></a>
 
-Check the eligibility rules:
-
-- Is it `[Serializable]`?
-- Is it `abstract`?
-- Is it a generic candidate type?
-- Does it derive from `UnityEngine.Object`?
-- Is `[HideInTypeMenu]` applied?
-
-### Can I select MonoBehaviour / ScriptableObject?
-
-No. Unity does not allow `UnityEngine.Object` types in `SerializeReference`.
-
-### Structs (value types)
-
-Unity documentation states that value types are not supported for SerializeReference,
-but in practice boxed structs may work in some scenarios.
-If you rely on structs, test on your target Unity versions and prefer classes when possible.
-
-### If the type is renamed, the reference is lost.
-
-It is a limitation of `SerializeReference` of Unity.
-
-When serializing a `SerializeReference` reference, the type name, namespace, and assembly name are used, so if any of these are changed, the reference cannot be resolved during deserialization.
-
-To solve this problem, `UnityEngine.Scripting.APIUpdating.MovedFromAttribute` can be used.
-
-Also, [this thread](https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/) will be helpful.
-
-#### References
-- https://forum.unity.com/threads/serializereference-data-loss-when-class-name-is-changed.736874/
-- https://issuetracker.unity3d.com/issues/serializereference-serialized-reference-data-lost-when-the-class-name-is-refactored
+See the [FAQ in Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/121) for shared references in collections, type migrations, custom Inspector integrations, and copy/paste scope.
 
 # <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
 
-I welcome feature requests and bug reports in [issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues).
+For usage questions and community discussions, visit [Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions). Feature requests and reproducible bug reports are welcome in [Issues](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/issues).
 
 If you feel that my works are worthwhile, I would greatly appreciate it if you could sponsor me.
 
