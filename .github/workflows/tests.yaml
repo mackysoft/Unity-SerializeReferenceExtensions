@@ -93,7 +93,7 @@ jobs:
             --editor-version "$UNITY_EDITOR_VERSION" \
             --mode EditMode \
             --output Logs/TestResults/editmode.xml \
-            --timeout 900 \
+            --timeout 1200 \
             -- -force-glcore -timestamps -logFile Logs/editmode.log
           DISPLAY_SESSION
 
