@@ -34,4 +34,9 @@ Existing published versions remain unchanged. See [OpenUPM's signing workflow](h
 3. The **Release / publish-openupm** job requests publication through GitHub OIDC
    and checks that OpenUPM reports the version as signed. No OpenUPM token is needed.
 
+Both release assets use `<package.json name>-<version>.<extension>`, for example:
+
+- `com.mackysoft.serializereference-extensions-2.0.1.unitypackage`
+- `com.mackysoft.serializereference-extensions-2.0.1.tgz`
+
 Keep the signed `.tgz` attached to the public Release so OpenUPM can retrieve it.

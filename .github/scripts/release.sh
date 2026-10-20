@@ -23,6 +23,7 @@ if [[ "$operation" == prepare ]]; then
   fi
 
   source_sha="$(git rev-parse HEAD)"
+  package_name="$(jq -er '.name' "$TARGET_FILE")"
   current_version="$(jq -er '.version | select(type == "string" and length > 0)' "$TARGET_FILE")"
   if [[ "$current_version" != "$VERSION" ]]; then
     manifest="$(mktemp "$RUNNER_TEMP/release-package-XXXXXX")"
@@ -58,8 +59,8 @@ if [[ "$operation" == prepare ]]; then
     git push --no-follow-tags --recurse-submodules=no \
       --force-with-lease="$RELEASE_REF:$source_sha" origin "$RELEASE_SHA:$RELEASE_REF"
   fi
-  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-  echo "sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+  printf 'version=%s\nsha=%s\nasset_basename=%s-%s\n' \
+    "$VERSION" "$RELEASE_SHA" "$package_name" "$VERSION" >> "$GITHUB_OUTPUT"
 elif [[ -z "$tag_commit" ]]; then
   git tag -- "$VERSION" "$RELEASE_SHA"
   # A non-forced tag push rejects a concurrent release for a different commit.
