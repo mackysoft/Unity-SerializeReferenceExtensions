@@ -216,7 +216,7 @@ Unity does not allow `UnityEngine.Object` types, including `MonoBehaviour` and `
 
 <a id="if-the-type-is-renamed-the-reference-is-lost"></a>
 
-See the [FAQ in Discussions](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/121) for shared references in collections, type migrations, custom Inspector integrations, and copy/paste scope.
+[FAQ](https://github.com/mackysoft/Unity-SerializeReferenceExtensions/discussions/categories/faq)
 
 # <a id="help-and-contribute" href="#help-and-contribute"> ✉ Help & Contribute </a>
 
