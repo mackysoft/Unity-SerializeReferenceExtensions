@@ -5,7 +5,7 @@
     "name": "MackySoft",
     "url": "https://github.com/mackysoft"
   },
-  "version": "2.0.0",
+  "version": "2.0.1",
   "unity": "2021.3",
   "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
   "keywords": [
