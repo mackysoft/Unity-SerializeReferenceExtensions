@@ -80,7 +80,15 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
             int splitIndex = typeName.IndexOf(' ');
             var assembly = Assembly.Load(typeName.Substring(0, splitIndex));
-            return assembly.GetType(typeName.Substring(splitIndex + 1));
+            string className = typeName.Substring(splitIndex + 1);
+            Type type = assembly.GetType(className);
+            // CoreCLR's serialized nested names use '/', while reflection uses '+'.
+            // Resolve them the same way as Unity's ScriptAttributeUtility.
+            if (type == null && className.IndexOf('/') >= 0)
+            {
+                type = assembly.GetType(className.Replace('/', '+'));
+            }
+            return type;
         }
 
     }

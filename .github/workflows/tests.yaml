@@ -5,7 +5,16 @@ on:
     branches:
       - main
   pull_request: {}
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      unityVersion:
+        description: 'Editor version for a targeted run (empty runs the full matrix)'
+        type: string
+        required: false
+      testFilter:
+        description: 'Unity test filter for a targeted run (empty runs all tests)'
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -47,9 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unityVersion:
-          - 2021.3.45f2
-          - 6000.6.6f1
+        unityVersion: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.unityVersion != '' && format('["{0}"]', inputs.unityVersion) || '["2021.3.45f2","6000.6.6f1","7000.0.0a11"]') }}
 
     steps:
       - name: Checkout
@@ -80,6 +87,7 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
           UNITY_EDITOR_VERSION: ${{ matrix.unityVersion }}
+          UNITY_TEST_FILTER: ${{ github.event_name == 'workflow_dispatch' && inputs.testFilter || '' }}
         run: |
           mkdir -p Logs
           xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
@@ -89,11 +97,16 @@ jobs:
           window_manager_pid=$!
           trap 'kill "$window_manager_pid" 2>/dev/null || true' EXIT
           timeout 15 bash -c 'until xprop -root _NET_SUPPORTING_WM_CHECK | grep -q "window id"; do sleep 0.1; done'
+          test_arguments=()
+          if [[ -n "$UNITY_TEST_FILTER" ]]; then
+            test_arguments+=(--filter "$UNITY_TEST_FILTER")
+          fi
           unity --non-interactive test . \
             --editor-version "$UNITY_EDITOR_VERSION" \
             --mode EditMode \
             --output Logs/TestResults/editmode.xml \
             --timeout 1200 \
+            "${test_arguments[@]}" \
             -- -force-glcore -timestamps -logFile Logs/editmode.log
           DISPLAY_SESSION
 
@@ -114,7 +127,7 @@ jobs:
           path: Logs/
 
   verify:
-    name: Verification
+    name: ${{ github.event_name == 'workflow_dispatch' && (inputs.unityVersion != '' || inputs.testFilter != '') && 'Targeted verification' || 'Verification' }}
     needs: [changes, test]
     if: always()
     runs-on: ubuntu-22.04

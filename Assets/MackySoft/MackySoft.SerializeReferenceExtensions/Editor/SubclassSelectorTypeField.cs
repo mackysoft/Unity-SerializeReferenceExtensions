@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
     // Keep the native PopupField hierarchy and theme; replace only menu activation.
-    internal sealed class SubclassSelectorTypeField : PopupField<string>
+    internal class SubclassSelectorTypeField : PopupField<string>
     {
         private readonly Action showPopup;
 
